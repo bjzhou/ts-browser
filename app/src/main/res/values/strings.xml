@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">TSBrowser</string>
+    <string name="form_resubmission">Form resubmission</string>
+    <string name="resend_data">Would you like to resend the data?</string>
+    <string name="warning">Warning</string>
+    <string name="insecue_message">Connection to this site is not secure\nProceed anyway?</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="signin">Sign in</string>
+    <string name="location">Location access</string>
+    <string name="location_message">%s want\'s to access your location.</string>
+    <string name="newtab">New tab</string>
+    <string name="download_message">Do you want to download file \"%1$s\"? (%2$s)</string>
+    <string name="unknown_size">unkown size</string>
+    <string name="download_channel">Download Notifications</string>
+    <string name="download_complete">Download complete</string>
+</resources>
