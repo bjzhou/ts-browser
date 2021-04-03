@@ -1,16 +1,21 @@
 package com.hinnka.tsbrowser.tab
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.webkit.WebView
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.web.TSWebView
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 object TabManager {
-    val tabs = mutableListOf<Tab>()
+    private val _tabs = mutableListOf<Tab>()
+    private val _currentTab = MutableLiveData<Tab?>()
+    private val _tabSize = MutableLiveData(_tabs.size)
+    val currentTab: LiveData<Tab?> = _currentTab
+    val tabs: List<Tab> = _tabs
+    val tabSize: LiveData<Int> = _tabSize
 
     private var idGenerator = 0
 
@@ -22,58 +27,41 @@ object TabManager {
             false,
             webView
         ).apply {
-            tabs.add(this)
+            _tabs.add(this)
+            _tabSize.postValue(_tabs.size)
         }
     }
 
     fun remove(id: Int) {
-        tabs.find { it.id == id }?.let {
+        _tabs.find { it.id == id }?.let {
             remove(it)
         }
+        _tabSize.postValue(_tabs.size)
     }
 
     fun remove(tab: Tab) {
-        tabs.remove(tab)
+        _tabs.remove(tab)
         tab.view.onDestroy()
+        _tabSize.postValue(_tabs.size)
     }
-}
 
-data class Tab(
-    val id: Int,
-    var title: String,
-    var icon: Bitmap?,
-    var isActive: Boolean = false,
-    var view: TSWebView,
-) {
-    init {
-
-        view.onCreateWindow = { message ->
-            message.apply {
-                val newWebView = TSWebView(view.context)
-                (obj as WebView.WebViewTransport).webView = newWebView
-                TabManager.newTab(view.context, newWebView).active()
-            }.sendToTarget()
-        }
-
-        view.onCloseWindow = {
-            TabManager.remove(this)
-        }
-
-        view.lifecycleScope.launchWhenCreated {
-            view.titleState.collect { title = it }
-            view.iconState.collect { icon = it }
+    fun active(tab: Tab) {
+        _tabs.forEach {
+            if (it == tab) {
+                it.isActive = true
+                it.view.onResume()
+                GlobalScope.launch {
+                    _currentTab.postValue(tab)
+                }
+            } else {
+                it.isActive = false
+                it.view.onPause()
+            }
         }
     }
+
 }
 
 fun Tab.active() {
-    TabManager.tabs.forEach {
-        if (it == this) {
-            it.isActive = true
-            it.view.onResume()
-        } else {
-            it.isActive = false
-            it.view.onPause()
-        }
-    }
+    TabManager.active(this)
 }

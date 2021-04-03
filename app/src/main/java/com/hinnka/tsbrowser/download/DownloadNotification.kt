@@ -22,7 +22,7 @@ object DownloadNotification {
 
     private fun createNotification(fileName: String): NotificationCompat.Builder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channel, App.instance[R.string.download_channel], NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(channel, App.instance[R.string.download_channel], NotificationManager.IMPORTANCE_HIGH)
             notificationManager?.createNotificationChannel(channel)
         }
         return NotificationCompat.Builder(App.instance, channel).apply {
@@ -30,6 +30,7 @@ object DownloadNotification {
             setProgress(100, 0, false)
             setSmallIcon(R.drawable.ic_launcher_foreground)
             setOngoing(true)
+            setCategory(NotificationCompat.CATEGORY_PROGRESS)
         }
     }
 

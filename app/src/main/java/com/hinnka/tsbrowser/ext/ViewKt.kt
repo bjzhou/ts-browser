@@ -14,9 +14,9 @@ fun View.removeFromParent() {
 fun View.setFullScreen(enable: Boolean) {
     val controller = ViewCompat.getWindowInsetsController(this)
     if (enable) {
-        controller?.hide(WindowInsetsCompat.Type.systemBars())
+        controller?.hide(WindowInsetsCompat.Type.statusBars())
     } else {
-        controller?.show(WindowInsetsCompat.Type.systemBars())
+        controller?.show(WindowInsetsCompat.Type.statusBars())
     }
 }
 

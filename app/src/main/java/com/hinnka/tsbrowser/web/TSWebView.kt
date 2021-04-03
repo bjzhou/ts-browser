@@ -17,16 +17,12 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.VideoView
 import androidx.core.view.children
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.activity
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.ext.setFullScreen
 import com.hinnka.tsbrowser.ui.base.BaseActivity
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import kotlin.coroutines.resume
@@ -42,10 +38,10 @@ class TSWebView @JvmOverloads constructor(
     private var origOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private val downloadHandler = DownloadHandler(context)
 
-    val urlState = MutableStateFlow("")
-    val progressState = MutableStateFlow(0)
-    val titleState = MutableStateFlow("")
-    val iconState = MutableStateFlow<Bitmap?>(null)
+    val urlState = MutableLiveData("")
+    val progressState = MutableLiveData(0f)
+    val titleState = MutableLiveData("")
+    val iconState = MutableLiveData<Bitmap?>()
 
     var onCreateWindow: (Message) -> Unit = {}
     var onCloseWindow: () -> Unit = {}
@@ -105,21 +101,21 @@ class TSWebView @JvmOverloads constructor(
     override fun loadUrl(url: String) {
         super.loadUrl(url)
         lifecycleScope.launchWhenResumed {
-            urlState.emit(url)
+            urlState.postValue(url)
         }
     }
 
     override fun loadUrl(url: String, additionalHttpHeaders: MutableMap<String, String>) {
         super.loadUrl(url, additionalHttpHeaders)
         lifecycleScope.launchWhenResumed {
-            urlState.emit(url)
+            urlState.postValue(url)
         }
     }
 
     override fun loadData(data: String, mimeType: String?, encoding: String?) {
         super.loadData(data, mimeType, encoding)
         lifecycleScope.launchWhenResumed {
-            urlState.emit(data.substring(0, min(10, data.length)))
+            urlState.postValue(data.substring(0, min(10, data.length)))
         }
     }
 
@@ -132,7 +128,7 @@ class TSWebView @JvmOverloads constructor(
     ) {
         super.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl)
         lifecycleScope.launchWhenResumed {
-            urlState.emit(baseUrl ?: "")
+            urlState.postValue(baseUrl ?: "")
         }
     }
 
@@ -159,19 +155,19 @@ class TSWebView @JvmOverloads constructor(
 
     override fun onProgressChanged(progress: Int) {
         lifecycleScope.launchWhenResumed {
-            progressState.emit(progress)
+            progressState.postValue(progress * 1f / 100)
         }
     }
 
     override fun onReceivedTitle(title: String?) {
         lifecycleScope.launchWhenResumed {
-            titleState.emit(title ?: urlState.value)
+            titleState.postValue(title ?: urlState.value)
         }
     }
 
     override fun onReceivedIcon(icon: Bitmap?) {
         lifecycleScope.launchWhenResumed {
-            iconState.emit(icon)
+            iconState.postValue(icon)
         }
     }
 
@@ -243,7 +239,7 @@ class TSWebView @JvmOverloads constructor(
     override fun onPageStarted(url: String, favicon: Bitmap?) {
         lifecycleScope.launchWhenResumed {
             favicon?.let {
-                iconState.emit(it)
+                iconState.postValue(it)
             }
         }
     }

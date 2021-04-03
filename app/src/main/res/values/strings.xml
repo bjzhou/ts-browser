@@ -11,7 +11,8 @@
     <string name="location_message">%s want\'s to access your location.</string>
     <string name="newtab">New tab</string>
     <string name="download_message">Do you want to download file \"%1$s\"? (%2$s)</string>
-    <string name="unknown_size">unkown size</string>
+    <string name="unknown_size">unknown size</string>
     <string name="download_channel">Download Notifications</string>
     <string name="download_complete">Download complete</string>
+    <string name="address_bar">Search or type web address.</string>
 </resources>

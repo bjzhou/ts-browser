@@ -4,11 +4,10 @@ Top secret Browser!
 
 ## TODO
 
-- [ ] progress
-- [ ] handle back key
+- [ ] tab list
 - [ ] tab ui
 - [ ] address bar ui
-- [ ] more menu
+- [ ] search history
 - [ ] drawer
 - [ ] secret code & secret mode change
 - [ ] bookmark
