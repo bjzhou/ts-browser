@@ -1,14 +1,11 @@
 package com.hinnka.tsbrowser.tab
 
-import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.lifecycle.LiveData
 import com.hinnka.tsbrowser.web.TSWebView
 
 data class Tab(
     val id: Int,
-    var title: String,
-    var icon: Bitmap?,
     var isActive: Boolean = false,
     var view: TSWebView,
 ) {

@@ -15,4 +15,6 @@
     <string name="download_channel">Download Notifications</string>
     <string name="download_complete">Download complete</string>
     <string name="address_bar">Search or type web address.</string>
+    <string name="untiled">Untitled</string>
+    <string name="closeAll">Close all</string>
 </resources>

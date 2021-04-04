@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -152,6 +153,18 @@ class TSWebView @JvmOverloads constructor(
         destroy()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
+
+    val thumbnail: Bitmap
+        get() {
+            if (width == 0 || height == 0) {
+                return Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+            }
+            val bitmap = Bitmap.createBitmap(width / 2, height / 2, Bitmap.Config.RGB_565)
+            val canvas = Canvas(bitmap)
+            canvas.scale(0.5f, 0.5f)
+            draw(canvas)
+            return bitmap
+        }
 
     override fun onProgressChanged(progress: Int) {
         lifecycleScope.launchWhenResumed {

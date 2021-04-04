@@ -1,6 +1,6 @@
 package com.hinnka.tsbrowser.ui.home
 
-import android.view.View
+import android.widget.FrameLayout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,18 +8,33 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
+import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.tab.TabManager
 
 @Composable
-fun MainView(tabContainer: View) {
+fun MainView() {
+    val owner = LocalLifecycleOwner.current
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
-            factory = { tabContainer },
-            modifier = Modifier.fillMaxSize()
+            factory = {
+                FrameLayout(it)
+            },
+            modifier = Modifier.fillMaxSize(),
+            update = { tabContainer ->
+                TabManager.currentTab.observe(owner) { t ->
+                    t?.let {
+                        tabContainer.removeAllViews()
+                        it.view.removeFromParent()
+                        tabContainer.addView(it.view)
+                    }
+                }
+            }
         )
         ProgressIndicator()
     }
@@ -39,6 +54,7 @@ fun ProgressIndicator() {
     AnimatedVisibility(visible = progress > 0f && progress < 1f) {
         LinearProgressIndicator(
             progress = progress,
+            color = MaterialTheme.colors.secondary,
             modifier = Modifier.fillMaxWidth()
         )
     }
