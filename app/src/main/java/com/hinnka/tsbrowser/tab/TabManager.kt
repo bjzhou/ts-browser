@@ -1,11 +1,22 @@
 package com.hinnka.tsbrowser.tab
 
 import android.content.Context
+import android.os.Parcel
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.MutableLiveData
+import com.hinnka.tsbrowser.db.TabEntity
+import com.hinnka.tsbrowser.db.Tabs
+import com.hinnka.tsbrowser.ext.decodeBitmap
+import com.hinnka.tsbrowser.ext.encodeToPath
+import com.hinnka.tsbrowser.ext.ioScope
+import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.web.TSWebView
+import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object TabManager {
     val tabs = mutableStateListOf<Tab>()
@@ -46,14 +57,70 @@ object TabManager {
         tabs.forEach {
             if (it == tab) {
                 it.isActive = true
-                it.view.onResume()
+                it.onResume()
                 GlobalScope.launch {
                     currentTab.postValue(tab)
                 }
             } else {
                 it.isActive = false
-                it.view.onPause()
+                it.onPause()
             }
+        }
+    }
+
+    fun onResume(uiState: UIState) {
+        currentTab.value?.view?.resumeTimers()
+        if (uiState == UIState.Main) {
+            currentTab.value?.onResume()
+        }
+    }
+
+    fun onPause() {
+        currentTab.value?.onPause()
+        currentTab.value?.view?.pauseTimers()
+        saveTabs()
+    }
+
+    fun saveTabs() {
+        ioScope.launch {
+            val mmkv = MMKV.defaultMMKV()
+            val tabs = Tabs(tabs.map {
+                val url = it.urlState.value ?: ""
+                TabEntity(
+                    it.id,
+                    it.isActive,
+                    it.titleState.value ?: "",
+                    it.iconState.value?.encodeToPath("icon-$url"),
+                    url,
+                    it.previewState.value?.encodeToPath("preview-$url")
+                )
+            })
+            mmkv?.encode("tabs", tabs)
+        }
+    }
+
+    fun loadTabs(context: Context) {
+        ioScope.launch {
+            val mmkv = MMKV.defaultMMKV()
+            val tabs = mmkv?.decodeParcelable("tabs", Tabs::class.java) ?: return@launch
+            val savedTabs = tabs.list.map {
+                val webview = withContext(Dispatchers.Main) {
+                    TSWebView(context)
+                }
+                Tab(it.id, it.isActive, webview).apply {
+                    view.titleState.postValue(it.title)
+                    view.iconState.postValue(it.iconPath?.decodeBitmap())
+                    view.previewState.postValue(it.thumbnailPath?.decodeBitmap())
+                    if (isActive) {
+                        currentTab.postValue(this)
+                    }
+                    view.post {
+                        view.loadUrl(it.url)
+                    }
+                }
+            }
+            TabManager.tabs.clear()
+            TabManager.tabs.addAll(savedTabs)
         }
     }
 

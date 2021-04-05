@@ -21,9 +21,12 @@ import androidx.core.view.children
 import androidx.lifecycle.*
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.activity
+import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.ext.setFullScreen
 import com.hinnka.tsbrowser.ui.base.BaseActivity
+import com.hinnka.tsbrowser.util.Settings
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import kotlin.coroutines.resume
@@ -43,6 +46,7 @@ class TSWebView @JvmOverloads constructor(
     val progressState = MutableLiveData(0f)
     val titleState = MutableLiveData("")
     val iconState = MutableLiveData<Bitmap?>()
+    val previewState = MutableLiveData<Bitmap?>()
 
     var onCreateWindow: (Message) -> Unit = {}
     var onCloseWindow: () -> Unit = {}
@@ -100,13 +104,20 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun loadUrl(url: String) {
-        super.loadUrl(url)
+        if (Settings.dnt) {
+            super.loadUrl(url, mapOf("DNT" to "1"))
+        } else {
+            super.loadUrl(url)
+        }
         lifecycleScope.launchWhenResumed {
             urlState.postValue(url)
         }
     }
 
     override fun loadUrl(url: String, additionalHttpHeaders: MutableMap<String, String>) {
+        if (Settings.dnt) {
+            additionalHttpHeaders["DNT"] = "1"
+        }
         super.loadUrl(url, additionalHttpHeaders)
         lifecycleScope.launchWhenResumed {
             urlState.postValue(url)
@@ -154,17 +165,18 @@ class TSWebView @JvmOverloads constructor(
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
 
-    val thumbnail: Bitmap
-        get() {
-            if (width == 0 || height == 0) {
-                return Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
-            }
+    fun generatePreview() {
+        if (width == 0 || height == 0) {
+            return
+        }
+        ioScope.launch {
             val bitmap = Bitmap.createBitmap(width / 2, height / 2, Bitmap.Config.RGB_565)
             val canvas = Canvas(bitmap)
             canvas.scale(0.5f, 0.5f)
             draw(canvas)
-            return bitmap
+            previewState.postValue(bitmap)
         }
+    }
 
     override fun onProgressChanged(progress: Int) {
         lifecycleScope.launchWhenResumed {
@@ -184,8 +196,13 @@ class TSWebView @JvmOverloads constructor(
         }
     }
 
-    override fun onShowCustomView(view: View, requestedOrientation: Int, callback: WebChromeClient.CustomViewCallback) {
-        origOrientation = activity?.requestedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    override fun onShowCustomView(
+        view: View,
+        requestedOrientation: Int,
+        callback: WebChromeClient.CustomViewCallback
+    ) {
+        origOrientation =
+            activity?.requestedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         if (fullScreenView != null) {
             callback.onCustomViewHidden()
         }

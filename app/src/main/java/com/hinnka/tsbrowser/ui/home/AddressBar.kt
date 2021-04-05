@@ -59,7 +59,9 @@ fun AddressBar(uiState: MutableState<UIState>) {
                 }
             }
             AnimatedVisibility(visible = uiState.value == UIState.Main) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    TabManager.currentTab.value?.goHome()
+                }) {
                     Icon(imageVector = Icons.Default.Home, contentDescription = "Home")
                 }
             }
@@ -192,7 +194,7 @@ fun NewTab(uiState: MutableState<UIState>) {
                 TabManager
                     .newTab(context)
                     .apply {
-                        loadUrl("https://www.baidu.com")
+                        goHome()
                         active()
                     }
                 uiState.value = UIState.Main

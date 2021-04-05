@@ -55,16 +55,19 @@ fun TabList(uiState: MutableState<UIState>) {
 
 @Composable
 fun TabItem(tab: Tab, uiState: MutableState<UIState>) {
-    val icon = tab.view.iconState.observeAsState()
-    val title = tab.view.titleState.observeAsState()
-    Column(modifier = Modifier.tap {
-        tab.active()
-        uiState.value = UIState.Main
-    }.border(
-        width = if (tab.isActive) 2.dp else 0.dp,
-        color = MaterialTheme.colors.secondary,
-        shape = RoundedCornerShape(4.dp)
-    )) {
+    val icon = tab.iconState.observeAsState()
+    val title = tab.titleState.observeAsState()
+    val preview = tab.previewState.observeAsState()
+    Column(modifier = Modifier
+        .tap {
+            tab.active()
+            uiState.value = UIState.Main
+        }
+        .border(
+            width = if (tab.isActive) 2.dp else 0.dp,
+            color = MaterialTheme.colors.secondary,
+            shape = RoundedCornerShape(4.dp)
+        )) {
         Row(modifier = Modifier.height(28.dp), verticalAlignment = Alignment.CenterVertically) {
             icon.value?.let {
                 Image(
@@ -82,16 +85,22 @@ fun TabItem(tab: Tab, uiState: MutableState<UIState>) {
                 maxLines = 1,
                 modifier = Modifier.weight(1f)
             )
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Close",
+            Box(
                 modifier = Modifier
-                    .size(22.dp)
-                    .padding(3.dp)
+                    .size(28.dp)
                     .clickable {
                         TabManager.remove(tab)
-                    }
-            )
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    modifier = Modifier
+                        .size(22.dp)
+                        .padding(3.dp)
+                )
+            }
         }
         Spacer(
             modifier = Modifier
@@ -99,11 +108,13 @@ fun TabItem(tab: Tab, uiState: MutableState<UIState>) {
                 .fillMaxWidth()
                 .background(Color.LightGray)
         )
-        Image(
-            bitmap = tab.view.thumbnail.asImageBitmap(),
-            contentDescription = tab.urlState.value,
-            alignment = Alignment.TopCenter,
-            contentScale = ContentScale.FillWidth
-        )
+        preview.value?.asImageBitmap()?.let {
+            Image(
+                bitmap = it,
+                contentDescription = tab.urlState.value,
+                alignment = Alignment.TopCenter,
+                contentScale = ContentScale.FillWidth
+            )
+        }
     }
 }

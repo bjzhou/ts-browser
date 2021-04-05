@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -58,4 +59,5 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
 
     implementation "com.github.ssseasonnn:RxDownload:1.0.9"
+    implementation 'com.tencent:mmkv-static:1.2.7'
 }

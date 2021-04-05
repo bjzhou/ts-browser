@@ -4,11 +4,13 @@ Top secret Browser!
 
 ## TODO
 
-- [ ] homepage
-- [ ] new tab url
+- [ ] scroll hide bar
+- [ ] long press
+- [ ] new tab ui
+- [ ] https info
 - [ ] search history
-- [ ] save tabs
 - [ ] drawer
+- [ ] downloads ui
 - [ ] secret code & secret mode change
 - [ ] bookmark
 - [ ] history

@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.tab
 
+import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.lifecycle.LiveData
 import com.hinnka.tsbrowser.web.TSWebView
@@ -12,9 +13,11 @@ data class Tab(
 
     val progressState: LiveData<Float> = view.progressState
     val urlState: LiveData<String?> = view.urlState
+    val titleState: LiveData<String?> = view.titleState
+    val iconState: LiveData<Bitmap?> = view.iconState
+    val previewState: LiveData<Bitmap?> = view.previewState
 
     init {
-
         view.onCreateWindow = { message ->
             message.apply {
                 val newWebView = TSWebView(view.context)
@@ -32,6 +35,21 @@ data class Tab(
         view.post {
             view.loadUrl(url)
         }
+    }
+
+    fun goHome() {
+        view.post {
+            view.loadUrl("https://www.google.com")
+        }
+    }
+
+    fun onResume() {
+        view.onResume()
+    }
+
+    fun onPause() {
+        view.generatePreview()
+        view.onPause()
     }
 
     fun onBackPressed(): Boolean {

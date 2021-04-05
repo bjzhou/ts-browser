@@ -10,11 +10,15 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import com.hinnka.tsbrowser.db.Tabs
 import com.hinnka.tsbrowser.ext.tap
+import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
+import com.hinnka.tsbrowser.web.TSWebView
+import com.tencent.mmkv.MMKV
 
 class MainActivity : BaseActivity() {
 
@@ -33,31 +37,51 @@ class MainActivity : BaseActivity() {
                 ) {
                     Crossfade(targetState = uiState.value) {
                         when (uiState.value) {
-                            UIState.Main -> MainView()
+                            UIState.Main -> {
+                                TabManager.currentTab.value?.onResume()
+                                MainView()
+                            }
                             UIState.Search -> Box(modifier = Modifier
                                 .fillMaxSize()
                                 .tap {
                                     uiState.value = UIState.Main
                                 })
-                            UIState.TabList -> TabList(uiState)
+                            UIState.TabList -> {
+                                TabManager.currentTab.value?.onPause()
+                                TabList(uiState)
+                            }
                         }
                     }
                     CheckTab()
                 }
             }
         }
+
+        TabManager.loadTabs(this)
     }
 
     @Composable
     fun CheckTab() {
         val tabs = TabManager.tabs
         if (tabs.isEmpty()) {
-            val tab = TabManager.newTab(this).also { it.active() }
-            tab.loadUrl("https://www.google.com")
+            TabManager.newTab(this).apply {
+                goHome()
+                active()
+            }
             if (uiState.value != UIState.Main) {
                 uiState.value = UIState.Main
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        TabManager.onResume(uiState.value)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        TabManager.onPause()
     }
 
     override fun onBackPressed() {
