@@ -10,7 +10,6 @@ data class Tab(
     var view: TSWebView,
 ) {
 
-
     val progressState: LiveData<Float> = view.progressState
     val urlState: LiveData<String?> = view.urlState
 
@@ -26,6 +25,12 @@ data class Tab(
 
         view.onCloseWindow = {
             TabManager.remove(this)
+        }
+    }
+
+    fun loadUrl(url: String) {
+        view.post {
+            view.loadUrl(url)
         }
     }
 

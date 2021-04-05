@@ -13,8 +13,11 @@ import androidx.compose.material.*
 import androidx.compose.material.TextFieldDefaults.textFieldColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
@@ -29,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.theme.lightWhite
@@ -105,7 +109,6 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { state ->
-                    println("focus:: $state")
                     if (state.isFocused) {
                         uiState.value = UIState.Search
                     } else {
@@ -118,6 +121,12 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(onGo = {
                 focusManager.clearFocus()
+                if (text.value.isBlank()) {
+                    text.value = ""
+                    return@KeyboardActions
+                }
+                TabManager.currentTab.value?.loadUrl(text.value.toUrl())
+                text.value = ""
             }),
             singleLine = true,
             onValueChange = {
@@ -129,9 +138,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
 
 @Composable
 fun TabButton(uiState: MutableState<UIState>) {
-    val context = LocalContext.current
     val tabs = TabManager.tabs
-    println("tabs change? ${tabs.size}")
     IconButton(onClick = {
         uiState.value = UIState.TabList
     }) {
@@ -185,9 +192,7 @@ fun NewTab(uiState: MutableState<UIState>) {
                 TabManager
                     .newTab(context)
                     .apply {
-                        view.post {
-                            view.loadUrl("https://www.baidu.com")
-                        }
+                        loadUrl("https://www.baidu.com")
                         active()
                     }
                 uiState.value = UIState.Main

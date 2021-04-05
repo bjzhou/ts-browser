@@ -5,7 +5,7 @@ Top secret Browser!
 ## TODO
 
 - [ ] homepage
-- [ ] address bar
+- [ ] new tab url
 - [ ] search history
 - [ ] save tabs
 - [ ] drawer

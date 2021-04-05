@@ -53,9 +53,7 @@ class MainActivity : BaseActivity() {
         val tabs = TabManager.tabs
         if (tabs.isEmpty()) {
             val tab = TabManager.newTab(this).also { it.active() }
-            tab.view.post {
-                tab.view.loadUrl("https://www.google.com")
-            }
+            tab.loadUrl("https://www.google.com")
             if (uiState.value != UIState.Main) {
                 uiState.value = UIState.Main
             }
