@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Message
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
@@ -17,6 +18,8 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.VideoView
+import androidx.annotation.RequiresApi
+import androidx.core.view.ViewConfigurationCompat
 import androidx.core.view.children
 import androidx.lifecycle.*
 import com.hinnka.tsbrowser.download.DownloadHandler
@@ -50,6 +53,7 @@ class TSWebView @JvmOverloads constructor(
 
     var onCreateWindow: (Message) -> Unit = {}
     var onCloseWindow: () -> Unit = {}
+    var onScrollChanged: (Direction) -> Unit = {}
 
     init {
         setWebContentsDebuggingEnabled(true)
@@ -95,12 +99,35 @@ class TSWebView @JvmOverloads constructor(
         webChromeClient = TSChromeClient(this)
         webViewClient = TSWebClient(this)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            listenScrollChange()
+        }
+
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 
     init {
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptThirdPartyCookies(this, true)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun listenScrollChange() {
+        setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            val slop = ViewConfiguration.get(context).scaledTouchSlop
+            if (scrollY - oldScrollY > slop) {
+                onScrollChanged.invoke(Direction.Down)
+            }
+            if (oldScrollY - scrollY > slop) {
+                onScrollChanged.invoke(Direction.Up)
+            }
+            if (scrollX - oldScrollX > slop) {
+                onScrollChanged.invoke(Direction.Right)
+            }
+            if (oldScrollX - scrollX > slop) {
+                onScrollChanged.invoke(Direction.Left)
+            }
+        }
     }
 
     override fun loadUrl(url: String) {
