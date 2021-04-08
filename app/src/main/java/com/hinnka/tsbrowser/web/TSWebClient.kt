@@ -1,9 +1,9 @@
 package com.hinnka.tsbrowser.web
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
-import android.os.Build
 import android.os.Message
 import android.text.TextUtils
 import android.util.Log
@@ -18,13 +18,16 @@ import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.webkit.SafeBrowsingResponseCompat
+import androidx.webkit.WebResourceErrorCompat
+import androidx.webkit.WebViewClientCompat
+import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.adblock.AdBlocker
 import java.util.concurrent.TimeUnit
 
-class TSWebClient(private val controller: UIController) : WebViewClient() {
+class TSWebClient(private val controller: UIController) : WebViewClientCompat() {
 
     companion object {
         val localSchemes = arrayOf("http", "https", "ftp", "file", "about", "chrome", "data", "javascript")
@@ -76,10 +79,6 @@ class TSWebClient(private val controller: UIController) : WebViewClient() {
         super.onLoadResource(view, url)
     }
 
-    override fun onPageCommitVisible(view: WebView?, url: String?) {
-        super.onPageCommitVisible(view, url)
-    }
-
     override fun shouldInterceptRequest(
         view: WebView,
         request: WebResourceRequest
@@ -88,16 +87,6 @@ class TSWebClient(private val controller: UIController) : WebViewClient() {
             return AdBlocker.emptyResponse
         }
         return null
-    }
-
-    override fun onReceivedError(
-        view: WebView,
-        request: WebResourceRequest,
-        error: WebResourceError
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.e("TSWebView", "error ${error.errorCode}: ${error.description}")
-        }
     }
 
     override fun onReceivedHttpError(
@@ -211,15 +200,37 @@ class TSWebClient(private val controller: UIController) : WebViewClient() {
         super.onReceivedLoginRequest(view, realm, account, args)
     }
 
-    override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
-        return super.onRenderProcessGone(view, detail)
+    override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail?): Boolean {
+        val activity = view.context as? Activity
+        activity?.recreate()
+        return true
+    }
+
+    override fun onPageCommitVisible(view: WebView, url: String) {
+        super.onPageCommitVisible(view, url)
+    }
+
+    override fun onReceivedError(
+        view: WebView,
+        request: WebResourceRequest,
+        error: WebResourceErrorCompat
+    ) {
+        super.onReceivedError(view, request, error)
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_DESCRIPTION)) {
+                Log.e(
+                    "TSWebView",
+                    "onReceivedError: ${request.url} ${error.errorCode} ${error.description}"
+                )
+            }
+        }
     }
 
     override fun onSafeBrowsingHit(
-        view: WebView?,
-        request: WebResourceRequest?,
+        view: WebView,
+        request: WebResourceRequest,
         threatType: Int,
-        callback: SafeBrowsingResponse?
+        callback: SafeBrowsingResponseCompat
     ) {
         super.onSafeBrowsingHit(view, request, threatType, callback)
     }
