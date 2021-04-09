@@ -3,6 +3,8 @@ package com.hinnka.tsbrowser.web
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
@@ -11,12 +13,10 @@ import android.os.Message
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.CookieManager
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import android.widget.FrameLayout
 import android.widget.VideoView
+import androidx.annotation.RequiresApi
 import androidx.core.view.children
 import androidx.lifecycle.*
 import com.hinnka.tsbrowser.download.DownloadHandler
@@ -29,6 +29,7 @@ import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.math.min
 
@@ -96,6 +97,25 @@ class TSWebView @JvmOverloads constructor(
         webViewClient = TSWebClient(this)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            test()
+        }
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun test() {
+        val packageName = "com.android.settings"
+        val context = context.createPackageContext(packageName, Context.CONTEXT_IGNORE_SECURITY)
+        val labelRes = context.packageManager.getApplicationInfo(packageName, 0).labelRes
+        val locales = context.resources.assets.locales
+        for (localStr in locales) {
+            val configuration = context.resources.configuration
+            configuration.setLocale(Locale.forLanguageTag(localStr))
+            val newContext = context.createConfigurationContext(configuration)
+            println("locale: $localStr appName: ${newContext.getString(labelRes)}")
+        }
     }
 
     init {

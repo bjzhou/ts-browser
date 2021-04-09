@@ -1,16 +1,20 @@
 package com.hinnka.tsbrowser.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.hinnka.tsbrowser.App
 
-private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+private val SecretColorPalette = darkColors(
+    primary = Color.Black,
+    primaryVariant = Color.Black,
+    secondary = Teal200,
+    onPrimary = Color.White,
+    surface = Color.Black,
+    onSurface = Color.White,
 )
 
 private val LightColorPalette = lightColors(
@@ -29,10 +33,17 @@ private val LightColorPalette = lightColors(
     */
 )
 
+val Colors.lightWhite: Color
+    get() = if (App.getProcessName().endsWith("secret")) {
+        lightBlack
+    } else {
+        com.hinnka.tsbrowser.ui.theme.lightWhite
+    }
+
 @Composable
-fun TSBrowserTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
+fun TSBrowserTheme(content: @Composable() () -> Unit) {
+    val colors = if (App.getProcessName().endsWith("secret")) {
+        SecretColorPalette
     } else {
         LightColorPalette
     }

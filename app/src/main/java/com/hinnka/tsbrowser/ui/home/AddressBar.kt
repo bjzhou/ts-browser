@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.home
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -47,7 +48,8 @@ fun AddressBar(uiState: MutableState<UIState>) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
                 }
             }
-            AnimatedVisibility(visible = true, modifier = Modifier
+            AnimatedVisibility(
+                visible = true, modifier = Modifier
                     .weight(1f)
             ) {
                 if (uiState.value != UIState.TabList) {
@@ -86,6 +88,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     if (uiState.value != UIState.Search) {
         focusManager.clearFocus()
     }
+    val context = LocalContext.current
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -95,7 +98,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
                 .height(40.dp)
                 .fillMaxWidth()
                 .background(
-                    color = lightWhite, shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colors.lightWhite, shape = RoundedCornerShape(20.dp),
                 ),
         )
         TextField(
@@ -117,13 +120,43 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
                         uiState.value = UIState.Main
                     }
                 },
-            leadingIcon = if (uiState.value == UIState.Search) {
-                { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") }
-            } else null,
+            leadingIcon = when {
+                uiState.value == UIState.Search -> {
+                    { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") }
+                }
+                url?.startsWith("https") == true -> {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Https",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colors.secondary
+                        )
+                    }
+                }
+                else -> {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.LightGray
+                        )
+                    }
+                }
+            },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(onGo = {
                 focusManager.clearFocus()
                 if (text.value.isBlank()) {
+                    text.value = ""
+                    return@KeyboardActions
+                }
+                if (text.value == "900902") {
+                    context.startActivity(Intent(context, SecretActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                    })
                     text.value = ""
                     return@KeyboardActions
                 }

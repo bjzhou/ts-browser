@@ -7,6 +7,8 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -21,7 +23,7 @@ import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import kotlin.math.abs
 
-class MainActivity : BaseActivity() {
+open class MainActivity : BaseActivity() {
 
     private val uiState = mutableStateOf(UIState.Main)
     private val addressBarVisible = mutableStateOf(true)
@@ -48,7 +50,7 @@ class MainActivity : BaseActivity() {
                         }
                     },
                     modifier = Modifier.pointerInput(Unit) {
-                        detectVerticalDragGestures { change, dragAmount ->
+                        detectVerticalDragGestures { _, dragAmount ->
                             if (dragAmount < 0 && abs(dragAmount) >= slop) {
                                 addressBarVisible.value = false
                             } else if (dragAmount > 0 && dragAmount >= slop) {
@@ -78,6 +80,8 @@ class MainActivity : BaseActivity() {
                 }
             }
         }
+        
+
 
         TabManager.loadTabs(this)
     }

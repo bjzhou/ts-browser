@@ -37,6 +37,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.home.SecretActivity"
+            android:exported="false"
+            android:label="@string/secret_name"
+            android:excludeFromRecents="true"
+            android:process=":secret"
+            android:taskAffinity="browser.secret"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.TSBrowser.Secret">
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

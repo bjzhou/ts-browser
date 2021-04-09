@@ -13,5 +13,6 @@ Top secret Browser!
 - [ ] secret code & secret mode change
 - [ ] bookmark
 - [ ] history
+- [ ] settings ui
 
 ...
