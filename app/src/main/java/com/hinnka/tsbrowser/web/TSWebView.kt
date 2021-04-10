@@ -44,6 +44,8 @@ class TSWebView @JvmOverloads constructor(
     private var origOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private val downloadHandler = DownloadHandler(context)
 
+    var isWindow = false
+
     val urlState = MutableLiveData("")
     val progressState = MutableLiveData(0f)
     val titleState = MutableLiveData("")
@@ -297,7 +299,7 @@ class TSWebView @JvmOverloads constructor(
 
         val hit = hitTestResult
 
-        if (userLinks.isEmpty()) {
+        if (!isWindow && userLinks.isEmpty()) {
             userLinks.add(url)
         }
 

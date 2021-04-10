@@ -13,6 +13,8 @@ data class Tab(
     var view: TSWebView,
 ) {
 
+    var parentTab: Tab? = null
+
     val progressState: LiveData<Float> = view.progressState
     val urlState: LiveData<String?> = view.urlState
     val titleState: LiveData<String?> = view.titleState
@@ -31,6 +33,8 @@ data class Tab(
                     ): Boolean {
                         val url = request.url
                         TabManager.newTab(view.context).apply {
+                            parentTab = this@Tab
+                            this.view.isWindow = true
                             loadUrl(url.toString())
                             active()
                         }
@@ -70,6 +74,11 @@ data class Tab(
     fun onBackPressed(): Boolean {
         if (view.canGoBack()) {
             view.goBack()
+            return true
+        }
+        parentTab?.let {
+            TabManager.remove(this)
+            TabManager.active(it)
             return true
         }
         return false
