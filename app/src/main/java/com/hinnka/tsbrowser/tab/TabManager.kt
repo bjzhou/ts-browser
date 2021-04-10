@@ -5,11 +5,13 @@ import android.os.Parcel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.MutableLiveData
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.db.TabEntity
 import com.hinnka.tsbrowser.db.Tabs
 import com.hinnka.tsbrowser.ext.decodeBitmap
 import com.hinnka.tsbrowser.ext.encodeToPath
 import com.hinnka.tsbrowser.ext.ioScope
+import com.hinnka.tsbrowser.ext.mainScope
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.web.TSWebView
 import com.tencent.mmkv.MMKV
@@ -21,6 +23,8 @@ import kotlinx.coroutines.withContext
 object TabManager {
     val tabs = mutableStateListOf<Tab>()
     val currentTab = MutableLiveData<Tab?>()
+    var isInitialized = false
+        private set
 
     private var idGenerator = 0
 
@@ -95,15 +99,16 @@ object TabManager {
                     it.previewState.value?.encodeToPath("preview-$url")
                 )
             })
-            mmkv?.encode("tabs", tabs)
+            mmkv?.encode("tabs-${App.getProcessName()}", tabs)
         }
     }
 
     fun loadTabs(context: Context) {
+        if (isInitialized) return
         ioScope.launch {
             val mmkv = MMKV.defaultMMKV()
-            val tabs = mmkv?.decodeParcelable("tabs", Tabs::class.java) ?: return@launch
-            val savedTabs = tabs.list.map {
+            val tabs = mmkv?.decodeParcelable("tabs-${App.getProcessName()}", Tabs::class.java)
+            val savedTabs = tabs?.list?.map {
                 val webview = withContext(Dispatchers.Main) {
                     TSWebView(context)
                 }
@@ -120,7 +125,17 @@ object TabManager {
                 }
             }
             TabManager.tabs.clear()
-            TabManager.tabs.addAll(savedTabs)
+            if (savedTabs != null) {
+                TabManager.tabs.addAll(savedTabs)
+            } else {
+                mainScope.launch {
+                    newTab(context).apply {
+                        goHome()
+                        active()
+                    }
+                }
+            }
+            isInitialized = true
         }
     }
 

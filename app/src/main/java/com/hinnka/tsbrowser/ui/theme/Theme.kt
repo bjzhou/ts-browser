@@ -34,7 +34,7 @@ private val LightColorPalette = lightColors(
 )
 
 val Colors.lightWhite: Color
-    get() = if (App.getProcessName().endsWith("secret")) {
+    get() = if (App.isSecretMode) {
         lightBlack
     } else {
         com.hinnka.tsbrowser.ui.theme.lightWhite
@@ -42,7 +42,7 @@ val Colors.lightWhite: Color
 
 @Composable
 fun TSBrowserTheme(content: @Composable() () -> Unit) {
-    val colors = if (App.getProcessName().endsWith("secret")) {
+    val colors = if (App.isSecretMode) {
         SecretColorPalette
     } else {
         LightColorPalette

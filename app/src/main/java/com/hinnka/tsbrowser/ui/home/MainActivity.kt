@@ -88,6 +88,7 @@ open class MainActivity : BaseActivity() {
 
     @Composable
     fun CheckTab() {
+        if (!TabManager.isInitialized) return
         val tabs = TabManager.tabs
         if (tabs.isEmpty()) {
             TabManager.newTab(this).apply {

@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 class TSWebClient(private val controller: UIController) : WebViewClientCompat() {
 
     companion object {
-        val localSchemes = arrayOf("http", "https", "ftp", "file", "about", "chrome", "data", "javascript")
+        val localSchemes = arrayOf("http", "https", "ftp", "file", "about", "data", "javascript")
         val sslKeepLastDuration = TimeUnit.SECONDS.toMillis(15)
     }
 
@@ -39,6 +39,18 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val uri = request.url
+        println("TSBrowser $uri ${request.hasGesture()}")
+        val hit = view.hitTestResult
+
+        when {
+            hit.type > 0 -> {
+                controller.userLinks.add(uri.toString())
+            }
+            request.hasGesture() -> {
+                controller.userLinks.add(uri.toString())
+            }
+        }
+
         if (localSchemes.contains(uri.scheme)) {
             view.loadUrl(uri.toString())
             return true

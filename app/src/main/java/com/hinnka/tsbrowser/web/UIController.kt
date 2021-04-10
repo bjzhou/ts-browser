@@ -5,8 +5,10 @@ import android.net.Uri
 import android.os.Message
 import android.view.View
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 
 interface UIController {
+    val userLinks: MutableSet<String>
     fun onProgressChanged(progress: Int)
     fun onReceivedTitle(title: String?)
     fun onReceivedIcon(icon: Bitmap?)

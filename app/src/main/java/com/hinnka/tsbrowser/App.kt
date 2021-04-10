@@ -33,7 +33,6 @@ class App : Application() {
         @JvmStatic
         lateinit var instance: App
 
-
         @SuppressLint("DiscouragedPrivateApi", "PrivateApi")
         fun getProcessName(): String {
             return if (Build.VERSION.SDK_INT >= 28) Application.getProcessName() else try {
@@ -51,5 +50,7 @@ class App : Application() {
                 throw RuntimeException(e)
             }
         }
+
+        val isSecretMode: Boolean by lazy { getProcessName().endsWith("secret") }
     }
 }

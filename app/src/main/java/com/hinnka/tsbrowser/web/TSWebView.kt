@@ -3,8 +3,6 @@ package com.hinnka.tsbrowser.web
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
@@ -13,10 +11,12 @@ import android.os.Message
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.*
+import android.webkit.CookieManager
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.VideoView
-import androidx.annotation.RequiresApi
 import androidx.core.view.children
 import androidx.lifecycle.*
 import com.hinnka.tsbrowser.download.DownloadHandler
@@ -29,7 +29,6 @@ import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
-import java.util.*
 import kotlin.coroutines.resume
 import kotlin.math.min
 
@@ -37,6 +36,8 @@ import kotlin.math.min
 class TSWebView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : WebView(context, attrs), UIController, LifecycleOwner {
+
+    override val userLinks = mutableSetOf<String>()
 
     private val lifecycleRegistry = LifecycleRegistry(context as LifecycleOwner)
     private var fullScreenView: View? = null
@@ -91,6 +92,7 @@ class TSWebView @JvmOverloads constructor(
             setAppCachePath(context.cacheDir.path)
             setGeolocationEnabled(true)
             setGeolocationDatabasePath(File(context.filesDir, "geodb").path)
+            setSupportMultipleWindows(true)
         }
 
         webChromeClient = TSChromeClient(this)
@@ -98,24 +100,6 @@ class TSWebView @JvmOverloads constructor(
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            test()
-        }
-
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    fun test() {
-        val packageName = "com.android.settings"
-        val context = context.createPackageContext(packageName, Context.CONTEXT_IGNORE_SECURITY)
-        val labelRes = context.packageManager.getApplicationInfo(packageName, 0).labelRes
-        val locales = context.resources.assets.locales
-        for (localStr in locales) {
-            val configuration = context.resources.configuration
-            configuration.setLocale(Locale.forLanguageTag(localStr))
-            val newContext = context.createConfigurationContext(configuration)
-            println("locale: $localStr appName: ${newContext.getString(labelRes)}")
-        }
     }
 
     init {
@@ -221,6 +205,7 @@ class TSWebView @JvmOverloads constructor(
         requestedOrientation: Int,
         callback: WebChromeClient.CustomViewCallback
     ) {
+        printView(view)
         origOrientation =
             activity?.requestedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         if (fullScreenView != null) {
@@ -242,9 +227,26 @@ class TSWebView @JvmOverloads constructor(
         videoView?.setOnCompletionListener {
             callback.onCustomViewHidden()
         }
+        println("TSBrowser onShowCustomView")
+    }
+
+    private fun printView(view: View, root: Boolean = true) {
+        if (root) {
+            println("TSBrowser: =====printView=====")
+        }
+        println("TSBrowser: ${view.javaClass.name}")
+        if (view is ViewGroup) {
+            for (child in view.children) {
+                printView(child, false)
+            }
+        }
+        if (root) {
+            println("TSBrowser: =====printView=====")
+        }
     }
 
     override fun onHideCustomView() {
+        println("TSBrowser onHideCustomView")
         try {
             fullScreenView?.keepScreenOn = false
         } catch (e: Exception) {
@@ -259,6 +261,7 @@ class TSWebView @JvmOverloads constructor(
         videoView?.setOnErrorListener(null)
         videoView?.setOnCompletionListener(null)
         fullScreenView = null
+        println("TSBrowser onHideCustomView")
     }
 
     override fun onCreateWindow(resultMsg: Message): Boolean {
@@ -287,14 +290,62 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onPageStarted(url: String, favicon: Bitmap?) {
-        lifecycleScope.launchWhenResumed {
-            favicon?.let {
-                iconState.postValue(it)
-            }
+        urlState.postValue(url)
+        favicon?.let {
+            iconState.postValue(it)
         }
+
+        val hit = hitTestResult
+
+        if (userLinks.isEmpty()) {
+            userLinks.add(url)
+        }
+
+        if (hit.type > 0) {
+            userLinks.add(url)
+        }
+
+        println("TSBrowser onPageStarted $url")
+        println("TSBrowser in backList ${copyBackForwardList().currentItem?.url}")
     }
 
     override fun onPageFinished(url: String) {
+        urlState.postValue(url)
+
+        val hit = hitTestResult
+        println("TSBrowser onPageFinished $url")
+        println("TSBrowser in backList ${copyBackForwardList().currentItem?.url}")
+
+        if (hit.type > 0) {
+            userLinks.add(url)
+        }
+    }
+
+    override fun canGoBack(): Boolean {
+        val list = copyBackForwardList()
+        val current = list.currentIndex
+        if (current == 0) {
+            return false
+        }
+        for (index in 0 until current) {
+            val item = list.getItemAtIndex(index)
+            if (userLinks.contains(item.url) || userLinks.contains(item.originalUrl)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun goBack() {
+        val list = copyBackForwardList()
+        val current = list.currentIndex
+        for (index in current-1 downTo 0) {
+            val item = list.getItemAtIndex(index)
+            if (userLinks.contains(item.url) || userLinks.contains(item.originalUrl)) {
+                goBackOrForward(index - current)
+                return
+            }
+        }
     }
 
     override fun getLifecycle(): Lifecycle {

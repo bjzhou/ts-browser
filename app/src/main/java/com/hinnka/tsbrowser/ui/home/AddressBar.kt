@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.home
 
+import android.app.Activity
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -24,6 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.tab.TabManager
@@ -89,6 +94,30 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
         focusManager.clearFocus()
     }
     val context = LocalContext.current
+
+    fun onGo() {
+        val urlText = text.value.trim()
+        focusManager.clearFocus()
+        if (urlText.isBlank()) {
+            text.value = ""
+            return
+        }
+        if (urlText == "900902") {
+            if (App.isSecretMode) {
+                (context as? Activity)?.finish()
+            } else {
+                context.startActivity(Intent(context, SecretActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                })
+            }
+            text.value = ""
+            return
+        }
+        TabManager.currentTab.value?.loadUrl(urlText.toUrl())
+        text.value = ""
+    }
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -113,6 +142,13 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
             ),
             modifier = Modifier
                 .fillMaxWidth()
+                .onKeyEvent { event ->
+                    if (event.key == Key.Enter) {
+                        onGo()
+                        return@onKeyEvent true
+                    }
+                    false
+                }
                 .onFocusChanged { state ->
                     if (state.isFocused) {
                         uiState.value = UIState.Search
@@ -146,23 +182,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
                 }
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-            keyboardActions = KeyboardActions(onGo = {
-                focusManager.clearFocus()
-                if (text.value.isBlank()) {
-                    text.value = ""
-                    return@KeyboardActions
-                }
-                if (text.value == "900902") {
-                    context.startActivity(Intent(context, SecretActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                        addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                    })
-                    text.value = ""
-                    return@KeyboardActions
-                }
-                TabManager.currentTab.value?.loadUrl(text.value.toUrl())
-                text.value = ""
-            }),
+            keyboardActions = KeyboardActions(onGo = { onGo() }),
             singleLine = true,
             onValueChange = {
                 text.value = it

@@ -1,7 +1,9 @@
 package com.hinnka.tsbrowser.tab
 
 import android.graphics.Bitmap
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.lifecycle.LiveData
 import com.hinnka.tsbrowser.web.TSWebView
 
@@ -19,10 +21,23 @@ data class Tab(
 
     init {
         view.onCreateWindow = { message ->
+            println("TSBrowser onCreateWindow ${message.target.looper.thread.name}")
             message.apply {
-                val newWebView = TSWebView(view.context)
+                val newWebView = WebView(view.context)
+                newWebView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView,
+                        request: WebResourceRequest
+                    ): Boolean {
+                        val url = request.url
+                        TabManager.newTab(view.context).apply {
+                            loadUrl(url.toString())
+                            active()
+                        }
+                        return true
+                    }
+                }
                 (obj as WebView.WebViewTransport).webView = newWebView
-                TabManager.newTab(view.context, newWebView).active()
             }.sendToTarget()
         }
 
