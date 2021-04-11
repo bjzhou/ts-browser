@@ -20,14 +20,12 @@ import android.widget.VideoView
 import androidx.core.view.children
 import androidx.lifecycle.*
 import com.hinnka.tsbrowser.download.DownloadHandler
-import com.hinnka.tsbrowser.ext.activity
-import com.hinnka.tsbrowser.ext.ioScope
-import com.hinnka.tsbrowser.ext.removeFromParent
-import com.hinnka.tsbrowser.ext.setFullScreen
+import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.math.min
@@ -306,9 +304,6 @@ class TSWebView @JvmOverloads constructor(
         if (hit.type > 0) {
             userLinks.add(url)
         }
-
-        println("TSBrowser onPageStarted $url")
-        println("TSBrowser in backList ${copyBackForwardList().currentItem?.url}")
     }
 
     override fun onPageFinished(url: String) {
@@ -316,11 +311,12 @@ class TSWebView @JvmOverloads constructor(
 
         val hit = hitTestResult
         println("TSBrowser onPageFinished $url")
-        println("TSBrowser in backList ${copyBackForwardList().currentItem?.url}")
 
         if (hit.type > 0) {
             userLinks.add(url)
         }
+
+        generatePreview()
     }
 
     override fun canGoBack(): Boolean {

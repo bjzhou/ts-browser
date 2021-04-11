@@ -64,7 +64,7 @@ fun TabItem(tab: Tab, uiState: MutableState<UIState>) {
             uiState.value = UIState.Main
         }
         .border(
-            width = if (tab.isActive) 2.dp else 0.dp,
+            width = if (tab.info.isActive) 2.dp else 0.dp,
             color = MaterialTheme.colors.secondary,
             shape = RoundedCornerShape(4.dp)
         )) {

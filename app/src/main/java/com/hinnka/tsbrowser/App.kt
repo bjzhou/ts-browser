@@ -1,11 +1,9 @@
 package com.hinnka.tsbrowser
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import android.webkit.WebView
-import com.tencent.mmkv.MMKV
-import android.annotation.SuppressLint
-import java.lang.RuntimeException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
@@ -15,7 +13,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        MMKV.initialize(this)
         configWebViewCacheDirWithAndroidP()
     }
 

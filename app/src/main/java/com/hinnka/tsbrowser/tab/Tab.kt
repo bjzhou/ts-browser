@@ -5,11 +5,16 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.LiveData
+import com.hinnka.tsbrowser.db.TabInfo
+import com.hinnka.tsbrowser.db.update
+import com.hinnka.tsbrowser.ext.encodeToPath
+import com.hinnka.tsbrowser.ext.ioScope
+import com.hinnka.tsbrowser.ext.mainScope
 import com.hinnka.tsbrowser.web.TSWebView
+import kotlinx.coroutines.launch
 
 data class Tab(
-    val id: Int,
-    var isActive: Boolean = false,
+    val info: TabInfo,
     var view: TSWebView,
 ) {
 
@@ -48,6 +53,16 @@ data class Tab(
         view.onCloseWindow = {
             TabManager.remove(this)
         }
+
+        previewState.observeForever {
+            ioScope.launch {
+                info.url = urlState.value ?: ""
+                info.iconPath = iconState.value?.encodeToPath("icon-${info.url}")
+                info.thumbnailPath = previewState.value?.encodeToPath("preview-${info.url}")
+                info.title = titleState.value ?: ""
+                info.update()
+            }
+        }
     }
 
     fun loadUrl(url: String) {
@@ -67,8 +82,8 @@ data class Tab(
     }
 
     fun onPause() {
-        view.generatePreview()
         view.onPause()
+        view.generatePreview()
     }
 
     fun onBackPressed(): Boolean {

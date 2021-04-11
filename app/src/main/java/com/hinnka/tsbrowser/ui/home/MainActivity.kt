@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
+import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
@@ -81,9 +82,9 @@ open class MainActivity : BaseActivity() {
             }
         }
         
-
-
-        TabManager.loadTabs(this)
+        lifecycleScope.launchWhenCreated {
+            TabManager.loadTabs(this@MainActivity)
+        }
     }
 
     @Composable

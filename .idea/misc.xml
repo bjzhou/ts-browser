@@ -5,6 +5,11 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="..\:/Projects/TSBrowser/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.38229166666666664" />
+        <entry key="app/src/main/res/drawable/ic_lock_black_24dp.xml" value="0.17685185185185184" />
+        <entry key="app/src/main/res/drawable/ic_person_black_24dp.xml" value="0.17685185185185184" />
+        <entry key="app/src/main/res/layout/multidataset_service_auth_activity.xml" value="0.1503623188405797" />
+        <entry key="app/src/main/res/layout/multidataset_service_list_item.xml" value="0.1503623188405797" />
+        <entry key="app/src/main/res/xml/service_configuration.xml" value="0.1503623188405797" />
       </map>
     </option>
   </component>
