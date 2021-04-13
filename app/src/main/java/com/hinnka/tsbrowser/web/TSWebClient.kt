@@ -39,21 +39,10 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val uri = request.url
-        println("TSBrowser $uri ${request.hasGesture()}")
-        val hit = view.hitTestResult
-
-        when {
-            hit.type > 0 -> {
-                controller.userLinks.add(uri.toString())
-            }
-            request.hasGesture() -> {
-                controller.userLinks.add(uri.toString())
-            }
-        }
+        println("TSBrowser $uri")
 
         if (localSchemes.contains(uri.scheme)) {
-            view.loadUrl(uri.toString())
-            return true
+            return false
         }
         return try {
             val intent = Intent.parseUri(uri.toString(), Intent.URI_INTENT_SCHEME)

@@ -73,7 +73,7 @@ data class Tab(
 
     fun goHome() {
         view.post {
-            view.loadUrl("https://www.google.com")
+            view.loadUrl("https://www.baidu.com")
         }
     }
 

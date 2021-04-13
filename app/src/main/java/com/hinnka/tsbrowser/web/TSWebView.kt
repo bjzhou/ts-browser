@@ -35,8 +35,6 @@ class TSWebView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : WebView(context, attrs), UIController, LifecycleOwner {
 
-    override val userLinks = mutableSetOf<String>()
-
     private val lifecycleRegistry = LifecycleRegistry(context as LifecycleOwner)
     private var fullScreenView: View? = null
     private var origOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -294,56 +292,11 @@ class TSWebView @JvmOverloads constructor(
         favicon?.let {
             iconState.postValue(it)
         }
-
-        val hit = hitTestResult
-
-        if (!isWindow && userLinks.isEmpty()) {
-            userLinks.add(url)
-        }
-
-        if (hit.type > 0) {
-            userLinks.add(url)
-        }
     }
 
     override fun onPageFinished(url: String) {
         urlState.postValue(url)
-
-        val hit = hitTestResult
-        println("TSBrowser onPageFinished $url")
-
-        if (hit.type > 0) {
-            userLinks.add(url)
-        }
-
         generatePreview()
-    }
-
-    override fun canGoBack(): Boolean {
-        val list = copyBackForwardList()
-        val current = list.currentIndex
-        if (current == 0) {
-            return false
-        }
-        for (index in 0 until current) {
-            val item = list.getItemAtIndex(index)
-            if (userLinks.contains(item.url) || userLinks.contains(item.originalUrl)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    override fun goBack() {
-        val list = copyBackForwardList()
-        val current = list.currentIndex
-        for (index in current-1 downTo 0) {
-            val item = list.getItemAtIndex(index)
-            if (userLinks.contains(item.url) || userLinks.contains(item.originalUrl)) {
-                goBackOrForward(index - current)
-                return
-            }
-        }
     }
 
     override fun getLifecycle(): Lifecycle {
