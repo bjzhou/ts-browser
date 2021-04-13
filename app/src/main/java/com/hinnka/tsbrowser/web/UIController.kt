@@ -6,6 +6,7 @@ import android.os.Message
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebView
 
 interface UIController {
     fun onProgressChanged(progress: Int)
@@ -19,6 +20,7 @@ interface UIController {
     suspend fun showFileChooser(fileChooserParams: WebChromeClient.FileChooserParams): Array<Uri>?
     fun onPageStarted(url: String, favicon: Bitmap?)
     fun onPageFinished(url: String)
+    fun doUpdateVisitedHistory(url: String, isReload: Boolean)
 }
 
 suspend fun UIController.requestPermission(permission: String): Boolean {

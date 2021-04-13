@@ -112,8 +112,8 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         }.show()
     }
 
-    override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
-        super.doUpdateVisitedHistory(view, url, isReload)
+    override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
+        controller.doUpdateVisitedHistory(url, isReload)
     }
 
     override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {

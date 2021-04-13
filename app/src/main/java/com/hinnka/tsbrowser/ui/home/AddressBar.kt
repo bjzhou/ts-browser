@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,16 +16,14 @@ import androidx.compose.material.*
 import androidx.compose.material.TextFieldDefaults.textFieldColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -34,11 +33,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.toUrl
+import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.theme.lightWhite
@@ -88,7 +89,10 @@ fun AddressBar(uiState: MutableState<UIState>) {
 @Composable
 fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     val text = remember { mutableStateOf("") }
-    val url = TabManager.currentTab.observeAsState().value?.urlState?.observeAsState()?.value
+    val tab: Tab? by TabManager.currentTab.observeAsState()
+    val url = tab?.urlState?.observeAsState()?.value
+    val title = tab?.titleState?.observeAsState()?.value
+    val icon = tab?.iconState?.observeAsState()?.value
     val focusManager = LocalFocusManager.current
     if (uiState.value != UIState.Search) {
         focusManager.clearFocus()
@@ -132,7 +136,14 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
         )
         TextField(
             value = text.value,
-            placeholder = { Text(text = url ?: stringResource(id = R.string.address_bar)) },
+            placeholder = {
+                Text(
+                    text = if (title.isNullOrEmpty()) url ?: stringResource(id = R.string.address_bar) else title,
+                    fontSize = 13.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Visible
+                )
+            },
             colors = textFieldColors(
                 backgroundColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
@@ -156,23 +167,19 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
                         uiState.value = UIState.Main
                     }
                 },
-            leadingIcon = when {
-                uiState.value == UIState.Search -> {
+            leadingIcon = when (uiState.value) {
+                UIState.Search -> {
                     { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") }
-                }
-                url?.startsWith("https") == true -> {
-                    {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = "Https",
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colors.secondary
-                        )
-                    }
                 }
                 else -> {
                     {
-                        Icon(
+                        icon?.asImageBitmap()?.let {
+                            Image(
+                                bitmap = it,
+                                contentDescription = url,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        } ?: Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = "Info",
                             modifier = Modifier.size(20.dp),

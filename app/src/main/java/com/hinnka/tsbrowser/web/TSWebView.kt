@@ -48,6 +48,8 @@ class TSWebView @JvmOverloads constructor(
     val iconState = MutableLiveData<Bitmap?>()
     val previewState = MutableLiveData<Bitmap?>()
 
+    val faviconMap = mutableMapOf<String, Bitmap?>()
+
     var onCreateWindow: (Message) -> Unit = {}
     var onCloseWindow: () -> Unit = {}
 
@@ -193,6 +195,8 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onReceivedIcon(icon: Bitmap?) {
+        val host = Uri.parse(urlState.value ?: "").host ?: return
+        faviconMap[host] = icon
         lifecycleScope.launchWhenResumed {
             iconState.postValue(icon)
         }
@@ -297,6 +301,12 @@ class TSWebView @JvmOverloads constructor(
     override fun onPageFinished(url: String) {
         urlState.postValue(url)
         generatePreview()
+    }
+
+    override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
+        urlState.value = url
+        val host = Uri.parse(urlState.value ?: "").host ?: return
+        iconState.postValue(faviconMap[host])
     }
 
     override fun getLifecycle(): Lifecycle {
