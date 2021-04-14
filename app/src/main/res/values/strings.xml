@@ -20,4 +20,5 @@
     <string name="closeAll">Close all</string>
     <string name="search_history">Search History</string>
     <string name="send_to">Share to..</string>
+    <string name="click_search">Click to search</string>
 </resources>

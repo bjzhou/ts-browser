@@ -39,6 +39,8 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.theme.lightWhite
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -257,10 +259,15 @@ fun NewTab(uiState: MutableState<UIState>) {
 @Composable
 fun CancelButton(uiState: MutableState<UIState>) {
     val viewModel = LocalViewModel.current
+    val scope = rememberCoroutineScope()
     IconButton(
         onClick = {
-            viewModel.addressText.value = TextFieldValue()
             uiState.value = UIState.Main
+            scope.launch {
+                //FIXME why need to delay
+                delay(50)
+                viewModel.addressText.value = TextFieldValue()
+            }
         }
     ) {
         Text(text = stringResource(id = R.string.action_cancel))

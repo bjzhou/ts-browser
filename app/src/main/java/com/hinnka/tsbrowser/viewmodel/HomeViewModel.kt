@@ -91,9 +91,12 @@ class HomeViewModel : ViewModel() {
             if (title.isNotBlank()) {
                 putExtra(Intent.EXTRA_TITLE, title)
             }
+            type = "plain/text"
+        }
+        val chooser = Intent.createChooser(intent, App.instance[R.string.send_to]).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        App.instance.startActivity(Intent.createChooser(intent, App.instance[R.string.send_to]))
+        App.instance.startActivity(chooser)
     }
 }
 
