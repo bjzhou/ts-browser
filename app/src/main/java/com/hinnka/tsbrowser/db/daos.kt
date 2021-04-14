@@ -6,14 +6,32 @@ import androidx.room.OnConflictStrategy.REPLACE
 @Dao
 interface TabDao {
     @Query("SELECT * FROM tabinfo")
-    fun getAll(): List<TabInfo>
+    suspend fun getAll(): List<TabInfo>
 
     @Insert
-    fun insert(tab: TabInfo): Long
+    suspend fun insert(tab: TabInfo): Long
 
     @Update(onConflict = REPLACE)
-    fun update(vararg tab: TabInfo)
+    suspend fun update(vararg tab: TabInfo)
 
     @Delete
-    fun delete(tab: TabInfo)
+    suspend fun delete(tab: TabInfo)
+}
+
+@Dao
+interface SearchHistoryDao {
+    @Query("SELECT * FROM searchhistory ORDER BY updatedAt")
+    suspend fun getAll(): List<SearchHistory>
+
+    @Query("SELECT * FROM searchhistory WHERE `query` = :query")
+    suspend fun getByName(query: String): SearchHistory?
+
+    @Insert(onConflict = REPLACE)
+    suspend fun insert(query: SearchHistory)
+
+    @Update
+    suspend fun update(query: SearchHistory)
+
+    @Delete
+    suspend fun delete(vararg query: SearchHistory)
 }

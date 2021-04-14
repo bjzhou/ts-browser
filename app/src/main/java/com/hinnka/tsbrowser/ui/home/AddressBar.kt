@@ -1,7 +1,5 @@
 package com.hinnka.tsbrowser.ui.home
 
-import android.app.Activity
-import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
@@ -17,7 +15,6 @@ import androidx.compose.material.TextFieldDefaults.textFieldColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
@@ -32,22 +29,23 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.ext.toUrl
-import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.theme.lightWhite
+import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AddressBar(uiState: MutableState<UIState>) {
-    TopAppBar {
+fun AddressBar() {
+    val viewModel = LocalViewModel.current
+    val uiState = viewModel.uiState
+    TopAppBar(contentPadding = PaddingValues(start = if (uiState.value == UIState.Search) 8.dp else 0.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AnimatedVisibility(visible = uiState.value != UIState.Search) {
                 IconButton(onClick = { /*TODO*/ }) {
@@ -82,17 +80,21 @@ fun AddressBar(uiState: MutableState<UIState>) {
             AnimatedVisibility(visible = uiState.value == UIState.TabList) {
                 NewTab(uiState)
             }
+            AnimatedVisibility(visible = uiState.value == UIState.Search) {
+                CancelButton(uiState)
+            }
         }
     }
 }
 
 @Composable
 fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
-    val text = remember { mutableStateOf("") }
-    val tab: Tab? by TabManager.currentTab.observeAsState()
-    val url = tab?.urlState?.observeAsState()?.value
-    val title = tab?.titleState?.observeAsState()?.value
-    val icon = tab?.iconState?.observeAsState()?.value
+    val viewModel = LocalViewModel.current
+    val text = viewModel.addressText
+    val tab = TabManager.currentTab.value
+    val url = tab?.urlState?.value
+    val title = tab?.titleState?.value
+    val icon = tab?.iconState?.value
     val focusManager = LocalFocusManager.current
     if (uiState.value != UIState.Search) {
         focusManager.clearFocus()
@@ -100,26 +102,10 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     val context = LocalContext.current
 
     fun onGo() {
-        val urlText = text.value.trim()
         focusManager.clearFocus()
-        if (urlText.isBlank()) {
-            text.value = ""
-            return
-        }
-        if (urlText == "900902") {
-            if (App.isSecretMode) {
-                (context as? Activity)?.finish()
-            } else {
-                context.startActivity(Intent(context, SecretActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                    addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                })
-            }
-            text.value = ""
-            return
-        }
-        TabManager.currentTab.value?.loadUrl(urlText.toUrl())
-        text.value = ""
+        viewModel.onGo(text.value.text, context)
+        text.value = TextFieldValue()
+        uiState.value = UIState.Main
     }
 
     Box(
@@ -138,7 +124,8 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
             value = text.value,
             placeholder = {
                 Text(
-                    text = if (title.isNullOrEmpty()) url ?: stringResource(id = R.string.address_bar) else title,
+                    text = if (title.isNullOrEmpty()) url
+                        ?: stringResource(id = R.string.address_bar) else title,
                     fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Visible
@@ -163,8 +150,6 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
                 .onFocusChanged { state ->
                     if (state.isFocused) {
                         uiState.value = UIState.Search
-                    } else {
-                        uiState.value = UIState.Main
                     }
                 },
             leadingIcon = when (uiState.value) {
@@ -267,4 +252,18 @@ fun NewTab(uiState: MutableState<UIState>) {
         Text(text = stringResource(id = R.string.newtab))
         Spacer(modifier = Modifier.width(8.dp))
     }
+}
+
+@Composable
+fun CancelButton(uiState: MutableState<UIState>) {
+    val viewModel = LocalViewModel.current
+    IconButton(
+        onClick = {
+            viewModel.addressText.value = TextFieldValue()
+            uiState.value = UIState.Main
+        }
+    ) {
+        Text(text = stringResource(id = R.string.action_cancel))
+    }
+
 }

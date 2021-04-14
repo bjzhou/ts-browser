@@ -1,9 +1,13 @@
 package com.hinnka.tsbrowser.db
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.hinnka.tsbrowser.ext.ioScope
+import kotlinx.coroutines.launch
 
 @Entity
 data class TabInfo(
@@ -16,13 +20,24 @@ data class TabInfo(
 )
 
 fun TabInfo.delete() {
-    AppDatabase.instance.tabDao().delete(this)
+    ioScope.launch {
+        AppDatabase.instance.tabDao().delete(this@delete)
+    }
 }
 
 fun TabInfo.update() {
-    try {
-        AppDatabase.instance.tabDao().update(this)
-    } catch (e: Exception) {
-        Log.e("TSBrowser", "update error", e)
+    ioScope.launch {
+        AppDatabase.instance.tabDao().update(this@update)
     }
+}
+
+@Entity
+data class SearchHistory(
+    @PrimaryKey var query: String,
+    @ColumnInfo var updatedAt: Long,
+    @ColumnInfo var title: String? = null,
+    @ColumnInfo var icon: String? = null
+) {
+    @Ignore
+    var iconBitmap: Bitmap? = null
 }

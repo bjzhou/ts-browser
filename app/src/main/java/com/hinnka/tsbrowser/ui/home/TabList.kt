@@ -29,15 +29,15 @@ import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TabList(uiState: MutableState<UIState>) {
-    val state = rememberLazyListState()
+fun TabList() {
+    val viewModel = LocalViewModel.current
     val tabs = TabManager.tabs
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
-        state = state,
         contentPadding = PaddingValues(8.dp)
     ) {
         items(tabs.size) {
@@ -47,7 +47,7 @@ fun TabList(uiState: MutableState<UIState>) {
                     .aspectRatio(2f / 3f)
                     .padding(8.dp)
             ) {
-                TabItem(tab = tabs[it], uiState)
+                TabItem(tab = tabs[it], viewModel.uiState)
             }
         }
     }
@@ -55,9 +55,9 @@ fun TabList(uiState: MutableState<UIState>) {
 
 @Composable
 fun TabItem(tab: Tab, uiState: MutableState<UIState>) {
-    val icon = tab.iconState.observeAsState()
-    val title = tab.titleState.observeAsState()
-    val preview = tab.previewState.observeAsState()
+    val icon = tab.iconState
+    val title = tab.titleState
+    val preview = tab.previewState
     Column(modifier = Modifier
         .tap {
             tab.active()
@@ -79,7 +79,7 @@ fun TabItem(tab: Tab, uiState: MutableState<UIState>) {
                 )
             }
             Text(
-                text = title.value ?: stringResource(id = R.string.untiled),
+                text = title.value,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.W500,
                 maxLines = 1,

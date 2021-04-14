@@ -20,6 +20,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 @Composable
 fun MainView() {
     val owner = LocalLifecycleOwner.current
+    val tab = TabManager.currentTab.value
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             factory = {
@@ -27,12 +28,10 @@ fun MainView() {
             },
             modifier = Modifier.fillMaxSize(),
             update = { tabContainer ->
-                TabManager.currentTab.observe(owner) { t ->
-                    t?.let {
-                        tabContainer.removeAllViews()
-                        it.view.removeFromParent()
-                        tabContainer.addView(it.view)
-                    }
+                tab?.let {
+                    tabContainer.removeAllViews()
+                    it.view.removeFromParent()
+                    tabContainer.addView(it.view)
                 }
             }
         )
@@ -43,8 +42,8 @@ fun MainView() {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgressIndicator() {
-    val currentTab = TabManager.currentTab.observeAsState()
-    val progressState = currentTab.value?.progressState?.observeAsState(0f)
+    val currentTab = TabManager.currentTab
+    val progressState = currentTab.value?.progressState
     val newProgress = progressState?.value ?: 0f
     val progress: Float = if (newProgress > 0) {
         animateFloatAsState(targetValue = newProgress).value

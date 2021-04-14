@@ -18,4 +18,6 @@
     <string name="address_bar">Search or type web address.</string>
     <string name="untiled">Untitled</string>
     <string name="closeAll">Close all</string>
+    <string name="search_history">Search History</string>
+    <string name="send_to">Share to..</string>
 </resources>

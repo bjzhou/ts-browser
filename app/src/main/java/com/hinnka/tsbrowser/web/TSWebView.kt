@@ -19,13 +19,14 @@ import android.widget.FrameLayout
 import android.widget.VideoView
 import androidx.core.view.children
 import androidx.lifecycle.*
+import com.hinnka.tsbrowser.db.AppDatabase
+import com.hinnka.tsbrowser.db.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.math.min
@@ -39,19 +40,10 @@ class TSWebView @JvmOverloads constructor(
     private var fullScreenView: View? = null
     private var origOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private val downloadHandler = DownloadHandler(context)
+    var dataListener: WebDataListener? = null
 
     var isWindow = false
-
-    val urlState = MutableLiveData("")
-    val progressState = MutableLiveData(0f)
-    val titleState = MutableLiveData("")
-    val iconState = MutableLiveData<Bitmap?>()
-    val previewState = MutableLiveData<Bitmap?>()
-
-    val faviconMap = mutableMapOf<String, Bitmap?>()
-
-    var onCreateWindow: (Message) -> Unit = {}
-    var onCloseWindow: () -> Unit = {}
+    private val faviconMap = mutableMapOf<String, Bitmap?>()
 
     init {
         setWebContentsDebuggingEnabled(true)
@@ -113,9 +105,6 @@ class TSWebView @JvmOverloads constructor(
         } else {
             super.loadUrl(url)
         }
-        lifecycleScope.launchWhenResumed {
-            urlState.postValue(url)
-        }
     }
 
     override fun loadUrl(url: String, additionalHttpHeaders: MutableMap<String, String>) {
@@ -123,16 +112,10 @@ class TSWebView @JvmOverloads constructor(
             additionalHttpHeaders["DNT"] = "1"
         }
         super.loadUrl(url, additionalHttpHeaders)
-        lifecycleScope.launchWhenResumed {
-            urlState.postValue(url)
-        }
     }
 
     override fun loadData(data: String, mimeType: String?, encoding: String?) {
         super.loadData(data, mimeType, encoding)
-        lifecycleScope.launchWhenResumed {
-            urlState.postValue(data.substring(0, min(10, data.length)))
-        }
     }
 
     override fun loadDataWithBaseURL(
@@ -143,9 +126,6 @@ class TSWebView @JvmOverloads constructor(
         historyUrl: String?
     ) {
         super.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl)
-        lifecycleScope.launchWhenResumed {
-            urlState.postValue(baseUrl ?: "")
-        }
     }
 
     override fun onResume() {
@@ -178,27 +158,36 @@ class TSWebView @JvmOverloads constructor(
             val canvas = Canvas(bitmap)
             canvas.scale(0.5f, 0.5f)
             draw(canvas)
-            previewState.postValue(bitmap)
+            dataListener?.previewState?.value = bitmap
         }
     }
 
     override fun onProgressChanged(progress: Int) {
-        lifecycleScope.launchWhenResumed {
-            progressState.postValue(progress * 1f / 100)
-        }
+        dataListener?.progressState?.value = progress * 1.0f / 100
     }
 
     override fun onReceivedTitle(title: String?) {
-        lifecycleScope.launchWhenResumed {
-            titleState.postValue(title ?: urlState.value)
-        }
+        dataListener?.titleState?.value = title ?: url ?: ""
     }
 
     override fun onReceivedIcon(icon: Bitmap?) {
-        val host = Uri.parse(urlState.value ?: "").host ?: return
-        faviconMap[host] = icon
-        lifecycleScope.launchWhenResumed {
-            iconState.postValue(icon)
+        url?.let { url ->
+            val host = Uri.parse(url).host ?: return
+            faviconMap[host] = icon
+            dataListener?.iconState?.value = icon
+
+            mainScope.launch {
+                val search = SearchHistory(
+                    this@TSWebView.originalUrl ?: "",
+                    System.currentTimeMillis()
+                )
+                search.title = dataListener?.titleState?.value
+                search.icon = icon?.encodeToPath("icon-$url")
+                val dao = AppDatabase.instance.searchHistoryDao()
+                if (dao.getByName(search.query) != null) {
+                    dao.update(search)
+                }
+            }
         }
     }
 
@@ -267,12 +256,12 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onCreateWindow(resultMsg: Message): Boolean {
-        onCreateWindow.invoke(resultMsg)
+        dataListener?.onCreateWindow(resultMsg)
         return true
     }
 
     override fun onCloseWindow() {
-        onCloseWindow.invoke()
+        dataListener?.onCloseWindow()
     }
 
     override suspend fun requestPermissions(vararg permissions: String): Map<String, Boolean> {
@@ -292,21 +281,16 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onPageStarted(url: String, favicon: Bitmap?) {
-        urlState.postValue(url)
-        favicon?.let {
-            iconState.postValue(it)
-        }
     }
 
     override fun onPageFinished(url: String) {
-        urlState.postValue(url)
         generatePreview()
     }
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
-        urlState.value = url
-        val host = Uri.parse(urlState.value ?: "").host ?: return
-        iconState.postValue(faviconMap[host])
+        dataListener?.urlState?.value = url
+        val host = Uri.parse(url).host ?: return
+        dataListener?.iconState?.value = faviconMap[host]
     }
 
     override fun getLifecycle(): Lifecycle {
