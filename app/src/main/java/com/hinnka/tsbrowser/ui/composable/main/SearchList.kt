@@ -1,7 +1,6 @@
-package com.hinnka.tsbrowser.ui.home
+package com.hinnka.tsbrowser.ui.composable.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +24,7 @@ import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.isUrl
 import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
+import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.HomeViewModel
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 

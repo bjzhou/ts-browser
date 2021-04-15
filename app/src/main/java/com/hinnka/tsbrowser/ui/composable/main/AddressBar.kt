@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.home
+package com.hinnka.tsbrowser.ui.composable.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.base.PageController
+import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.theme.lightWhite
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 import kotlinx.coroutines.delay
@@ -50,7 +52,10 @@ fun AddressBar() {
     TopAppBar(contentPadding = PaddingValues(start = if (uiState.value == UIState.Search) 8.dp else 0.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AnimatedVisibility(visible = uiState.value != UIState.Search) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    /*TODO*/
+                    PageController.navigate("downloads")
+                }) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
                 }
             }
