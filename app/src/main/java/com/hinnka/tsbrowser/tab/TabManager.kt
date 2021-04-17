@@ -3,7 +3,6 @@ package com.hinnka.tsbrowser.tab
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import com.hinnka.tsbrowser.db.AppDatabase
 import com.hinnka.tsbrowser.db.TabInfo
 import com.hinnka.tsbrowser.db.delete
@@ -12,7 +11,6 @@ import com.hinnka.tsbrowser.ext.decodeBitmap
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.web.TSWebView
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 object TabManager {

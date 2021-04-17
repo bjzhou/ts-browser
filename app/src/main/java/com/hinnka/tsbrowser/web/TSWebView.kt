@@ -159,6 +159,7 @@ class TSWebView @JvmOverloads constructor(
             canvas.scale(0.5f, 0.5f)
             draw(canvas)
             dataListener?.previewState?.value = bitmap
+            dataListener?.updateInfo()
         }
     }
 

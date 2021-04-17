@@ -13,4 +13,5 @@ interface WebDataListener {
 
     fun onCreateWindow(message: Message)
     fun onCloseWindow()
+    suspend fun updateInfo()
 }

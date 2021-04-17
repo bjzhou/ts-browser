@@ -16,18 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
-import com.hinnka.tsbrowser.db.update
-import com.hinnka.tsbrowser.ext.encodeToPath
-import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -73,13 +68,12 @@ fun MainPage() {
                 }
             }
         }
-        CheckTab()
+        CheckTabs()
     }
 }
 
 @Composable
 fun MainView() {
-    val owner = LocalLifecycleOwner.current
     val tab = TabManager.currentTab.value
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -100,7 +94,8 @@ fun MainView() {
 }
 
 @Composable
-fun CheckTab() {
+//FIXME sometimes not work
+fun CheckTabs() {
     if (!TabManager.isInitialized) return
     val context = LocalContext.current
     val viewModel = LocalViewModel.current
@@ -112,18 +107,6 @@ fun CheckTab() {
         }
         if (viewModel.uiState.value != UIState.Main) {
             viewModel.uiState.value = UIState.Main
-        }
-    }
-    val current = TabManager.currentTab
-    current.value?.let { tab ->
-        tab.previewState.value?.let {
-            ioScope.launch {
-                tab.info.url = tab.urlState.value ?: ""
-                tab.info.iconPath = tab.iconState.value?.encodeToPath("icon-${tab.info.url}")
-                tab.info.thumbnailPath = tab.previewState.value?.encodeToPath("preview-${tab.info.url}")
-                tab.info.title = tab.titleState.value ?: ""
-                tab.info.update()
-            }
         }
     }
 }

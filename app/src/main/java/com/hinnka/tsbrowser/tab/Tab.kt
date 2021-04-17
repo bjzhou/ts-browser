@@ -93,4 +93,12 @@ data class Tab(
         }
         return false
     }
+
+    override suspend fun updateInfo() {
+        info.url = urlState.value
+        info.iconPath = iconState.value?.encodeToPath("icon-${info.url}")
+        info.thumbnailPath = previewState.value?.encodeToPath("preview-${info.url}")
+        info.title = titleState.value
+        info.update()
+    }
 }
