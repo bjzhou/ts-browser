@@ -1,6 +1,7 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +41,9 @@ fun SearchList() {
 
     viewModel.loadSearchHistory()
 
-    LazyColumn {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xf0FFFFFF))) {
         tab?.let { tab ->
             item {
                 CurrentUrl(viewModel = viewModel, tab = tab)

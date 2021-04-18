@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -29,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import kotlin.coroutines.resume
-import kotlin.math.min
 
 @SuppressLint("SetJavaScriptEnabled")
 class TSWebView @JvmOverloads constructor(
@@ -154,11 +152,8 @@ class TSWebView @JvmOverloads constructor(
             return
         }
         ioScope.launch {
-            val bitmap = Bitmap.createBitmap(width / 2, height / 2, Bitmap.Config.RGB_565)
-            val canvas = Canvas(bitmap)
-            canvas.scale(0.5f, 0.5f)
-            draw(canvas)
-            dataListener?.previewState?.value = bitmap
+            buildDrawingCache()
+            dataListener?.previewState?.value = drawingCache.copy(Bitmap.Config.RGB_565, false)
             dataListener?.updateInfo()
         }
     }
@@ -197,7 +192,7 @@ class TSWebView @JvmOverloads constructor(
         requestedOrientation: Int,
         callback: WebChromeClient.CustomViewCallback
     ) {
-        printView(view)
+//        printView(view)
         origOrientation =
             activity?.requestedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         if (fullScreenView != null) {
@@ -206,6 +201,15 @@ class TSWebView @JvmOverloads constructor(
         if (requestedOrientation != activity?.requestedOrientation) {
             activity?.requestedOrientation = requestedOrientation
         }
+        val resolver = context.contentResolver
+        val autoRotationOff = android.provider.Settings.System.getInt(
+            resolver,
+            android.provider.Settings.System.ACCELEROMETER_ROTATION
+        ) == 0
+        if (autoRotationOff && requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
+
         fullScreenView = view
         val decorView = activity?.window?.decorView as? ViewGroup
         decorView?.addView(view, FrameLayout.LayoutParams(-1, -1))

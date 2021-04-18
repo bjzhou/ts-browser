@@ -1,6 +1,9 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -13,20 +16,19 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -38,8 +40,6 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -59,6 +59,7 @@ fun TabList() {
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
+        modifier = Modifier.background(Color.White).fillMaxSize(),
         state = listState,
         contentPadding = PaddingValues(8.dp)
     ) {
@@ -184,7 +185,9 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
                             if (TabManager.tabs.size > index) {
                                 TabManager.tabs[index].active()
                             } else if (TabManager.tabs.isNotEmpty()) {
-                                TabManager.tabs.last().active()
+                                TabManager.tabs
+                                    .last()
+                                    .active()
                             }
                         }
                     },

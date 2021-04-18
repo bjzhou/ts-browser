@@ -55,17 +55,17 @@ fun MainPage() {
             }
         }
     ) {
-        Crossfade(targetState = uiState.value) {
+        Box {
+            MainView()
             when (uiState.value) {
-                UIState.Main -> {
-                    TabManager.currentTab.value?.onResume()
-                    MainView()
+                UIState.Search -> {
+                    SearchList()
                 }
-                UIState.Search -> SearchList()
                 UIState.TabList -> {
-                    TabManager.currentTab.value?.onPause()
+                    TabManager.currentTab.value?.view?.generatePreview()
                     TabList()
                 }
+                else -> {}
             }
         }
         CheckTabs()
