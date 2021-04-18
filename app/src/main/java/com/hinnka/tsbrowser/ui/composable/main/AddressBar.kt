@@ -266,6 +266,7 @@ fun CancelButton(uiState: MutableState<UIState>) {
     val viewModel = LocalViewModel.current
     val scope = rememberCoroutineScope()
     IconButton(
+        modifier = Modifier.widthIn(56.dp, 72.dp),
         onClick = {
             uiState.value = UIState.Main
             scope.launch {

@@ -18,16 +18,8 @@ class OpenReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != action) return
         val url = intent.getStringExtra("url") ?: return
-//        val publicDir = File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS)
         val file = url.file()
-        println("TSBrowser file exist and canRead: ${file.exists()} ${file.canRead()}")
-        val contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-        val openIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(contentUri, file.mimeType)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        context.startActivity(openIntent)
+        file.open(context)
     }
 
     companion object {
@@ -52,4 +44,14 @@ class OpenReceiver : BroadcastReceiver() {
             return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
+}
+
+fun File.open(context: Context) {
+    val contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", this)
+    val openIntent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(contentUri, this@open.mimeType)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(openIntent)
 }

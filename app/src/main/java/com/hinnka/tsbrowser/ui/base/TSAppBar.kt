@@ -15,15 +15,16 @@ fun TSAppBar(
     showBack: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    Row(modifier = Modifier.height(56.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (showBack) {
-            IconButton(onClick = { PageController.navigateUp() }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+    Box(modifier = Modifier.height(56.dp), contentAlignment = Alignment.Center) {
+        Text(text = title, style = MaterialTheme.typography.h6)
+        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+            if (showBack) {
+                IconButton(onClick = { PageController.navigateUp() }) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                }
             }
-        } else {
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.weight(1f))
+            actions()
         }
-        Text(text = title, style = MaterialTheme.typography.h6, modifier = Modifier.weight(1f))
-        actions()
     }
 }

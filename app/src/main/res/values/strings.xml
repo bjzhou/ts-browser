@@ -22,4 +22,12 @@
     <string name="send_to">Share to..</string>
     <string name="click_search">Click to search</string>
     <string name="downloads">Downloads</string>
+    <string name="downloads_empty">File that you download appear here.</string>
+    <string name="open">Open</string>
+    <string name="resume">Resume</string>
+    <string name="pause">Pause</string>
+    <string name="pending">Pending</string>
+    <string name="retry">Retry</string>
+    <string name="download_error">Download error</string>
+    <string name="clear">Clear</string>
 </resources>

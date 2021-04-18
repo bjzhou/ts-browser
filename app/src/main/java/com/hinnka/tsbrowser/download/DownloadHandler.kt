@@ -11,8 +11,10 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.text.format.Formatter.formatFileSize
+import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.DownloadListener
+import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -25,7 +27,11 @@ import io.reactivex.schedulers.Schedulers
 import zlc.season.rxdownload4.RANGE_CHECK_HEADER
 import zlc.season.rxdownload4.download
 import zlc.season.rxdownload4.file
+import zlc.season.rxdownload4.manager.*
+import zlc.season.rxdownload4.notification.SimpleNotificationCreator
+import zlc.season.rxdownload4.recorder.RoomRecorder
 import zlc.season.rxdownload4.task.Task
+import zlc.season.rxdownload4.utils.getFileNameFromUrl
 import java.io.File
 import java.io.FileInputStream
 
@@ -89,7 +95,7 @@ class DownloadHandler(val context: Context) : DownloadListener {
         return false
     }
 
-    private fun getTask(url: String): Task {
+    private fun getTask(url: String, guessName: String, mimetype: String?): Task {
         val savePath = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             File(context.filesDir, Environment.DIRECTORY_DOWNLOADS)
         } else {
@@ -98,8 +104,16 @@ class DownloadHandler(val context: Context) : DownloadListener {
         if (!savePath.exists()) {
             savePath.mkdir()
         }
+        var saveName = guessName
+        val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimetype)
+        if (!ext.isNullOrBlank()) {
+            if (!saveName.endsWith(ext)) {
+                saveName += ext
+            }
+        }
         return Task(
             url = url,
+            saveName = saveName,
             savePath = savePath.path
         )
     }
@@ -110,24 +124,27 @@ class DownloadHandler(val context: Context) : DownloadListener {
         if (!cookie.isNullOrEmpty()) {
             headerMap["Cookie"] = cookie
         }
-        val disposable = getTask(url).download(headerMap)
-            .observeOn(Schedulers.io())
-            .subscribeBy(
-                onError = {
-                    println("TSBrowser, download error: $it")
-                },
-                onNext = {
-                    println("TSBrowser, download state: ${it.percent()}")
-                    DownloadNotification.notify(url, guessName, it.percent().toInt())
-                },
-                onComplete = {
-                    println("TSBrowser, download finished")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        addToPublicDownloadDir(url)
+        val manager = getTask(url, guessName, mimetype).manager(
+            recorder = RoomRecorder(),
+            notificationCreator = DownloadNotificationCreator()
+        )
+
+        val disposable = manager
+            .subscribe { status ->
+                when (status) {
+                    is Failed -> println("TSBrowser, download error: ${status.throwable}")
+                    is Downloading -> println("TSBrowser, download state: ${status.progress}")
+                    is Completed -> {
+                        println("TSBrowser, download finished")
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            addToPublicDownloadDir(url)
+                        }
                     }
-                    DownloadNotification.notifyComplete(url)
+                    else -> {
+                    }
                 }
-            )
+            }
+        manager.start()
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -142,7 +159,7 @@ class DownloadHandler(val context: Context) : DownloadListener {
                 MediaStore.Downloads._ID,
                 MediaStore.Downloads.TITLE
             ),
-            "${MediaStore.Downloads.TITLE}='${file.name}' or ${MediaStore.Downloads.TITLE}='${file.nameWithoutExtension}'",
+            "${MediaStore.Downloads.TITLE}=\'${file.name}\' or ${MediaStore.Downloads.TITLE}=\'${file.nameWithoutExtension}\'",
             null,
             null
         )
