@@ -3,7 +3,9 @@ package com.hinnka.tsbrowser
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import android.webkit.WebView
+import io.reactivex.plugins.RxJavaPlugins
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
@@ -14,6 +16,9 @@ class App : Application() {
         super.onCreate()
         instance = this
         configWebViewCacheDirWithAndroidP()
+        RxJavaPlugins.setErrorHandler {
+            Log.e("TSBrowser", "RxJava run error", it)
+        }
     }
 
     private fun configWebViewCacheDirWithAndroidP() {

@@ -30,4 +30,7 @@
     <string name="retry">Retry</string>
     <string name="download_error">Download error</string>
     <string name="clear">Clear</string>
+    <string name="copy_link">Copy link</string>
+    <string name="delete">Delete</string>
+    <string name="clear_confirm">Delete %d downloads?</string>
 </resources>

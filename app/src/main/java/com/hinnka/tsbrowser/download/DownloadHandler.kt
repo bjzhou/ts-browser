@@ -11,7 +11,6 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.text.format.Formatter.formatFileSize
-import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
@@ -22,16 +21,11 @@ import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.mimeType
 import com.hinnka.tsbrowser.ui.base.BaseActivity
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import zlc.season.rxdownload4.RANGE_CHECK_HEADER
-import zlc.season.rxdownload4.download
 import zlc.season.rxdownload4.file
 import zlc.season.rxdownload4.manager.*
-import zlc.season.rxdownload4.notification.SimpleNotificationCreator
 import zlc.season.rxdownload4.recorder.RoomRecorder
 import zlc.season.rxdownload4.task.Task
-import zlc.season.rxdownload4.utils.getFileNameFromUrl
 import java.io.File
 import java.io.FileInputStream
 

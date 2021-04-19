@@ -37,3 +37,9 @@ fun Modifier.tap(block: (Offset) -> Unit): Modifier {
         detectTapGestures(onTap = block)
     }
 }
+
+fun Modifier.longPress(block: (Offset) -> Unit): Modifier {
+    return pointerInput(Unit) {
+        detectTapGestures(onLongPress = block)
+    }
+}
