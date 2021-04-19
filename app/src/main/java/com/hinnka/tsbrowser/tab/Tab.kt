@@ -6,15 +6,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
 import com.hinnka.tsbrowser.db.TabInfo
 import com.hinnka.tsbrowser.db.update
 import com.hinnka.tsbrowser.ext.encodeToPath
-import com.hinnka.tsbrowser.ext.ioScope
-import com.hinnka.tsbrowser.ext.mainScope
 import com.hinnka.tsbrowser.web.TSWebView
 import com.hinnka.tsbrowser.web.WebDataListener
-import kotlinx.coroutines.launch
 
 data class Tab(
     val info: TabInfo,
@@ -28,6 +24,8 @@ data class Tab(
     override val titleState = mutableStateOf("")
     override val iconState = mutableStateOf<Bitmap?>(null)
     override val previewState = mutableStateOf<Bitmap?>(null)
+    override val canGoBackState = mutableStateOf(false)
+    override val canGoForwardState = mutableStateOf(false)
 
     override fun onCreateWindow(message: Message) {
         println("TSBrowser onCreateWindow")
@@ -77,8 +75,8 @@ data class Tab(
     }
 
     fun onPause() {
-        view.onPause()
         view.generatePreview()
+        view.onPause()
     }
 
     fun onBackPressed(): Boolean {
@@ -92,6 +90,12 @@ data class Tab(
             return true
         }
         return false
+    }
+
+    fun goForward() {
+        if (view.canGoForward()) {
+            view.goForward()
+        }
     }
 
     override suspend fun updateInfo() {

@@ -10,6 +10,8 @@ interface WebDataListener {
     val titleState: MutableState<String>
     val iconState: MutableState<Bitmap?>
     val previewState: MutableState<Bitmap?>
+    val canGoBackState: MutableState<Boolean>
+    val canGoForwardState: MutableState<Boolean>
 
     fun onCreateWindow(message: Message)
     fun onCloseWindow()

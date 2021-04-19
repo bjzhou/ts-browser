@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -89,7 +91,6 @@ class TSWebView @JvmOverloads constructor(
         webViewClient = TSWebClient(this)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-
     }
 
     init {
@@ -147,13 +148,24 @@ class TSWebView @JvmOverloads constructor(
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_UP) {
+            generatePreview()
+        }
+        return super.onTouchEvent(event)
+    }
+
     fun generatePreview() {
         if (width == 0 || height == 0) {
             return
         }
         ioScope.launch {
-            buildDrawingCache()
-            dataListener?.previewState?.value = drawingCache.copy(Bitmap.Config.RGB_565, false)
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            val canvas = Canvas(bitmap)
+            canvas.translate(-scrollX.toFloat(), -scrollY.toFloat())
+            draw(canvas)
+            dataListener?.previewState?.value = bitmap
             dataListener?.updateInfo()
         }
     }
@@ -289,13 +301,15 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onPageFinished(url: String) {
-        generatePreview()
     }
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
         dataListener?.urlState?.value = url
         val host = Uri.parse(url).host ?: return
         dataListener?.iconState?.value = faviconMap[host]
+        dataListener?.canGoBackState?.value = canGoBack()
+        dataListener?.canGoForwardState?.value = canGoForward()
+        generatePreview()
     }
 
     override fun getLifecycle(): Lifecycle {

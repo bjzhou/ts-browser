@@ -72,13 +72,6 @@ fun AddressBar() {
                 }
             }
             AnimatedVisibility(visible = uiState.value == UIState.Main) {
-                IconButton(onClick = {
-                    TabManager.currentTab.value?.goHome()
-                }) {
-                    Icon(imageVector = Icons.Default.Home, contentDescription = "Home")
-                }
-            }
-            AnimatedVisibility(visible = uiState.value == UIState.Main) {
                 TabButton(uiState)
             }
             AnimatedVisibility(visible = uiState.value == UIState.TabList) {
@@ -194,6 +187,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
 fun TabButton(uiState: MutableState<UIState>) {
     val tabs = TabManager.tabs
     IconButton(onClick = {
+        TabManager.currentTab.value?.view?.generatePreview()
         uiState.value = UIState.TabList
     }) {
         Box(
