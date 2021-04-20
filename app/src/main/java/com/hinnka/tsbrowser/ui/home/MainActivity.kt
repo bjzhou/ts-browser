@@ -1,13 +1,19 @@
 package com.hinnka.tsbrowser.ui.home
 
+import android.app.SearchManager
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Browser
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.lifecycleScope
+import com.hinnka.tsbrowser.ext.logD
+import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.tab.TabManager
+import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.base.PageContainer
 import com.hinnka.tsbrowser.ui.base.PageController
@@ -38,6 +44,8 @@ open class MainActivity : BaseActivity() {
         lifecycleScope.launchWhenCreated {
             TabManager.loadTabs(this@MainActivity)
         }
+
+        handleIntent(intent)
     }
 
     @Composable
@@ -45,6 +53,51 @@ open class MainActivity : BaseActivity() {
         CompositionLocalProvider(
             LocalViewModel provides viewModel,
             content = content)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    fun handleIntent(intent: Intent?) {
+        intent ?: return
+        logD("handleIntent: ${intent.action} ${intent.extras?.keySet()?.joinToString(",")} ${intent.data}")
+        when (intent.action) {
+            Intent.ACTION_WEB_SEARCH -> handleSearch(intent)
+            Intent.ACTION_VIEW -> handleOpen(intent)
+        }
+    }
+
+    fun handleSearch(intent: Intent) {
+        val query = intent.getStringExtra(SearchManager.QUERY) ?: ""
+        val appId = intent.getStringExtra(Browser.EXTRA_APPLICATION_ID)
+        val newSearch = intent.getBooleanExtra(SearchManager.EXTRA_NEW_SEARCH, false)
+
+        logD("handleSearch: $query $appId $newSearch")
+        if (appId != packageName || newSearch) {
+            TabManager.newTab(this).apply {
+                loadUrl(query.toUrl())
+                active()
+            }
+        } else {
+            TabManager.currentTab.value?.loadUrl(query.toUrl())
+        }
+    }
+
+    fun handleOpen(intent: Intent) {
+        val appId = intent.getStringExtra(Browser.EXTRA_APPLICATION_ID)
+        val url = intent.data?.toString() ?: return
+
+        logD("handleOpen: $appId")
+        if (appId != packageName) {
+            TabManager.newTab(this).apply {
+                loadUrl(url)
+                active()
+            }
+        } else {
+            TabManager.currentTab.value?.loadUrl(url)
+        }
     }
 
     override fun onResume() {

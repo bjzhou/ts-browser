@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.mimeType
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import zlc.season.rxdownload4.RANGE_CHECK_HEADER
@@ -112,6 +113,11 @@ class DownloadHandler(val context: Context) : DownloadListener {
         )
     }
 
+    fun downloadImage(url: String) {
+        val guessName = URLUtil.guessFileName(url, null, null)
+        download(url, guessName, null)
+    }
+
     private fun download(url: String, guessName: String, mimetype: String?) {
         val headerMap = RANGE_CHECK_HEADER.toMutableMap()
         val cookie = CookieManager.getInstance().getCookie(url)
@@ -126,10 +132,10 @@ class DownloadHandler(val context: Context) : DownloadListener {
         val disposable = manager
             .subscribe { status ->
                 when (status) {
-                    is Failed -> println("TSBrowser, download error: ${status.throwable}")
-                    is Downloading -> println("TSBrowser, download state: ${status.progress}")
+                    is Failed -> logD("download error: ${status.throwable}")
+                    is Downloading -> logD("download state: ${status.progress}")
                     is Completed -> {
-                        println("TSBrowser, download finished")
+                        logD("download finished")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             addToPublicDownloadDir(url)
                         }

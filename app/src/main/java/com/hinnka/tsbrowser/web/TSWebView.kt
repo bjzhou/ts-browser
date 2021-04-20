@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.AttributeSet
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -17,14 +18,29 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
+import android.widget.PopupWindow
 import android.widget.VideoView
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.children
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.db.AppDatabase
 import com.hinnka.tsbrowser.db.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.ui.base.BaseActivity
+import com.hinnka.tsbrowser.ui.home.LongPressInfo
+import com.hinnka.tsbrowser.ui.home.MainActivity
 import com.hinnka.tsbrowser.util.IconCache
 import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
@@ -42,6 +58,13 @@ class TSWebView @JvmOverloads constructor(
     private var origOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private val downloadHandler = DownloadHandler(context)
     var dataListener: WebDataListener? = null
+
+    val gestureDetector =
+        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(e: MotionEvent) {
+                handleLongPress(e)
+            }
+        })
 
     var isWindow = false
     private val faviconMap = mutableMapOf<String, Bitmap?>()
@@ -151,10 +174,19 @@ class TSWebView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
         if (event.action == MotionEvent.ACTION_UP) {
             generatePreview()
         }
         return super.onTouchEvent(event)
+    }
+
+    fun handleLongPress(event: MotionEvent) {
+        val type = hitTestResult.type
+        val extra = hitTestResult.extra
+        logD("webview hitResult", type, extra)
+        dataListener?.longPressState?.value =
+            LongPressInfo(true, event.x.toInt(), event.y.toInt(), type, extra ?: "")
     }
 
     fun generatePreview() {
@@ -242,26 +274,24 @@ class TSWebView @JvmOverloads constructor(
         videoView?.setOnCompletionListener {
             callback.onCustomViewHidden()
         }
-        println("TSBrowser onShowCustomView")
     }
 
     private fun printView(view: View, root: Boolean = true) {
         if (root) {
-            println("TSBrowser: =====printView=====")
+            logD("=====printView=====")
         }
-        println("TSBrowser: ${view.javaClass.name}")
+        logD(view.javaClass.name)
         if (view is ViewGroup) {
             for (child in view.children) {
                 printView(child, false)
             }
         }
         if (root) {
-            println("TSBrowser: =====printView=====")
+            logD("=====printView=====")
         }
     }
 
     override fun onHideCustomView() {
-        println("TSBrowser onHideCustomView")
         try {
             fullScreenView?.keepScreenOn = false
         } catch (e: Exception) {
@@ -276,7 +306,6 @@ class TSWebView @JvmOverloads constructor(
         videoView?.setOnErrorListener(null)
         videoView?.setOnCompletionListener(null)
         fullScreenView = null
-        println("TSBrowser onHideCustomView")
     }
 
     override fun onCreateWindow(resultMsg: Message): Boolean {

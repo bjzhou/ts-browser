@@ -22,7 +22,7 @@ suspend fun Bitmap.encodeToPath(name: String): String? {
             }
             return@withContext file.path
         } catch (e: Exception) {
-            println("encode bitmap failed, $e")
+            logE("compress bitmap failed", throwable = e)
         }
         return@withContext null
     }
@@ -33,7 +33,7 @@ suspend fun String.decodeBitmap(): Bitmap? {
         try {
             BitmapFactory.decodeFile(this@decodeBitmap)
         } catch (e: Exception) {
-            println("decode bitmap failed, $e")
+            logE("decode bitmap failed", throwable = e)
             null
         }
     }

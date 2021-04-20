@@ -124,7 +124,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
             value = text.value,
             placeholder = {
                 Text(
-                    text = if (title.isNullOrEmpty()) url
+                    text = if (title.isNullOrBlank()) url
                         ?: stringResource(id = R.string.address_bar) else title,
                     fontSize = 13.sp,
                     maxLines = 1,

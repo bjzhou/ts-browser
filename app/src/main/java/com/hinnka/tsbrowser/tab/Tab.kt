@@ -10,6 +10,7 @@ import com.hinnka.tsbrowser.db.TabInfo
 import com.hinnka.tsbrowser.db.update
 import com.hinnka.tsbrowser.ext.encodeToPath
 import com.hinnka.tsbrowser.ext.host
+import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import com.hinnka.tsbrowser.util.IconCache
 import com.hinnka.tsbrowser.web.TSWebView
 import com.hinnka.tsbrowser.web.WebDataListener
@@ -28,9 +29,9 @@ data class Tab(
     override val previewState = mutableStateOf<Bitmap?>(null)
     override val canGoBackState = mutableStateOf(false)
     override val canGoForwardState = mutableStateOf(false)
+    override val longPressState = mutableStateOf(LongPressInfo())
 
     override fun onCreateWindow(message: Message) {
-        println("TSBrowser onCreateWindow")
         message.apply {
             val newWebView = WebView(view.context)
             newWebView.webViewClient = object : WebViewClient() {
@@ -61,6 +62,7 @@ data class Tab(
     }
 
     fun loadUrl(url: String) {
+        urlState.value = url
         view.post {
             view.loadUrl(url)
         }

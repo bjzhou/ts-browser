@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Build
 import android.util.Log
 import android.webkit.WebView
+import com.hinnka.tsbrowser.ext.logE
 import io.reactivex.plugins.RxJavaPlugins
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -17,7 +18,7 @@ class App : Application() {
         instance = this
         configWebViewCacheDirWithAndroidP()
         RxJavaPlugins.setErrorHandler {
-            Log.e("TSBrowser", "RxJava run error", it)
+            logE("RxJava run error", throwable = it)
         }
     }
 

@@ -4,11 +4,14 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
@@ -16,10 +19,12 @@ import com.hinnka.tsbrowser.db.AppDatabase
 import com.hinnka.tsbrowser.db.SearchHistory
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.tab.TabManager
+import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import com.hinnka.tsbrowser.ui.home.SecretActivity
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.util.IconCache
 import kotlinx.coroutines.launch
+import java.io.File
 
 class HomeViewModel : ViewModel() {
     val uiState = mutableStateOf(UIState.Main)
@@ -84,13 +89,29 @@ class HomeViewModel : ViewModel() {
         addressText.value = TextFieldValue(url, TextRange(url.length, url.length))
     }
 
-    fun share(url: String, title: String) {
+    fun share(url: String, title: String = "") {
         val intent = Intent(Intent.ACTION_SEND).apply {
             putExtra(Intent.EXTRA_TEXT, url)
             if (title.isNotBlank()) {
                 putExtra(Intent.EXTRA_TITLE, title)
             }
             type = "plain/text"
+        }
+        val chooser = Intent.createChooser(intent, App.instance[R.string.send_to]).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        App.instance.startActivity(chooser)
+    }
+
+    fun share(image: File) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/png"
+            val uri = FileProvider.getUriForFile(
+                App.instance,
+                App.instance.packageName + ".provider",
+                image
+            )
+            putExtra(Intent.EXTRA_STREAM, uri)
         }
         val chooser = Intent.createChooser(intent, App.instance[R.string.send_to]).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

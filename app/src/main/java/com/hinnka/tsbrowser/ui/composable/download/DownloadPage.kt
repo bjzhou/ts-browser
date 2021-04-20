@@ -8,17 +8,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadNotificationCreator
@@ -70,7 +71,6 @@ fun DownloadPage() {
     }) {
         DisposableEffect(key1 = tasks) {
             val disposable = RxDownloadRecorder.getAllTask().subscribe { list ->
-                println("TSBrowser $list")
                 list?.let {
                     tasks.clear()
                     tasks.addAll(it.sortedBy { item ->
@@ -109,17 +109,20 @@ fun DownloadPage() {
             itemsIndexed(tasks) { index, entity ->
 
                 val showPopup = remember { mutableStateOf(false) }
+                val popupOffset = remember { mutableStateOf(DpOffset.Zero) }
+                val manager = entity.task.manager(
+                    recorder = RoomRecorder(),
+                    notificationCreator = DownloadNotificationCreator()
+                )
+                val clipboardManager = LocalClipboardManager.current
+                val density = LocalDensity.current
 
                 Box(modifier = Modifier
                     .longPress {
                         showPopup.value = true
+                        popupOffset.value = density.run { DpOffset(it.x.toDp(), it.y.toDp()) }
                     }
                     .height(100.dp)) {
-                    val manager = entity.task.manager(
-                        recorder = RoomRecorder(),
-                        notificationCreator = DownloadNotificationCreator()
-                    )
-
                     when (entity.status) {
                         is Completed -> CompletedItem(entity = entity)
                         is Failed -> ErrorItem(entity = entity)
@@ -134,17 +137,32 @@ fun DownloadPage() {
                             DownloadingItem(entity)
                         }
                     }
-                    val clipboardManager = LocalClipboardManager.current
-                    LongPressPopup(
-                        showPopup = showPopup,
-                        onCopy = {
-                            clipboardManager.setText(AnnotatedString(entity.task.url))
-                        },
-                        onDelete = {
-                            manager.delete()
-                            tasks.removeAll { item -> item.id == entity.id }
-                        },
-                    )
+                }
+
+                DropdownMenu(
+                    expanded = showPopup.value,
+                    offset = popupOffset.value,
+                    onDismissRequest = { showPopup.value = false },
+                ) {
+                    DropdownMenuItem(onClick = {
+                        clipboardManager.setText(AnnotatedString(entity.task.url))
+                        showPopup.value = false
+                    }) {
+                        Text(
+                            text = stringResource(id = R.string.copy_link),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
+                    DropdownMenuItem(onClick = {
+                        manager.delete()
+                        tasks.removeAll { item -> item.id == entity.id }
+                        showPopup.value = false
+                    }) {
+                        Text(
+                            text = stringResource(id = R.string.delete),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
                 }
             }
         }

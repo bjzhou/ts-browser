@@ -33,4 +33,10 @@
     <string name="copy_link">Copy link</string>
     <string name="delete">Delete</string>
     <string name="clear_confirm">Delete %d downloads?</string>
+    <string name="open_in_new_tab">Open in new tab</string>
+    <string name="open_in_background_tab">Open in background tab</string>
+    <string name="share_link">Share link</string>
+    <string name="save_image">Save image</string>
+    <string name="share_image">Share image</string>
+    <string name="copy">Copy</string>
 </resources>

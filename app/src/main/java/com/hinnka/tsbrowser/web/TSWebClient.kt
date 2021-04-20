@@ -25,6 +25,8 @@ import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.adblock.AdBlocker
+import com.hinnka.tsbrowser.ext.logD
+import com.hinnka.tsbrowser.ext.logE
 import java.util.concurrent.TimeUnit
 
 class TSWebClient(private val controller: UIController) : WebViewClientCompat() {
@@ -39,7 +41,7 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val uri = request.url
-        println("TSBrowser $uri")
+        logD(uri)
 
         if (localSchemes.contains(uri.scheme)) {
             return false
@@ -95,7 +97,7 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         request: WebResourceRequest,
         errorResponse: WebResourceResponse
     ) {
-        Log.e("TSWebView", "http error ${errorResponse.statusCode}: ${errorResponse.reasonPhrase}")
+        logE("http error ${errorResponse.statusCode}: ${errorResponse.reasonPhrase}")
     }
 
     override fun onFormResubmission(view: WebView, dontResend: Message, resend: Message) {
@@ -219,8 +221,7 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         super.onReceivedError(view, request, error)
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_DESCRIPTION)) {
-                Log.e(
-                    "TSWebView",
+                logE(
                     "onReceivedError: ${request.url} ${error.errorCode} ${error.description}"
                 )
             }
