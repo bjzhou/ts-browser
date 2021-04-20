@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import com.hinnka.tsbrowser.db.TabInfo
 import com.hinnka.tsbrowser.db.update
 import com.hinnka.tsbrowser.ext.encodeToPath
+import com.hinnka.tsbrowser.ext.host
+import com.hinnka.tsbrowser.util.IconCache
 import com.hinnka.tsbrowser.web.TSWebView
 import com.hinnka.tsbrowser.web.WebDataListener
 
@@ -100,7 +102,9 @@ data class Tab(
 
     override suspend fun updateInfo() {
         info.url = urlState.value
-        info.iconPath = iconState.value?.encodeToPath("icon-${info.url}")
+        iconState.value?.let {
+            info.url.host?.let { it1 -> IconCache.save(it1, it) }
+        }
         info.thumbnailPath = previewState.value?.encodeToPath("preview-${info.url}")
         info.title = titleState.value
         info.update()

@@ -2,6 +2,7 @@ package com.hinnka.tsbrowser.ui.composable.download
 
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -36,7 +37,7 @@ fun DownloadPage() {
     val context = LocalContext.current
     Scaffold(topBar = {
         TSAppBar(title = stringResource(id = R.string.downloads), actions = {
-            IconButton(onClick = {
+            Box(modifier = Modifier.fillMaxHeight().clickable {
                 RxDownloadRecorder.getAllTaskWithStatus(Completed())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
@@ -58,10 +59,11 @@ fun DownloadPage() {
                             }
                         }.show()
                     }
-            }, modifier = Modifier.widthIn(min = 56.dp)) {
+            }, contentAlignment = Alignment.Center) {
                 Text(
                     text = stringResource(id = R.string.clear),
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    maxLines = 1,
                 )
             }
         })

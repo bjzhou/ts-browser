@@ -14,7 +14,6 @@ data class TabInfo(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     @ColumnInfo var isActive: Boolean = false,
     @ColumnInfo var title: String = "",
-    @ColumnInfo var iconPath: String? = "",
     @ColumnInfo var url: String = "",
     @ColumnInfo var thumbnailPath: String? = "",
 )
@@ -36,7 +35,7 @@ data class SearchHistory(
     @PrimaryKey var query: String,
     @ColumnInfo var updatedAt: Long,
     @ColumnInfo var title: String? = null,
-    @ColumnInfo var icon: String? = null
+    @ColumnInfo var url: String? = null
 ) {
     @Ignore
     var iconBitmap: Bitmap? = null

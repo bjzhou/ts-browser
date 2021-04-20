@@ -25,6 +25,7 @@ import com.hinnka.tsbrowser.db.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.ui.base.BaseActivity
+import com.hinnka.tsbrowser.util.IconCache
 import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -180,17 +181,23 @@ class TSWebView @JvmOverloads constructor(
 
     override fun onReceivedIcon(icon: Bitmap?) {
         url?.let { url ->
-            val host = Uri.parse(url).host ?: return
-            faviconMap[host] = icon
+            url.host?.let {
+                faviconMap[it] = icon
+            }
             dataListener?.iconState?.value = icon
 
-            mainScope.launch {
+            lifecycleScope.launchWhenCreated {
                 val search = SearchHistory(
                     this@TSWebView.originalUrl ?: "",
                     System.currentTimeMillis()
                 )
                 search.title = dataListener?.titleState?.value
-                search.icon = icon?.encodeToPath("icon-$url")
+                icon?.let {
+                    url.host?.let { host ->
+                        IconCache.save(host, it)
+                    }
+                }
+                search.url = url
                 val dao = AppDatabase.instance.searchHistoryDao()
                 if (dao.getByName(search.query) != null) {
                     dao.update(search)
@@ -305,8 +312,14 @@ class TSWebView @JvmOverloads constructor(
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
         dataListener?.urlState?.value = url
-        val host = Uri.parse(url).host ?: return
-        dataListener?.iconState?.value = faviconMap[host]
+        url.host?.let { host ->
+            lifecycleScope.launchWhenCreated {
+                if (faviconMap[host] == null) {
+                    faviconMap[host] = IconCache.asyncGet(host)
+                }
+                dataListener?.iconState?.value = faviconMap[host]
+            }
+        }
         dataListener?.canGoBackState?.value = canGoBack()
         dataListener?.canGoForwardState?.value = canGoForward()
         generatePreview()

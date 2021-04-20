@@ -8,8 +8,10 @@ import com.hinnka.tsbrowser.db.TabInfo
 import com.hinnka.tsbrowser.db.delete
 import com.hinnka.tsbrowser.db.update
 import com.hinnka.tsbrowser.ext.decodeBitmap
+import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ui.home.UIState
+import com.hinnka.tsbrowser.util.IconCache
 import com.hinnka.tsbrowser.web.TSWebView
 import kotlinx.coroutines.launch
 
@@ -84,7 +86,7 @@ object TabManager {
             Tab(it, TSWebView(context)).apply {
                 urlState.value = it.url
                 titleState.value = it.title
-                iconState.value = it.iconPath?.decodeBitmap()
+                iconState.value = IconCache.asyncGet(it.url.host ?: "")
                 previewState.value = it.thumbnailPath?.decodeBitmap()
                 if (it.isActive) {
                     currentTab.value = this
