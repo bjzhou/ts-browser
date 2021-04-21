@@ -2,6 +2,7 @@ package com.hinnka.tsbrowser.ui.composable.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,15 +47,17 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AddressBar() {
+fun AddressBar(drawerState: DrawerState) {
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
+    val scope = rememberCoroutineScope()
     TopAppBar(contentPadding = PaddingValues(start = if (uiState.value == UIState.Search) 8.dp else 0.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AnimatedVisibility(visible = uiState.value != UIState.Search) {
                 IconButton(onClick = {
-                    /*TODO*/
-                    PageController.navigate("downloads")
+                    scope.launch {
+                        drawerState.open()
+                    }
                 }) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
                 }

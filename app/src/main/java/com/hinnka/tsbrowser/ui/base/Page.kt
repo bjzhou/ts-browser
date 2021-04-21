@@ -20,6 +20,12 @@ object PageController {
     var addAnimPending = false
     var removeAnimPending = false
 
+    fun set(route: String, vararg arguments: Any) {
+        argumentMap[route] = arguments
+        routes.add(route)
+        currentRoute.value = route
+    }
+
     fun navigate(route: String, vararg arguments: Any) {
         addAnimPending = true
         argumentMap[route] = arguments
@@ -55,7 +61,7 @@ object PageGraphBuilder {
 @Composable
 fun PageContainer(start: String, pageGraph: PageGraphBuilder.() -> Unit) {
     if (PageController.routes.isEmpty()) {
-        PageController.navigate(start)
+        PageController.set(start)
     }
     PageGraphBuilder.pageGraph()
     Box(modifier = Modifier.fillMaxSize()) {

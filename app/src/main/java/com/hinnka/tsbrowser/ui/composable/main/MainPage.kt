@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -22,6 +19,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.base.StatusBar
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 import kotlin.math.abs
@@ -38,14 +36,19 @@ fun MainPage() {
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            AnimatedVisibility(
-                visible = addressBarVisible.value,
-                enter = fadeIn() + slideInVertically() + expandIn(initialSize = { IntSize(it.width, 0) }),
-                exit = fadeOut() + slideOutVertically() + shrinkOut(targetSize = { IntSize(it.width, 0) })
-            ) {
-                AddressBar()
+            Column {
+                StatusBar()
+                AnimatedVisibility(
+                    visible = addressBarVisible.value,
+                    enter = fadeIn() + slideInVertically() + expandIn(initialSize = { IntSize(it.width, 0) }),
+                    exit = fadeOut() + slideOutVertically() + shrinkOut(targetSize = { IntSize(it.width, 0) })
+                ) {
+                    AddressBar(scaffoldState.drawerState)
+                }
             }
         },
+        drawerContent = { TSDrawer() },
+        drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
         modifier = Modifier.pointerInput(Unit) {
             detectVerticalDragGestures { _, dragAmount ->
                 if (dragAmount < 0 && abs(dragAmount) >= slop) {
