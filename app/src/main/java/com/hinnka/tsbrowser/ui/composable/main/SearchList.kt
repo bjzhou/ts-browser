@@ -43,7 +43,7 @@ fun SearchList() {
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-        .background(Color(0xf0FFFFFF))) {
+        .background(Color(0xf7FFFFFF))) {
         tab?.let { tab ->
             item {
                 CurrentUrl(viewModel = viewModel, tab = tab)

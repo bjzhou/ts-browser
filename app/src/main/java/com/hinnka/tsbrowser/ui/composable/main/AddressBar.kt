@@ -2,7 +2,6 @@ package com.hinnka.tsbrowser.ui.composable.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
-import com.hinnka.tsbrowser.ui.base.PageController
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.theme.lightWhite
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
@@ -51,7 +49,10 @@ fun AddressBar(drawerState: DrawerState) {
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
     val scope = rememberCoroutineScope()
-    TopAppBar(contentPadding = PaddingValues(start = if (uiState.value == UIState.Search) 8.dp else 0.dp)) {
+    TopAppBar(
+        contentPadding = PaddingValues(start = if (uiState.value == UIState.Search) 8.dp else 0.dp),
+        elevation = 0.dp
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AnimatedVisibility(visible = uiState.value != UIState.Search) {
                 IconButton(onClick = {

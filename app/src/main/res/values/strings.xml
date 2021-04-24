@@ -40,4 +40,7 @@
     <string name="share_image">Share image</string>
     <string name="copy">Copy</string>
     <string name="bookmark">Bookmarks</string>
+    <string name="privacy_protect">Privacy protect</string>
+    <string name="days">%d days</string>
+    <string name="history">History</string>
 </resources>

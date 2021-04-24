@@ -2,103 +2,125 @@ package com.hinnka.tsbrowser.ui.composable.main
 
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.viewinterop.AndroidView
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.removeFromParent
+import com.hinnka.tsbrowser.ext.screenSize
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.base.StatusBar
+import com.hinnka.tsbrowser.ui.base.statusBarHeight
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
-import kotlin.math.abs
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainPage() {
-    val viewModel = LocalViewModel.current
     val scaffoldState = rememberScaffoldState()
-    val addressBarVisible = viewModel.addressBarVisible
-    val uiState = viewModel.uiState
-    val context = LocalContext.current
-    val slop = ViewConfiguration.get(context).scaledTouchSlop
     Scaffold(
         scaffoldState = scaffoldState,
-        topBar = {
-            Column {
-                StatusBar()
-                AnimatedVisibility(
-                    visible = addressBarVisible.value,
-                    enter = fadeIn() + slideInVertically() + expandIn(initialSize = { IntSize(it.width, 0) }),
-                    exit = fadeOut() + slideOutVertically() + shrinkOut(targetSize = { IntSize(it.width, 0) })
-                ) {
-                    AddressBar(scaffoldState.drawerState)
-                }
-            }
-        },
+        topBar = { StatusBar() },
         drawerContent = { TSDrawer() },
         drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
-        modifier = Modifier.pointerInput(Unit) {
-            detectVerticalDragGestures { _, dragAmount ->
-                if (dragAmount < 0 && abs(dragAmount) >= slop) {
-                    addressBarVisible.value = false
-                } else if (dragAmount > 0 && dragAmount >= slop) {
-                    addressBarVisible.value = true
-                }
-            }
-        }
     ) {
-        Box {
-            MainView()
-            when (uiState.value) {
-                UIState.Search -> {
-                    SearchList()
-                }
-                UIState.TabList -> {
-                    TabList()
-                }
-                else -> {}
-            }
-        }
+        MainView(scaffoldState.drawerState)
         CheckTabs()
+        LongPressPopup()
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MainView() {
+fun MainView(drawerState: DrawerState) {
+    val tab = TabManager.currentTab.value
+    val webViewHeight =
+        with(LocalDensity.current) { screenSize().y.toDp() } - 48.dp - statusBarHeight()
+    val density = LocalDensity.current
+    val addressBarPadding = remember { mutableStateOf(0.dp) }
+
+    val viewModel = LocalViewModel.current
+    val uiState = viewModel.uiState
+
     Column(modifier = Modifier.fillMaxSize()) {
-        val tab = TabManager.currentTab.value
-        Box(modifier = Modifier.weight(1f)) {
-            AndroidView(
-                factory = {
-                    FrameLayout(it)
-                },
-                modifier = Modifier.fillMaxSize(),
-                update = { tabContainer ->
-                    tab?.let {
-                        tabContainer.removeAllViews()
-                        it.view.removeFromParent()
-                        tabContainer.addView(it.view)
-                    }
+        Box(modifier = Modifier
+            .weight(1f)
+            .nestedScroll(object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    val padding =
+                        addressBarPadding.value + with(density) { available.y.toDp() }
+                    addressBarPadding.value = max((-56).dp, min(0.dp, padding))
+                    logD("onPreScroll $padding")
+                    return super.onPreScroll(available, source)
                 }
-            )
-            ProgressIndicator()
+            })) {
+            Box(modifier = Modifier.height(webViewHeight)) {
+                AndroidView(
+                    factory = {
+                        FrameLayout(it).apply {
+                            setPadding(0, with(density) { 56.dp.toPx() }.toInt(), 0, 0)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    update = { tabContainer ->
+                        tab?.let {
+                            tabContainer.removeAllViews()
+                            it.view.removeFromParent()
+                            tabContainer.addView(it.view)
+                        }
+                    }
+                )
+                ProgressIndicator()
+            }
         }
         BottomBar()
     }
-    LongPressPopup()
+    when (uiState.value) {
+        UIState.Search -> {
+            Box(modifier = Modifier.padding(top = 56.dp)) {
+                SearchList()
+            }
+        }
+        UIState.TabList -> {
+            Box(modifier = Modifier.padding(top = 56.dp)) {
+                TabList()
+            }
+        }
+        else -> {
+        }
+    }
+    Box(modifier = Modifier.graphicsLayer {
+        translationY = addressBarPadding.value.toPx()
+    }) {
+        AddressBar(drawerState)
+    }
 }
 
 @Composable

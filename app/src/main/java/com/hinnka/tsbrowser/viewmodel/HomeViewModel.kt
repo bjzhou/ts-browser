@@ -28,7 +28,6 @@ import java.io.File
 
 class HomeViewModel : ViewModel() {
     val uiState = mutableStateOf(UIState.Main)
-    val addressBarVisible = mutableStateOf(true)
     val searchList = mutableStateListOf<SearchHistory>()
     val addressText = mutableStateOf(TextFieldValue())
 
