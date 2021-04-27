@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ext
 
+import android.content.res.Resources
 import java.text.DecimalFormat
 
 fun Long.formatByte(): String {
@@ -19,3 +20,6 @@ fun Long.formatByte(): String {
         else -> "${format.format(byte)} B"
     }
 }
+
+val Int.dpx
+    get() = Resources.getSystem().displayMetrics.density * this

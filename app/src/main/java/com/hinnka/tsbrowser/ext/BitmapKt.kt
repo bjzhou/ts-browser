@@ -16,7 +16,7 @@ suspend fun Bitmap.encodeToPath(name: String): String? {
             dir.mkdir()
         }
         try {
-            val file = File(dir, Base64.encodeToString(name.toByteArray(), Base64.URL_SAFE).trim())
+            val file = File(dir, (if (name.length > 100) { name.substring(0, 100) } else name).replace(":", "").replace("/", "").trim())
             FileOutputStream(file).use {
                 compress(Bitmap.CompressFormat.PNG, 70, it)
             }

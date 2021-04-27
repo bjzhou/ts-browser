@@ -1,32 +1,22 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
-import android.view.ViewConfiguration
+import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.viewinterop.AndroidView
-import com.hinnka.tsbrowser.ext.logD
+import com.hinnka.tsbrowser.ext.dpx
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.ext.screenSize
 import com.hinnka.tsbrowser.tab.TabManager
@@ -58,42 +48,32 @@ fun MainView(drawerState: DrawerState) {
     val tab = TabManager.currentTab.value
     val webViewHeight =
         with(LocalDensity.current) { screenSize().y.toDp() } - 48.dp - statusBarHeight()
-    val density = LocalDensity.current
-    val addressBarPadding = remember { mutableStateOf(0.dp) }
+    val addressBarPadding = remember { mutableStateOf(0f) }
 
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier
-            .weight(1f)
-            .nestedScroll(object : NestedScrollConnection {
-                override fun onPreScroll(
-                    available: Offset,
-                    source: NestedScrollSource
-                ): Offset {
-                    val padding =
-                        addressBarPadding.value + with(density) { available.y.toDp() }
-                    addressBarPadding.value = max((-56).dp, min(0.dp, padding))
-                    logD("onPreScroll $padding")
-                    return super.onPreScroll(available, source)
-                }
-            })) {
+        Box(modifier = Modifier.weight(1f)) {
             Box(modifier = Modifier.height(webViewHeight)) {
                 AndroidView(
                     factory = {
-                        FrameLayout(it).apply {
-                            setPadding(0, with(density) { 56.dp.toPx() }.toInt(), 0, 0)
-                        }
+                        FrameLayout(it)
                     },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxSize(),
                     update = { tabContainer ->
                         tab?.let {
                             tabContainer.removeAllViews()
                             it.view.removeFromParent()
+                            it.view.setPadding(0, 56.dpx.toInt(), 0, 0)
                             tabContainer.addView(it.view)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                it.view.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                                    if (scrollY <= 56.dpx) {
+                                        addressBarPadding.value = (-scrollY).toFloat()
+                                    }
+                                }
+                            }
                         }
                     }
                 )
@@ -117,7 +97,7 @@ fun MainView(drawerState: DrawerState) {
         }
     }
     Box(modifier = Modifier.graphicsLayer {
-        translationY = addressBarPadding.value.toPx()
+        translationY = addressBarPadding.value
     }) {
         AddressBar(drawerState)
     }
