@@ -68,6 +68,9 @@ data class Tab(
         }
     }
 
+    val isHome
+        get() = urlState.value == "https://www.baidu.com"
+
     fun goHome() {
         view.post {
             view.loadUrl("https://www.baidu.com")

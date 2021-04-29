@@ -4,11 +4,16 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Browser
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.ext.logD
@@ -23,6 +28,7 @@ import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import com.hinnka.tsbrowser.viewmodel.HomeViewModel
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import kotlinx.coroutines.launch
 
 open class MainActivity : BaseActivity() {
 
@@ -38,6 +44,7 @@ open class MainActivity : BaseActivity() {
                         page("main") { MainPage() }
                         page("downloads") { DownloadPage() }
                     }
+                    ImeListener()
                 }
             }
         }
@@ -54,6 +61,23 @@ open class MainActivity : BaseActivity() {
         CompositionLocalProvider(
             LocalViewModel provides viewModel,
             content = content)
+    }
+
+    @Composable
+    fun ImeListener() {
+        val viewModel = LocalViewModel.current
+        val scope = rememberCoroutineScope()
+
+        val view = LocalView.current
+        view.setOnApplyWindowInsetsListener { v, insets ->
+            val imeHeight =
+                WindowInsetsCompat.toWindowInsetsCompat(insets).getInsets(
+                    WindowInsetsCompat.Type.ime())
+            scope.launch {
+                viewModel.imeHeightState.animateTo(imeHeight.bottom.toFloat())
+            }
+            insets
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -111,6 +135,7 @@ open class MainActivity : BaseActivity() {
         TabManager.onPause()
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onBackPressed() {
         if (PageController.routes.size > 1) {
             PageController.navigateUp()

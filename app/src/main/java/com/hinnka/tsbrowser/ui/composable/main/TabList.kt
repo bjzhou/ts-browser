@@ -38,6 +38,7 @@ import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.base.statusBarHeight
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 
@@ -56,10 +57,13 @@ fun TabList() {
     val hideAnim = remember { mutableStateOf(false) }
     val resetAnim = remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
+    val statusBarHeight = statusBarHeight()
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
-        modifier = Modifier.background(Color.White).fillMaxSize(),
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize(),
         state = listState,
         contentPadding = PaddingValues(8.dp)
     ) {
@@ -77,7 +81,8 @@ fun TabList() {
                             targetSize.value = IntSize(width.toInt(), height.toInt())
                             val offset = coor.positionInRoot()
                             val x = (offset.x + density.run { 2.dp.toPx() }).toInt()
-                            val y = (offset.y - density.run { 24.dp.toPx() }).toInt()
+                            val y =
+                                (offset.y + density.run { (30.dp - statusBarHeight).toPx() }).toInt()
                             targetOffset.value = IntOffset(x, y)
                         }
                     }

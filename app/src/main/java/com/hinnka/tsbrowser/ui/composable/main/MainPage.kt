@@ -1,105 +1,93 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
-import android.os.Build
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
-import com.hinnka.tsbrowser.ext.dpx
+import androidx.core.view.WindowInsetsCompat
 import com.hinnka.tsbrowser.ext.removeFromParent
-import com.hinnka.tsbrowser.ext.screenSize
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.base.StatusBar
-import com.hinnka.tsbrowser.ui.base.statusBarHeight
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainPage() {
-    val scaffoldState = rememberScaffoldState()
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = { StatusBar() },
+    val drawerState = rememberBottomDrawerState(initialValue = BottomDrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    BottomDrawer(
         drawerContent = { TSDrawer() },
-        drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
+        drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen
     ) {
-        MainView(scaffoldState.drawerState)
+        Column {
+            StatusBar()
+            MainView(drawerState)
+        }
         CheckTabs()
         LongPressPopup()
+        BackHandler(enabled = drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
+        }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun MainView(drawerState: DrawerState) {
+fun MainView(drawerState: BottomDrawerState) {
     val tab = TabManager.currentTab.value
-    val webViewHeight =
-        with(LocalDensity.current) { screenSize().y.toDp() } - 48.dp - statusBarHeight()
-    val addressBarPadding = remember { mutableStateOf(0f) }
-
-    val viewModel = LocalViewModel.current
-    val uiState = viewModel.uiState
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
-            Box(modifier = Modifier.height(webViewHeight)) {
-                AndroidView(
-                    factory = {
-                        FrameLayout(it)
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                    update = { tabContainer ->
-                        tab?.let {
-                            tabContainer.removeAllViews()
-                            it.view.removeFromParent()
-                            it.view.setPadding(0, 56.dpx.toInt(), 0, 0)
-                            tabContainer.addView(it.view)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                it.view.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                                    if (scrollY <= 56.dpx) {
-                                        addressBarPadding.value = (-scrollY).toFloat()
-                                    }
-                                }
-                            }
-                        }
+            AndroidView(
+                factory = {
+                    FrameLayout(it)
+                },
+                modifier = Modifier.fillMaxSize(),
+                update = { tabContainer ->
+                    tab?.let {
+                        tabContainer.removeAllViews()
+                        it.view.removeFromParent()
+                        tabContainer.addView(it.view)
                     }
-                )
-                ProgressIndicator()
-            }
+                }
+            )
+            ProgressIndicator()
+            CoverView()
         }
-        BottomBar()
+        BottomBar(drawerState)
     }
+}
+
+@Composable
+fun CoverView() {
+    val viewModel = LocalViewModel.current
+    val uiState = viewModel.uiState
     when (uiState.value) {
-        UIState.Search -> {
-            Box(modifier = Modifier.padding(top = 56.dp)) {
-                SearchList()
-            }
-        }
-        UIState.TabList -> {
-            Box(modifier = Modifier.padding(top = 56.dp)) {
-                TabList()
-            }
-        }
+        UIState.Search -> SearchList()
+        UIState.TabList -> TabList()
         else -> {
         }
-    }
-    Box(modifier = Modifier.graphicsLayer {
-        translationY = addressBarPadding.value
-    }) {
-        AddressBar(drawerState)
     }
 }
 

@@ -2,6 +2,8 @@ package com.hinnka.tsbrowser.ext
 
 import android.content.res.Resources
 import java.text.DecimalFormat
+import kotlin.math.max
+import kotlin.math.min
 
 fun Long.formatByte(): String {
     val byte = this.toDouble()
@@ -23,3 +25,13 @@ fun Long.formatByte(): String {
 
 val Int.dpx
     get() = Resources.getSystem().displayMetrics.density * this
+
+fun Float.between(min: Float, max: Float): Float {
+    if (this > max) {
+        return max
+    }
+    if (this < min) {
+        return min
+    }
+    return this
+}

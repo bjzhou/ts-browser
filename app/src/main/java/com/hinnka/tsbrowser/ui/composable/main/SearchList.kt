@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,117 +36,118 @@ fun SearchList() {
     val context = LocalContext.current
     val list = viewModel.searchList
     val tab = TabManager.currentTab.value
+    val density = LocalDensity.current
 
     val clipboard = LocalClipboardManager.current
     val clipboardText = clipboard.getText()
 
     viewModel.loadSearchHistory()
 
-    LazyColumn(modifier = Modifier
+    Column(modifier = Modifier
         .fillMaxSize()
-        .background(Color(0xf7FFFFFF))) {
-        tab?.let { tab ->
+        .padding(bottom = with(density) { viewModel.imeHeightState.value.toDp() })
+        .background(Color.White),
+    ) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
             item {
-                CurrentUrl(viewModel = viewModel, tab = tab)
+                Text(
+                    text = stringResource(id = R.string.search_history),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
+                )
             }
-        }
-        if (!clipboardText.isNullOrBlank()) {
-            item {
+            items(list.size) { index ->
+                val item = list[index]
                 Row(
                     modifier = Modifier
                         .height(56.dp)
                         .clickable {
-                            viewModel.onGo(clipboardText.text, context)
+                            viewModel.onGo(item.query, context)
                             viewModel.uiState.value = UIState.Main
-                        },
-                    verticalAlignment = Alignment.CenterVertically
+                        }, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.width(16.dp))
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
+                    if (item.query.isUrl()) {
+                        item.iconBitmap?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = item.query,
+                                modifier = Modifier.size(32.dp),
+                            )
+                        } ?: Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = item.query,
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.LightGray,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = item.query,
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.LightGray,
+                        )
+                    }
+                    Text(
+                        text = item.title ?: item.query,
                         modifier = Modifier
-                            .size(32.dp),
-                        tint = Color.LightGray,
-                    )
-                    Text(
-                        text = stringResource(id = R.string.click_search),
-                        modifier = Modifier.padding(start = 8.dp),
-                    )
-                    Text(
-                        text = " \"",
-                    )
-                    Text(
-                        text = clipboardText.text,
-                        maxLines = 1,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.weight(1f, fill = false),
+                            .weight(1f)
+                            .padding(start = 8.dp),
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = "\"",
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    IconButton(onClick = {
+                        viewModel.delete(item)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = item.query,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.LightGray,
+                        )
+                    }
                 }
             }
         }
-        item {
-            Text(
-                text = stringResource(id = R.string.search_history),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
-            )
-        }
-        items(list.size) { index ->
-            val item = list[index]
+        if (!clipboardText.isNullOrBlank()) {
             Row(
                 modifier = Modifier
                     .height(56.dp)
                     .clickable {
-                        viewModel.onGo(item.query, context)
+                        viewModel.onGo(clipboardText.text, context)
                         viewModel.uiState.value = UIState.Main
-                    }, verticalAlignment = Alignment.CenterVertically
+                    },
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(16.dp))
-                if (item.query.isUrl()) {
-                    item.iconBitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = item.query,
-                            modifier = Modifier.size(32.dp),
-                        )
-                    } ?: Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = item.query,
-                        modifier = Modifier.size(32.dp),
-                        tint = Color.LightGray,
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = item.query,
-                        modifier = Modifier.size(32.dp),
-                        tint = Color.LightGray,
-                    )
-                }
-                Text(
-                    text = item.title ?: item.query,
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp),
+                        .size(32.dp),
+                    tint = Color.LightGray,
+                )
+                Text(
+                    text = stringResource(id = R.string.click_search),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+                Text(
+                    text = " \"",
+                )
+                Text(
+                    text = clipboardText.text,
+                    maxLines = 1,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f, fill = false),
                     overflow = TextOverflow.Ellipsis
                 )
-                IconButton(onClick = {
-                    viewModel.delete(item)
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = item.query,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.LightGray,
-                    )
-                }
+                Text(
+                    text = "\"",
+                )
+                Spacer(modifier = Modifier.width(16.dp))
             }
+        }
+        tab?.let { tab ->
+            CurrentUrl(viewModel = viewModel, tab = tab)
         }
     }
 }

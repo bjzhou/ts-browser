@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
+import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -19,7 +19,6 @@ import com.hinnka.tsbrowser.db.AppDatabase
 import com.hinnka.tsbrowser.db.SearchHistory
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import com.hinnka.tsbrowser.ui.home.SecretActivity
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.util.IconCache
@@ -30,6 +29,7 @@ class HomeViewModel : ViewModel() {
     val uiState = mutableStateOf(UIState.Main)
     val searchList = mutableStateListOf<SearchHistory>()
     val addressText = mutableStateOf(TextFieldValue())
+    val imeHeightState = Animatable(0f)
 
     fun onGo(text: String, context: Context) {
         val urlText = text.trim()
