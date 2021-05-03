@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.base
+package com.hinnka.tsbrowser.ui.composable.wiget
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Box
@@ -67,7 +67,11 @@ fun PageContainer(start: String, pageGraph: PageGraphBuilder.() -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         PageController.routes.forEach { route ->
             Page(route = route) {
-                PageGraphBuilder.pages[route]?.invoke(PageController.argumentMap[route])
+                TSBackHandler(
+                    enabled = PageController.routes.size > 1,
+                    onBack = { PageController.navigateUp() }) {
+                    PageGraphBuilder.pages[route]?.invoke(PageController.argumentMap[route])
+                }
             }
         }
     }

@@ -38,7 +38,7 @@ import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
-import com.hinnka.tsbrowser.ui.base.statusBarHeight
+import com.hinnka.tsbrowser.ui.composable.wiget.statusBarHeight
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 
@@ -160,7 +160,7 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
         }
         .border(
             width = if (tab.info.isActive) 2.dp else 0.dp,
-            color = MaterialTheme.colors.secondary,
+            color = MaterialTheme.colors.primary,
             shape = RoundedCornerShape(4.dp)
         )) {
         Row(modifier = Modifier.height(28.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -69,7 +69,7 @@ fun DownloadingItem(entity: TaskEntity) {
             LinearProgressIndicator(
                 progress = entity.status.progress.percent().toFloat() / 100f,
                 modifier = Modifier.padding(top = 8.dp),
-                color = MaterialTheme.colors.secondary
+                color = MaterialTheme.colors.primary
             )
         }
         Button(
@@ -86,7 +86,7 @@ fun DownloadingItem(entity: TaskEntity) {
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color(0xFFE1FFFA),
-                contentColor = MaterialTheme.colors.secondary
+                contentColor = MaterialTheme.colors.primary
             ),
             elevation = ButtonDefaults.elevation(defaultElevation = 0.dp),
             shape = RoundedCornerShape(16.dp),

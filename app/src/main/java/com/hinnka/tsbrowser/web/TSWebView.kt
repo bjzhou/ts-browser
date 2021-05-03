@@ -161,9 +161,6 @@ class TSWebView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(event)
-        if (event.action == MotionEvent.ACTION_UP) {
-            generatePreview()
-        }
         return super.onTouchEvent(event)
     }
 

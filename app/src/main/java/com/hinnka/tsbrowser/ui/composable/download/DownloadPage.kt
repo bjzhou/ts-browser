@@ -12,7 +12,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadNotificationCreator
 import com.hinnka.tsbrowser.ext.longPress
-import com.hinnka.tsbrowser.ui.base.TSAppBar
+import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import zlc.season.rxdownload4.file
 import zlc.season.rxdownload4.manager.*

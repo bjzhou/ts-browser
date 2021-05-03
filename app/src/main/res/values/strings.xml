@@ -23,6 +23,7 @@
     <string name="click_search">Click to search</string>
     <string name="downloads">Downloads</string>
     <string name="downloads_empty">File that you download appear here.</string>
+    <string name="bookmarks_empty">Your bookmarks appear here.</string>
     <string name="open">Open</string>
     <string name="resume">Resume</string>
     <string name="pause">Pause</string>
@@ -43,4 +44,12 @@
     <string name="privacy_protect">Privacy protect</string>
     <string name="days">%d days</string>
     <string name="history">History</string>
+    <string name="empty">Empty</string>
+    <string name="bookmark_count">%d bookmarks</string>
+    <string name="add_folder">Add folder</string>
+    <string name="title">Title</string>
+    <string name="parent_folder">Parent folder</string>
+    <string name="bookmark_root">Root folder</string>
+    <string name="edit_bookmark">Edit bookmark</string>
+    <string name="url">Url</string>
 </resources>

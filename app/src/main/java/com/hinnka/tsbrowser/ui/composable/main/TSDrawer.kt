@@ -9,25 +9,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.BookmarkAdded
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.db.*
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.base.PageController
-import com.hinnka.tsbrowser.ui.base.statusBarHeight
+import com.hinnka.tsbrowser.ui.composable.wiget.PageController
+import com.hinnka.tsbrowser.ui.theme.PrimaryWhite
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -36,7 +32,7 @@ fun ColumnScope.TSDrawer() {
         modifier = Modifier
             .height(48.dp)
             .fillMaxWidth()
-            .background(Color(0xFFF1FFFB))
+            .background(PrimaryWhite)
     ) {
         BackButton()
         ForwardButton()
@@ -45,7 +41,7 @@ fun ColumnScope.TSDrawer() {
     }
     Row(
         modifier = Modifier
-            .background(Color(0xFFF1FFFB))
+            .background(PrimaryWhite)
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -67,7 +63,9 @@ fun ColumnScope.TSDrawer() {
         )
     }
     ListItem(
-        modifier = Modifier.clickable { },
+        modifier = Modifier.clickable {
+            PageController.navigate("bookmarks")
+        },
         icon = { Icon(imageVector = Icons.Outlined.Bookmarks, contentDescription = "Bookmarks") },
     ) {
         Text(text = stringResource(id = R.string.bookmark))
@@ -138,19 +136,33 @@ fun RowScope.ShareButton() {
 
 @Composable
 fun RowScope.BookmarkButton() {
-    val added = remember { mutableStateOf(false) }
+    val tab by TabManager.currentTab
+    val url = tab?.urlState?.value ?: return
+    val title = tab?.titleState?.value ?: stringResource(id = R.string.untiled)
+    val bookmark = remember { mutableStateOf(Bookmark.findByUrl(url)) }
     IconButton(
         onClick = {
-            added.value = !added.value
+            if (bookmark.value == null) {
+                bookmark.value = Bookmark(
+                    url = url,
+                    name = title,
+                    type = BookmarkType.Url
+                ).apply {
+                    Bookmark.root.addChild(this)
+                }
+            } else {
+                bookmark.value?.remove()
+                bookmark.value = null
+            }
         },
         modifier = Modifier
             .weight(1f)
             .height(48.dp),
     ) {
         Icon(
-            imageVector = if (added.value) Icons.Default.BookmarkAdded else Icons.Outlined.BookmarkAdd,
+            imageVector = if (bookmark.value != null) Icons.Default.BookmarkAdded else Icons.Outlined.BookmarkAdd,
             contentDescription = "Bookmark",
-            tint = if (added.value) MaterialTheme.colors.secondary else MaterialTheme.colors.onPrimary
+            tint = if (bookmark.value != null) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
         )
     }
 }

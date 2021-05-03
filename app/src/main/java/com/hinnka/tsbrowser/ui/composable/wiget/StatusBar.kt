@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.base
+package com.hinnka.tsbrowser.ui.composable.wiget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,7 +19,7 @@ fun StatusBar() {
     Box(modifier = Modifier
         .fillMaxWidth()
         .height(statusBarHeight())
-        .background(MaterialTheme.colors.primaryVariant)
+        .background(MaterialTheme.colors.surface)
     )
 }
 

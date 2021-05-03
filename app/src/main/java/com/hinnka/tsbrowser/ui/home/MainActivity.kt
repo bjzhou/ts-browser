@@ -4,27 +4,26 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Browser
-import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import com.hinnka.tsbrowser.BuildConfig
+import com.hinnka.tsbrowser.db.Bookmark
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.base.BaseActivity
-import com.hinnka.tsbrowser.ui.base.PageContainer
-import com.hinnka.tsbrowser.ui.base.PageController
+import com.hinnka.tsbrowser.ui.composable.bookmark.AddFolder
+import com.hinnka.tsbrowser.ui.composable.bookmark.BookmarkPage
+import com.hinnka.tsbrowser.ui.composable.bookmark.EditBookmark
 import com.hinnka.tsbrowser.ui.composable.download.DownloadPage
 import com.hinnka.tsbrowser.ui.composable.main.MainPage
+import com.hinnka.tsbrowser.ui.composable.wiget.PageContainer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import com.hinnka.tsbrowser.viewmodel.HomeViewModel
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
@@ -38,11 +37,14 @@ open class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Providers {
+            Initialize {
                 TSBrowserTheme {
                     PageContainer("main") {
                         page("main") { MainPage() }
                         page("downloads") { DownloadPage() }
+                        page("bookmarks") { BookmarkPage() }
+                        page("addFolder") { AddFolder(it?.get(0) as Bookmark) }
+                        page("editBookmark") { EditBookmark(it?.get(0) as Bookmark) }
                     }
                     ImeListener()
                 }
@@ -54,6 +56,21 @@ open class MainActivity : BaseActivity() {
         }
 
         handleIntent(intent)
+
+        if (BuildConfig.DEBUG) {
+            window.decorView.keepScreenOn = true
+        }
+    }
+
+    @Composable
+    fun Initialize(content: @Composable () -> Unit) {
+        val initialized = remember {
+            mutableStateOf(false)
+        }
+        Bookmark.init { initialized.value = true }
+        if (initialized.value) {
+            Providers(content)
+        }
     }
 
     @Composable
@@ -133,20 +150,5 @@ open class MainActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         TabManager.onPause()
-    }
-
-    @OptIn(ExperimentalMaterialApi::class)
-    override fun onBackPressed() {
-        if (PageController.routes.size > 1) {
-            PageController.navigateUp()
-            return
-        }
-        if (viewModel.uiState.value != UIState.Main) {
-            viewModel.uiState.value = UIState.Main
-            return
-        }
-        if (TabManager.currentTab.value?.onBackPressed() != true) {
-            super.onBackPressed()
-        }
     }
 }
