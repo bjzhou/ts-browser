@@ -21,8 +21,8 @@ import android.widget.FrameLayout
 import android.widget.VideoView
 import androidx.core.view.children
 import androidx.lifecycle.*
-import com.hinnka.tsbrowser.db.AppDatabase
-import com.hinnka.tsbrowser.db.SearchHistory
+import com.hinnka.tsbrowser.persist.AppDatabase
+import com.hinnka.tsbrowser.persist.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.ui.base.BaseActivity

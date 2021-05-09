@@ -1,6 +1,5 @@
 package com.hinnka.tsbrowser.ui.composable.bookmark
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,21 +8,18 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.db.Bookmark
-import com.hinnka.tsbrowser.db.BookmarkType
+import com.hinnka.tsbrowser.persist.Bookmark
+import com.hinnka.tsbrowser.persist.BookmarkType
 import com.hinnka.tsbrowser.ui.composable.wiget.PageController
 import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField

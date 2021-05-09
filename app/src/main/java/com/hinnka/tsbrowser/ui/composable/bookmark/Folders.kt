@@ -12,8 +12,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hinnka.tsbrowser.db.Bookmark
-import com.hinnka.tsbrowser.db.BookmarkType
+import com.hinnka.tsbrowser.persist.Bookmark
+import com.hinnka.tsbrowser.persist.BookmarkType
 
 
 @Composable

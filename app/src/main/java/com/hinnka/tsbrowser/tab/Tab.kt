@@ -6,8 +6,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.mutableStateOf
-import com.hinnka.tsbrowser.db.TabInfo
-import com.hinnka.tsbrowser.db.update
+import com.hinnka.tsbrowser.persist.TabInfo
+import com.hinnka.tsbrowser.persist.update
 import com.hinnka.tsbrowser.ext.encodeToPath
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ui.home.LongPressInfo

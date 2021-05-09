@@ -1,21 +1,17 @@
-package com.hinnka.tsbrowser.db
+package com.hinnka.tsbrowser.persist
 
+import android.graphics.Bitmap
 import androidx.room.*
-import androidx.room.OnConflictStrategy.REPLACE
 
-@Dao
-interface TabDao {
-    @Query("SELECT * FROM tabinfo")
-    suspend fun getAll(): List<TabInfo>
-
-    @Insert
-    suspend fun insert(tab: TabInfo): Long
-
-    @Update(onConflict = REPLACE)
-    suspend fun update(vararg tab: TabInfo)
-
-    @Delete
-    suspend fun delete(tab: TabInfo)
+@Entity
+data class SearchHistory(
+    @PrimaryKey var query: String,
+    @ColumnInfo var updatedAt: Long,
+    @ColumnInfo var title: String? = null,
+    @ColumnInfo var url: String? = null
+) {
+    @Ignore
+    var iconBitmap: Bitmap? = null
 }
 
 @Dao
@@ -26,7 +22,7 @@ interface SearchHistoryDao {
     @Query("SELECT * FROM searchhistory WHERE `query` = :query")
     suspend fun getByName(query: String): SearchHistory?
 
-    @Insert(onConflict = REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(query: SearchHistory)
 
     @Update

@@ -7,7 +7,6 @@ import android.content.Intent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -15,8 +14,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.db.AppDatabase
-import com.hinnka.tsbrowser.db.SearchHistory
+import com.hinnka.tsbrowser.persist.AppDatabase
+import com.hinnka.tsbrowser.persist.SearchHistory
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.home.SecretActivity

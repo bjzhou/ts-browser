@@ -19,8 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.db.Bookmark
-import com.hinnka.tsbrowser.db.BookmarkType
+import com.hinnka.tsbrowser.persist.Bookmark
+import com.hinnka.tsbrowser.persist.BookmarkType
 import com.hinnka.tsbrowser.ui.composable.wiget.PageController
 import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField

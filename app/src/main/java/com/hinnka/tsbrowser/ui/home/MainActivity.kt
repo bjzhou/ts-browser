@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.BuildConfig
-import com.hinnka.tsbrowser.db.Bookmark
+import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.tab.TabManager

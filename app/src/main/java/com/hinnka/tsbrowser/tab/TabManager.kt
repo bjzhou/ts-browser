@@ -3,10 +3,10 @@ package com.hinnka.tsbrowser.tab
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import com.hinnka.tsbrowser.db.AppDatabase
-import com.hinnka.tsbrowser.db.TabInfo
-import com.hinnka.tsbrowser.db.delete
-import com.hinnka.tsbrowser.db.update
+import com.hinnka.tsbrowser.persist.AppDatabase
+import com.hinnka.tsbrowser.persist.TabInfo
+import com.hinnka.tsbrowser.persist.delete
+import com.hinnka.tsbrowser.persist.update
 import com.hinnka.tsbrowser.ext.decodeBitmap
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.ioScope

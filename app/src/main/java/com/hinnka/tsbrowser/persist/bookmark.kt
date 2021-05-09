@@ -1,49 +1,19 @@
-package com.hinnka.tsbrowser.db
+package com.hinnka.tsbrowser.persist
 
-import android.graphics.Bitmap
-import androidx.room.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.logE
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileReader
 import java.util.*
 
-@Entity
-data class TabInfo(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo var isActive: Boolean = false,
-    @ColumnInfo var title: String = "",
-    @ColumnInfo var url: String = "",
-    @ColumnInfo var thumbnailPath: String? = "",
-)
-
-fun TabInfo.delete() {
-    ioScope.launch {
-        AppDatabase.instance.tabDao().delete(this@delete)
-    }
-}
-
-fun TabInfo.update() {
-    ioScope.launch {
-        AppDatabase.instance.tabDao().update(this@update)
-    }
-}
-
-@Entity
-data class SearchHistory(
-    @PrimaryKey var query: String,
-    @ColumnInfo var updatedAt: Long,
-    @ColumnInfo var title: String? = null,
-    @ColumnInfo var url: String? = null
-) {
-    @Ignore
-    var iconBitmap: Bitmap? = null
-}
 
 private val gson = Gson()
 
