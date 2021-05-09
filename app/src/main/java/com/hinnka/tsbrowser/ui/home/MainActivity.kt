@@ -22,6 +22,7 @@ import com.hinnka.tsbrowser.ui.composable.bookmark.AddFolder
 import com.hinnka.tsbrowser.ui.composable.bookmark.BookmarkPage
 import com.hinnka.tsbrowser.ui.composable.bookmark.EditBookmark
 import com.hinnka.tsbrowser.ui.composable.download.DownloadPage
+import com.hinnka.tsbrowser.ui.composable.history.HistoryPage
 import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.wiget.PageContainer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
@@ -43,6 +44,7 @@ open class MainActivity : BaseActivity() {
                         page("main") { MainPage() }
                         page("downloads") { DownloadPage() }
                         page("bookmarks") { BookmarkPage() }
+                        page("history") { HistoryPage() }
                         page("addFolder") { AddFolder(it?.get(0) as Bookmark) }
                         page("editBookmark") { EditBookmark(it?.get(0) as Bookmark) }
                     }

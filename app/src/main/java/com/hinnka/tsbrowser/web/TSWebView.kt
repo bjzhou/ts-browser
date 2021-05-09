@@ -25,6 +25,7 @@ import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
+import com.hinnka.tsbrowser.persist.History
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import com.hinnka.tsbrowser.util.IconCache
@@ -334,6 +335,20 @@ class TSWebView @JvmOverloads constructor(
         }
         dataListener?.canGoBackState?.value = canGoBack()
         dataListener?.canGoForwardState?.value = canGoForward()
+        lifecycleScope.launchWhenCreated {
+            dataListener?.titleState?.value?.let { title ->
+                if (title.isNotBlank()) {
+                    val last = AppDatabase.instance.historyDao().last()
+                    if (url != last?.url && title != last?.title) {
+                        AppDatabase.instance.historyDao().insert(History(
+                            url = url,
+                            title = title,
+                            date = System.currentTimeMillis()
+                        ))
+                    }
+                }
+            }
+        }
         generatePreview()
     }
 

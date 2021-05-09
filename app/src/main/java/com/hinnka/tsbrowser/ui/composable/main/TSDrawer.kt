@@ -70,7 +70,9 @@ fun ColumnScope.TSDrawer() {
         Text(text = stringResource(id = R.string.bookmark))
     }
     ListItem(
-        modifier = Modifier.clickable { },
+        modifier = Modifier.clickable {
+            PageController.navigate("history")
+        },
         icon = { Icon(imageVector = Icons.Outlined.History, contentDescription = "History") },
     ) {
         Text(text = stringResource(id = R.string.history))

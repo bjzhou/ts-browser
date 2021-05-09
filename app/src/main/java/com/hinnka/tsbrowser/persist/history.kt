@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.persist
 
+import androidx.paging.PagingSource
 import androidx.room.*
 
 @Entity
@@ -13,10 +14,13 @@ data class History(
 @Dao
 interface HistoryDao {
     @Query("SELECT * FROM history ORDER BY date DESC")
-    suspend fun getAll(): List<History>
+    fun getAll(): PagingSource<Int, History>
 
-    @Query("SELECT * FROM history WHERE url LIKE :query OR title LIKE :query")
-    suspend fun search(query: String): History?
+    @Query("SELECT * FROM history WHERE url LIKE :query OR title LIKE :query ORDER BY date DESC")
+    fun search(query: String): PagingSource<Int, History>
+
+    @Query("SELECT * FROM history ORDER BY date DESC LIMIT 1")
+    suspend fun last(): History?
 
     @Insert
     suspend fun insert(history: History): Long

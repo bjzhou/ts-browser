@@ -37,6 +37,7 @@ fun TSTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(onGo = { onEnter() }),
+    onValueChanged: () -> Unit = {}
 ) {
     Box(
         modifier = modifier,
@@ -86,6 +87,7 @@ fun TSTextField(
             singleLine = true,
             onValueChange = {
                 text.value = it
+                onValueChanged()
             },
         )
     }

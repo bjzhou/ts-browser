@@ -1,7 +1,10 @@
 package com.hinnka.tsbrowser.ext
 
 import android.content.res.Resources
+import java.text.DateFormat
 import java.text.DecimalFormat
+import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -34,4 +37,22 @@ fun Float.between(min: Float, max: Float): Float {
         return min
     }
     return this
+}
+
+fun Long.toCalendar(): Calendar {
+    return Calendar.getInstance().apply {
+        timeInMillis = this@toCalendar
+    }
+}
+
+fun Long.toDateString(): String {
+    val dateFormat = DateFormat.getDateInstance()
+    return dateFormat.format(Date(this))
+}
+
+infix fun Long.isSameDay(other: Long): Boolean {
+    val calendar = toCalendar()
+    val calendarOther = other.toCalendar()
+    return calendar.get(Calendar.DAY_OF_YEAR) == calendarOther.get(Calendar.DAY_OF_YEAR) &&
+            calendar.get(Calendar.YEAR) == calendarOther.get(Calendar.YEAR)
 }
