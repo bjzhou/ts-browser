@@ -52,4 +52,5 @@
     <string name="bookmark_root">Root folder</string>
     <string name="edit_bookmark">Edit bookmark</string>
     <string name="url">Url</string>
+    <string name="clear_all_history">History cannot be restored after being cleared.</string>
 </resources>

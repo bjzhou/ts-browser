@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.composable.history
 
+import android.webkit.WebStorage
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
@@ -9,7 +10,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.NetworkCell
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,8 +21,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,18 +40,14 @@ import androidx.paging.compose.itemsIndexed
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.isSameDay
-import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toDateString
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.History
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.composable.main.CancelButton
 import com.hinnka.tsbrowser.ui.composable.wiget.PageController
 import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField
-import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.util.IconCache
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -56,6 +56,7 @@ fun HistoryPage() {
     val scope = rememberCoroutineScope()
     val searchText = remember { mutableStateOf(TextFieldValue()) }
     val focusState = remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val pager = remember {
         Pager(
@@ -72,10 +73,18 @@ fun HistoryPage() {
     Scaffold(topBar = {
         TSAppBar(title = stringResource(id = R.string.history), actions = {
             IconButton(onClick = {
-                scope.launch {
-                    AppDatabase.instance.historyDao().clear()
-                    lazyPagingItems.refresh()
-                }
+                androidx.appcompat.app.AlertDialog.Builder(context).apply {
+                    setMessage(context.getString(R.string.clear_all_history))
+                    setPositiveButton(R.string.clear) { _, _ ->
+                        scope.launch {
+                            WebStorage.getInstance().deleteAllData()
+                            AppDatabase.instance.historyDao().clear()
+                            lazyPagingItems.refresh()
+                        }
+                    }
+                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                    }
+                }.show()
             }) {
                 Icon(
                     imageVector = Icons.Default.DeleteForever,
