@@ -85,6 +85,14 @@ fun ColumnScope.TSDrawer() {
     ) {
         Text(text = stringResource(id = R.string.downloads))
     }
+    ListItem(
+        modifier = Modifier.clickable {
+            PageController.navigate("settings")
+        },
+        icon = { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") },
+    ) {
+        Text(text = stringResource(id = R.string.settings))
+    }
 }
 
 @Composable
