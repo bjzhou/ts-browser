@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel

@@ -2,6 +2,7 @@ package com.hinnka.tsbrowser.ext
 
 import android.net.Uri
 import android.webkit.URLUtil
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.util.AUTOLINK_WEB_URL
 
 fun String.toUrl(): String {
@@ -27,7 +28,7 @@ fun String.isUrl(): Boolean {
 }
 
 fun String.toSearchUrl(): String {
-    return "https://www.google.com/search?q=$this"
+    return String.format(Settings.searchEngine.value, this)
 }
 
 val String.host: String?

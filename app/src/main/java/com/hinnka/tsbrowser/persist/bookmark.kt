@@ -107,22 +107,16 @@ data class Bookmark(
             return list
         }
 
-        fun init(block: () -> Unit) {
-            GlobalScope.launch {
-                root = withContext(Dispatchers.IO) {
-                    runCatching {
-                        if (!rootPath.exists()) return@runCatching null
-                        FileReader(rootPath).use {
-                            gson.fromJson(it, Bookmark::class.java)
-                        }
-                    }.onFailure {
-                        logE("parse bookmarks error", throwable = it)
-                    }.getOrNull() ?: root
+        fun init() {
+            if (!rootPath.exists()) return
+            try {
+                root = FileReader(rootPath).use {
+                    gson.fromJson(it, Bookmark::class.java)
                 }
-                list.clear()
-                list.addAll(buildTree())
-                block()
+            } catch (e: Exception) {
             }
+            list.clear()
+            list.addAll(buildTree())
         }
 
         fun findByUrl(url: String): Bookmark? {

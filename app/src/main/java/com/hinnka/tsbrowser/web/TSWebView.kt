@@ -26,10 +26,10 @@ import com.hinnka.tsbrowser.persist.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.persist.History
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import com.hinnka.tsbrowser.util.IconCache
-import com.hinnka.tsbrowser.util.Settings
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File

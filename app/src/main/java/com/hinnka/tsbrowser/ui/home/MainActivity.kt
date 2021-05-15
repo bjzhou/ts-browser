@@ -68,13 +68,8 @@ open class MainActivity : BaseActivity() {
 
     @Composable
     fun Initialize(content: @Composable () -> Unit) {
-        val initialized = remember {
-            mutableStateOf(false)
-        }
-        Bookmark.init { initialized.value = true }
-        if (initialized.value) {
-            Providers(content)
-        }
+        Bookmark.init()
+        Providers(content)
     }
 
     @Composable

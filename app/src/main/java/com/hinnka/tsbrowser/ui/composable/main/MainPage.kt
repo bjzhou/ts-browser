@@ -8,41 +8,36 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.wiget.StatusBar
 import com.hinnka.tsbrowser.ui.composable.wiget.TSBackHandler
+import com.hinnka.tsbrowser.ui.composable.wiget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.viewmodel.LocalViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainPage() {
-    val drawerState = rememberBottomDrawerState(initialValue = BottomDrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    BottomDrawer(
+    val drawerState = remember { BottomDrawerState() }
+    TSBottomDrawer(
         drawerContent = { TSDrawer() },
         drawerState = drawerState,
-        gesturesEnabled = drawerState.isOpen
     ) {
         Column {
             StatusBar()
-            TSBackHandler(enabled = drawerState.isOpen, onBack = {
-                scope.launch {
-                    drawerState.close()
-                }
-            }) {
-                MainView(drawerState)
-            }
+            MainView(drawerState)
         }
         CheckTabs()
         LongPressPopup()
