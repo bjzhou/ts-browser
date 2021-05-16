@@ -13,19 +13,19 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.hinnka.tsbrowser.ext.removeFromParent
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.wiget.StatusBar
 import com.hinnka.tsbrowser.ui.composable.wiget.TSBackHandler
 import com.hinnka.tsbrowser.ui.composable.wiget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable

@@ -1,5 +1,8 @@
 package com.hinnka.tsbrowser.ui.composable.settings
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,23 +38,34 @@ fun SettingsPage() {
     val scope = rememberCoroutineScope()
     val sheetItems = remember { mutableStateOf(listOf<NameValue>()) }
     val checkedItem = remember { mutableStateOf(NameValue("", "")) }
+    val showClearDataSheet = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val itemHeight = with(LocalDensity.current) { 56.dp.toPx() }
 
     TSBottomDrawer(
         drawerContent = {
-            SettingOption(options = sheetItems.value, checked = checkedItem) { newValue ->
-                checkedItem.value = newValue
-                when (sheetItems.value) {
-                    SettingOptions.searchEngine -> {
-                        Settings.searchEngine = newValue
-                    }
-                    SettingOptions.userAgent -> {
-                        Settings.userAgent = newValue
+            if (showClearDataSheet.value) {
+                ClearCache {
+                    Toast.makeText(context, context.getString(R.string.clear_success), Toast.LENGTH_SHORT).show()
+                    scope.launch {
+                        state.close()
                     }
                 }
-                scope.launch {
-                    state.close()
+            } else {
+                SettingOption(options = sheetItems.value, checked = checkedItem) { newValue ->
+                    checkedItem.value = newValue
+                    when (sheetItems.value) {
+                        SettingOptions.searchEngine -> {
+                            Settings.searchEngine = newValue
+                        }
+                        SettingOptions.userAgent -> {
+                            Settings.userAgent = newValue
+                        }
+                    }
+                    scope.launch {
+                        state.close()
+                    }
                 }
             }
         },
@@ -69,6 +84,7 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
+                        showClearDataSheet.value = false
                         sheetItems.value = SettingOptions.searchEngine
                         checkedItem.value = Settings.searchEngine
                         state.drawerHeight = sheetItems.value.size * itemHeight
@@ -86,7 +102,13 @@ fun SettingsPage() {
                     }
                 )
                 ListItem(
-                    modifier = Modifier.clickable { },
+                    modifier = Modifier.clickable {
+                        showClearDataSheet.value = true
+                        state.drawerHeight = 5 * itemHeight
+                        scope.launch {
+                            state.open()
+                        }
+                    },
                     secondaryText = { Text(text = stringResource(id = R.string.clear_browse_data_hint)) },
                     text = { Text(text = stringResource(id = R.string.clear_browse_data)) },
                     trailing = {
@@ -98,6 +120,7 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
+                        showClearDataSheet.value = false
                         sheetItems.value = SettingOptions.userAgent
                         checkedItem.value = Settings.userAgent
                         state.drawerHeight = sheetItems.value.size * itemHeight
@@ -195,7 +218,14 @@ fun SettingsPage() {
                     }
                 )
                 ListItem(
-                    modifier = Modifier.clickable { },
+                    modifier = Modifier.clickable {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse(
+                                "https://play.google.com/store/apps/details?id=com.hinnka.tsbrowser")
+                            setPackage("com.android.vending")
+                        }
+                        context.startActivity(intent)
+                    },
                     text = { Text(text = stringResource(id = R.string.update)) },
                     trailing = {
                         Icon(

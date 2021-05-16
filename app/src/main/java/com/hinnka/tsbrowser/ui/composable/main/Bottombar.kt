@@ -40,7 +40,7 @@ import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

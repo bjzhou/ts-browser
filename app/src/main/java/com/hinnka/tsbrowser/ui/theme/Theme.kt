@@ -19,7 +19,7 @@ private val SecretColorPalette = darkColors(
 private val LightColorPalette = lightColors(
     primary = Teal200,
     primaryVariant = Teal700,
-    secondary = Color(0xFF6200EE),
+    secondary = Teal200,
     surface = Color.White,
 )
 

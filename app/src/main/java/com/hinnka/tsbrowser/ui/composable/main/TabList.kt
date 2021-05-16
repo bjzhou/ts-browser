@@ -40,7 +40,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.composable.wiget.statusBarHeight
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

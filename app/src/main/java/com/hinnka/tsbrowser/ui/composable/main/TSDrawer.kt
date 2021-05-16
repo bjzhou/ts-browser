@@ -22,7 +22,7 @@ import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.composable.wiget.PageController
 import com.hinnka.tsbrowser.ui.theme.PrimaryWhite
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

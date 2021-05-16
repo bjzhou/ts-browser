@@ -11,7 +11,7 @@ import com.hinnka.tsbrowser.persist.update
 import com.hinnka.tsbrowser.ext.encodeToPath
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
-import com.hinnka.tsbrowser.util.IconCache
+import com.hinnka.tsbrowser.persist.IconCache
 import com.hinnka.tsbrowser.web.TSWebView
 import com.hinnka.tsbrowser.web.WebDataListener
 

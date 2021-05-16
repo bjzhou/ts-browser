@@ -47,7 +47,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.composable.wiget.PageController
 import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField
-import com.hinnka.tsbrowser.util.IconCache
+import com.hinnka.tsbrowser.persist.IconCache
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)

@@ -72,7 +72,7 @@ fun TSBottomDrawer(
                         }
                     }
                     .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) },
-                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
                 elevation = DrawerDefaults.Elevation

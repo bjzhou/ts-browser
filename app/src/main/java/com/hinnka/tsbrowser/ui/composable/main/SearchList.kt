@@ -27,8 +27,8 @@ import com.hinnka.tsbrowser.ext.isUrl
 import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.viewmodel.HomeViewModel
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import com.hinnka.tsbrowser.ui.AppViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 
 @Composable
 fun SearchList() {
@@ -153,7 +153,7 @@ fun SearchList() {
 }
 
 @Composable
-fun CurrentUrl(viewModel: HomeViewModel, tab: Tab) {
+fun CurrentUrl(viewModel: AppViewModel, tab: Tab) {
     val title = tab.titleState.value
     val url = tab.urlState.value
     Row(modifier = Modifier.clickable {

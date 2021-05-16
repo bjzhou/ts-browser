@@ -1,9 +1,11 @@
-package com.hinnka.tsbrowser.viewmodel
+package com.hinnka.tsbrowser.ui
 
 import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.webkit.CookieManager
+import android.webkit.WebStorage
 import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,11 +22,11 @@ import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.home.SecretActivity
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.util.IconCache
+import com.hinnka.tsbrowser.persist.IconCache
 import kotlinx.coroutines.launch
 import java.io.File
 
-class HomeViewModel : ViewModel() {
+class AppViewModel : ViewModel() {
     val uiState = mutableStateOf(UIState.Main)
     val searchList = mutableStateListOf<SearchHistory>()
     val addressText = mutableStateOf(TextFieldValue())
@@ -116,8 +118,23 @@ class HomeViewModel : ViewModel() {
         }
         App.instance.startActivity(chooser)
     }
+
+    suspend fun clearData(cookie: Boolean, site: Boolean, history: Boolean, search: Boolean) {
+        if (cookie) {
+            CookieManager.getInstance().removeAllCookies {  }
+        }
+        if (site) {
+            WebStorage.getInstance().deleteAllData()
+        }
+        if (history) {
+            AppDatabase.instance.historyDao().clear()
+        }
+        if (search) {
+            AppDatabase.instance.searchHistoryDao().clear()
+        }
+    }
 }
 
-val LocalViewModel = staticCompositionLocalOf<HomeViewModel> {
+val LocalViewModel = staticCompositionLocalOf<AppViewModel> {
     error("no view model provided")
 }

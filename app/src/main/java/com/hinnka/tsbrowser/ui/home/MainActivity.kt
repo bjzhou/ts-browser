@@ -27,13 +27,13 @@ import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.settings.SettingsPage
 import com.hinnka.tsbrowser.ui.composable.wiget.PageContainer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
-import com.hinnka.tsbrowser.viewmodel.HomeViewModel
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import com.hinnka.tsbrowser.ui.AppViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import kotlinx.coroutines.launch
 
 open class MainActivity : BaseActivity() {
 
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModels<AppViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

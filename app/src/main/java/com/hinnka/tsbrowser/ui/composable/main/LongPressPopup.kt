@@ -18,7 +18,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import com.hinnka.tsbrowser.ui.home.hidePopup
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import zlc.season.rxdownload4.download
 import zlc.season.rxdownload4.file
 

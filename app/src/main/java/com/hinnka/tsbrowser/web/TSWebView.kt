@@ -29,7 +29,7 @@ import com.hinnka.tsbrowser.persist.History
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
-import com.hinnka.tsbrowser.util.IconCache
+import com.hinnka.tsbrowser.persist.IconCache
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
@@ -96,6 +96,8 @@ class TSWebView @JvmOverloads constructor(
             setGeolocationEnabled(true)
             setGeolocationDatabasePath(File(context.filesDir, "geodb").path)
             setSupportMultipleWindows(true)
+
+            userAgentString = Settings.userAgent.value
         }
 
         webChromeClient = TSChromeClient(this)
@@ -106,7 +108,7 @@ class TSWebView @JvmOverloads constructor(
 
     init {
         val cookieManager = CookieManager.getInstance()
-        cookieManager.setAcceptThirdPartyCookies(this, true)
+        cookieManager.setAcceptThirdPartyCookies(this, Settings.acceptThirdPartyCookies)
     }
 
     override fun loadUrl(url: String) {

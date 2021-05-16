@@ -1,6 +1,7 @@
 package com.hinnka.tsbrowser.persist
 
 import android.content.Context
+import android.webkit.CookieManager
 import android.webkit.WebSettings
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.core.content.edit
 import com.google.gson.Gson
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.asMutable
+import com.hinnka.tsbrowser.tab.TabManager
 
 object Settings {
     private val pref = App.instance.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -39,6 +41,14 @@ object Settings {
         set(value) {
             pref.edit { putString("userAgent", gson.toJson(value)) }
             userAgentState.asMutable().value = value
+            TabManager.currentTab.value?.view?.let {
+                it.settings.userAgentString = value.value
+                it.reload()
+                it.post {
+                    it.settings.loadWithOverviewMode = false
+                    it.settings.loadWithOverviewMode = true
+                }
+            }
         }
 
     var adblock: Boolean
@@ -46,6 +56,7 @@ object Settings {
         set(value) {
             pref.edit { putBoolean("adblock", value) }
             adblockState.asMutable().value = value
+            TabManager.currentTab.value?.view?.reload()
         }
 
     var acceptThirdPartyCookies: Boolean
@@ -53,6 +64,9 @@ object Settings {
         set(value) {
             pref.edit { putBoolean("acceptThirdpartyCookies", value) }
             acceptThirdPartyCookiesState.asMutable().value = value
+            TabManager.currentTab.value?.view?.let {
+                CookieManager.getInstance().setAcceptThirdPartyCookies(it, value)
+            }
         }
 
     var dnt: Boolean

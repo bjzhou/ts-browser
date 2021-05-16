@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.util
+package com.hinnka.tsbrowser.persist
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

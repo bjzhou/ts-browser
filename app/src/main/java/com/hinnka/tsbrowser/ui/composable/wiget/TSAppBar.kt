@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hinnka.tsbrowser.viewmodel.LocalViewModel
 
 @Composable
 fun TSAppBar(

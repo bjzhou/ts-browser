@@ -30,4 +30,7 @@ interface SearchHistoryDao {
 
     @Delete
     suspend fun delete(vararg query: SearchHistory)
+
+    @Query("DELETE FROM SearchHistory")
+    suspend fun clear()
 }

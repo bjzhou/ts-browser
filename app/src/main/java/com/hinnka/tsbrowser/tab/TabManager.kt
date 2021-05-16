@@ -11,7 +11,7 @@ import com.hinnka.tsbrowser.ext.decodeBitmap
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.util.IconCache
+import com.hinnka.tsbrowser.persist.IconCache
 import com.hinnka.tsbrowser.web.TSWebView
 import kotlinx.coroutines.launch
 
