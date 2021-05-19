@@ -53,9 +53,6 @@ class TSWebView @JvmOverloads constructor(
             }
         })
 
-    var isWindow = false
-    private val faviconMap = mutableMapOf<String, Bitmap?>()
-
     init {
         setWebContentsDebuggingEnabled(true)
     }
@@ -84,7 +81,7 @@ class TSWebView @JvmOverloads constructor(
             displayZoomControls = false
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             domStorageEnabled = true
-            javaScriptCanOpenWindowsAutomatically = true
+            javaScriptCanOpenWindowsAutomatically = false
             javaScriptEnabled = true
             loadWithOverviewMode = true
             mediaPlaybackRequiresUserGesture = false
@@ -198,30 +195,7 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onReceivedIcon(icon: Bitmap?) {
-        url?.let { url ->
-            url.host?.let {
-                faviconMap[it] = icon
-            }
-            dataListener?.iconState?.value = icon
-
-            lifecycleScope.launchWhenCreated {
-                val search = SearchHistory(
-                    this@TSWebView.originalUrl ?: "",
-                    System.currentTimeMillis()
-                )
-                search.title = dataListener?.titleState?.value
-                icon?.let {
-                    url.host?.let { host ->
-                        IconCache.save(host, it)
-                    }
-                }
-                search.url = url
-                val dao = AppDatabase.instance.searchHistoryDao()
-                if (dao.getByName(search.query) != null) {
-                    dao.update(search)
-                }
-            }
-        }
+        dataListener?.onReceivedIcon(icon)
     }
 
     override fun onShowCustomView(
@@ -326,32 +300,7 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
-        dataListener?.urlState?.value = url
-        url.host?.let { host ->
-            lifecycleScope.launchWhenCreated {
-                if (faviconMap[host] == null) {
-                    faviconMap[host] = IconCache.asyncGet(host)
-                }
-                dataListener?.iconState?.value = faviconMap[host]
-            }
-        }
-        dataListener?.canGoBackState?.value = canGoBack()
-        dataListener?.canGoForwardState?.value = canGoForward()
-        lifecycleScope.launchWhenCreated {
-            dataListener?.titleState?.value?.let { title ->
-                if (title.isNotBlank()) {
-                    val last = AppDatabase.instance.historyDao().last()
-                    if (url != last?.url && title != last?.title) {
-                        AppDatabase.instance.historyDao().insert(History(
-                            url = url,
-                            title = title,
-                            date = System.currentTimeMillis()
-                        ))
-                    }
-                }
-            }
-        }
-        generatePreview()
+        dataListener?.doUpdateVisitedHistory(url, isReload)
     }
 
     override fun getLifecycle(): Lifecycle {

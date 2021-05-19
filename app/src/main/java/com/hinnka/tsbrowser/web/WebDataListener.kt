@@ -8,15 +8,13 @@ import com.hinnka.tsbrowser.ui.home.LongPressInfo
 
 interface WebDataListener {
     val progressState: MutableState<Float>
-    val urlState: MutableState<String>
     val titleState: MutableState<String>
-    val iconState: MutableState<Bitmap?>
     val previewState: MutableState<Bitmap?>
-    val canGoBackState: MutableState<Boolean>
-    val canGoForwardState: MutableState<Boolean>
     val longPressState: MutableState<LongPressInfo>
 
     fun onCreateWindow(message: Message)
     fun onCloseWindow()
     suspend fun updateInfo()
+    fun doUpdateVisitedHistory(url: String, isReload: Boolean)
+    fun onReceivedIcon(icon: Bitmap?)
 }
