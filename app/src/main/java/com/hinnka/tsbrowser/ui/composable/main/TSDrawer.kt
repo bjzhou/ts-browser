@@ -20,13 +20,16 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.composable.wiget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.theme.PrimaryWhite
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ColumnScope.TSDrawer() {
+fun TSDrawer() {
+    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
             .height(48.dp)

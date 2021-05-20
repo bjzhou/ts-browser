@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.composable.wiget
+package com.hinnka.tsbrowser.ui.composable.widget
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.TweenSpec
@@ -16,13 +16,13 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.hinnka.tsbrowser.ext.logD
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
 @ExperimentalMaterialApi
 fun TSBottomDrawer(
-    drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: BottomDrawerState = remember { BottomDrawerState() },
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
@@ -30,6 +30,9 @@ fun TSBottomDrawer(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+
+    var waitForShow by drawerState.waitForShow
+//    logD("TSBottomDrawer $waitForShow")
 
     BoxWithConstraints(modifier.fillMaxSize()) {
         val fullHeight = constraints.maxHeight.toFloat()
@@ -62,13 +65,17 @@ fun TSBottomDrawer(
             BottomDrawerScrim(
                 color = DrawerDefaults.scrimColor,
                 onDismiss = { scope.launch { drawerState.close() } },
-                visible = !drawerState.isClosed
+                visible = !drawerState.isClosed || waitForShow
             )
             Surface(
                 drawerConstraints
                     .onGloballyPositioned { position ->
-                        if (drawerState.drawerHeight <= 0f) {
-                            drawerState.drawerHeight = position.size.height.toFloat()
+                        if (waitForShow) {
+                            val drawerHeight = position.size.height.toFloat()
+                            scope.launch {
+                                drawerState.offset.animateTo(fullHeight - drawerHeight)
+                            }
+                            waitForShow = false
                         }
                     }
                     .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) },
@@ -77,7 +84,7 @@ fun TSBottomDrawer(
                 contentColor = drawerContentColor,
                 elevation = DrawerDefaults.Elevation
             ) {
-                Column(blockClicks, content = drawerContent)
+                Column(blockClicks, content = drawerState.drawerContent)
             }
         }
     }
@@ -88,7 +95,9 @@ class BottomDrawerState {
     private var fullHeight = 0f
     internal val offset = Animatable(fullHeight)
 
-    var drawerHeight = 0f
+    internal var drawerContent: @Composable ColumnScope.() -> Unit = {}
+
+    val waitForShow = mutableStateOf(false)
 
     val isClosed: Boolean
         get() = offset.value == fullHeight
@@ -98,8 +107,9 @@ class BottomDrawerState {
         offset.snapTo(fullHeight)
     }
 
-    suspend fun open() {
-        offset.animateTo(fullHeight - drawerHeight)
+    suspend fun open(content: @Composable ColumnScope.() -> Unit) {
+        drawerContent = content
+        waitForShow.value = true
     }
 
     suspend fun close() = offset.animateTo(fullHeight)

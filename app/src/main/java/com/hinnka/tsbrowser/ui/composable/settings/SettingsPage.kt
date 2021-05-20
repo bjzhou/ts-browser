@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,56 +25,28 @@ import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.NameValue
 import com.hinnka.tsbrowser.persist.SettingOptions
 import com.hinnka.tsbrowser.persist.Settings
-import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
-import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
-import com.hinnka.tsbrowser.ui.composable.wiget.TSBottomDrawer
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
+import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingsPage() {
-    val state = remember { BottomDrawerState() }
     val scope = rememberCoroutineScope()
-    val sheetItems = remember { mutableStateOf(listOf<NameValue>()) }
     val checkedItem = remember { mutableStateOf(NameValue("", "")) }
-    val showClearDataSheet = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val itemHeight = with(LocalDensity.current) { 56.dp.toPx() }
+    val state = remember { BottomDrawerState() }
 
-    TSBottomDrawer(
-        drawerContent = {
-            if (showClearDataSheet.value) {
-                ClearCache {
-                    Toast.makeText(context, context.getString(R.string.clear_success), Toast.LENGTH_SHORT).show()
-                    scope.launch {
-                        state.close()
-                    }
-                }
-            } else {
-                SettingOption(options = sheetItems.value, checked = checkedItem) { newValue ->
-                    checkedItem.value = newValue
-                    when (sheetItems.value) {
-                        SettingOptions.searchEngine -> {
-                            Settings.searchEngine = newValue
-                        }
-                        SettingOptions.userAgent -> {
-                            Settings.userAgent = newValue
-                        }
-                    }
-                    scope.launch {
-                        state.close()
-                    }
-                }
-            }
-        },
-        drawerState = state,
-    ) {
+    TSBottomDrawer(drawerState = state) {
         Column(Modifier.background(MaterialTheme.colors.surface)) {
             TSAppBar(title = stringResource(id = R.string.settings))
-            Column(modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Text(
                     text = stringResource(id = R.string.general),
                     modifier = Modifier.padding(16.dp),
@@ -84,13 +55,22 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
-                        showClearDataSheet.value = false
-                        sheetItems.value = SettingOptions.searchEngine
                         checkedItem.value = Settings.searchEngine
-                        state.drawerHeight = sheetItems.value.size * itemHeight
                         scope.launch {
-                            state.open()
+                            state.open {
+                                SettingOption(
+                                    options = SettingOptions.searchEngine,
+                                    checked = checkedItem
+                                ) { newValue ->
+                                    checkedItem.value = newValue
+                                    Settings.searchEngine = newValue
+                                    scope.launch {
+                                        state.close()
+                                    }
+                                }
+                            }
                         }
+
                     },
                     secondaryText = { Text(text = Settings.searchEngineState.value.name) },
                     text = { Text(text = stringResource(id = R.string.search_engine)) },
@@ -103,14 +83,24 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
-                        showClearDataSheet.value = true
-                        state.drawerHeight = 5 * itemHeight
+                        checkedItem.value = Settings.userAgent
                         scope.launch {
-                            state.open()
+                            state.open {
+                                SettingOption(
+                                    options = SettingOptions.userAgent,
+                                    checked = checkedItem
+                                ) { newValue ->
+                                    checkedItem.value = newValue
+                                    Settings.userAgent = newValue
+                                    scope.launch {
+                                        state.close()
+                                    }
+                                }
+                            }
                         }
                     },
-                    secondaryText = { Text(text = stringResource(id = R.string.clear_browse_data_hint)) },
-                    text = { Text(text = stringResource(id = R.string.clear_browse_data)) },
+                    secondaryText = { Text(text = Settings.userAgentState.value.name) },
+                    text = { Text(text = stringResource(id = R.string.user_agent)) },
                     trailing = {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowRight,
@@ -120,16 +110,39 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
-                        showClearDataSheet.value = false
-                        sheetItems.value = SettingOptions.userAgent
-                        checkedItem.value = Settings.userAgent
-                        state.drawerHeight = sheetItems.value.size * itemHeight
+
+                    },
+                    secondaryText = { Text(text = stringResource(id = R.string.mnemonic_hint)) },
+                    text = {
+                        Text(text = stringResource(id = Settings.mnemonicState.value?.let { R.string.change_mnemonic }
+                            ?: R.string.set_mnemonic))
+                    },
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = ""
+                        )
+                    }
+                )
+                ListItem(
+                    modifier = Modifier.clickable {
                         scope.launch {
-                            state.open()
+                            state.open {
+                                ClearCache {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.clear_success),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    scope.launch {
+                                        state.close()
+                                    }
+                                }
+                            }
                         }
                     },
-                    secondaryText = { Text(text = Settings.userAgentState.value.name) },
-                    text = { Text(text = stringResource(id = R.string.user_agent)) },
+                    secondaryText = { Text(text = stringResource(id = R.string.clear_browse_data_hint)) },
+                    text = { Text(text = stringResource(id = R.string.clear_browse_data)) },
                     trailing = {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowRight,
@@ -221,7 +234,8 @@ fun SettingsPage() {
                     modifier = Modifier.clickable {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             data = Uri.parse(
-                                "https://play.google.com/store/apps/details?id=com.hinnka.tsbrowser")
+                                "https://play.google.com/store/apps/details?id=com.hinnka.tsbrowser"
+                            )
                             setPackage("com.android.vending")
                         }
                         context.startActivity(intent)

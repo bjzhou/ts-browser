@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadNotificationCreator
 import com.hinnka.tsbrowser.ext.longPress
-import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
+import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import zlc.season.rxdownload4.file
 import zlc.season.rxdownload4.manager.*

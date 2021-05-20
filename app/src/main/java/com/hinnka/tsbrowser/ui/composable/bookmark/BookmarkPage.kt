@@ -26,9 +26,9 @@ import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.BookmarkType
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.composable.wiget.PageController
-import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
-import com.hinnka.tsbrowser.ui.composable.wiget.TSBackHandler
+import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
+import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
 import com.hinnka.tsbrowser.persist.IconCache
 
 @Composable

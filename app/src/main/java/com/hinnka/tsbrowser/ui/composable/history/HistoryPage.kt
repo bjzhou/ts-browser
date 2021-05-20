@@ -44,9 +44,9 @@ import com.hinnka.tsbrowser.ext.toDateString
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.History
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.composable.wiget.PageController
-import com.hinnka.tsbrowser.ui.composable.wiget.TSAppBar
-import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField
+import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
+import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import com.hinnka.tsbrowser.persist.IconCache
 import kotlinx.coroutines.launch
 
@@ -171,11 +171,11 @@ fun HistoryPage() {
 
 @Composable
 fun DateItemOrNull(lazyPagingItems: LazyPagingItems<History>, index: Int) {
-    val item = lazyPagingItems[index] ?: return
+    val item = lazyPagingItems.getAsState(index).value ?: return
     val canShow = if (index == 0) {
         true
     } else {
-        val prevItem = lazyPagingItems[index - 1] ?: return
+        val prevItem = lazyPagingItems.getAsState(index - 1).value ?: return
         !(prevItem.date isSameDay item.date)
     }
     if (canShow) {

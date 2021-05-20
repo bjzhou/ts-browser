@@ -6,11 +6,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 
-open class BaseActivity : ComponentActivity() {
+open class BaseActivity : AppCompatActivity() {
 
     private val requestCode = AtomicInteger()
     private val callbackMap = mutableMapOf<Int, (resultCode: Int, data: Intent?) -> Unit>()

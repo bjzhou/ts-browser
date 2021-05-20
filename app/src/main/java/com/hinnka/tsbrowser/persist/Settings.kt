@@ -9,6 +9,7 @@ import androidx.core.content.edit
 import com.google.gson.Gson
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.asMutable
+import com.hinnka.tsbrowser.ext.md5
 import com.hinnka.tsbrowser.tab.TabManager
 
 object Settings {
@@ -51,6 +52,14 @@ object Settings {
             }
         }
 
+    var mnemonic: String?
+        get() {
+            return pref.getString("mnemonic", null)
+        }
+        set(value) {
+            pref.edit { putString("mnemonic", value.md5()) }
+        }
+
     var adblock: Boolean
         get() = pref.getBoolean("adblock", Default.adblock)
         set(value) {
@@ -79,6 +88,7 @@ object Settings {
 
     val searchEngineState: State<NameValue> = mutableStateOf(searchEngine)
     val userAgentState: State<NameValue> = mutableStateOf(userAgent)
+    val mnemonicState: State<String?> = mutableStateOf(mnemonic)
     val adblockState: State<Boolean> = mutableStateOf(adblock)
     val acceptThirdPartyCookiesState: State<Boolean> = mutableStateOf(acceptThirdPartyCookies)
     val dntState: State<Boolean> = mutableStateOf(dnt)
@@ -93,10 +103,22 @@ object SettingOptions {
     )
     val userAgent = listOf(
         Settings.Default.userAgent,
-        NameValue("iPhone", "Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Mobile/15E148 Safari/604.1"),
-        NameValue("PC", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"),
-        NameValue("iPad", "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1 Mobile/15E148 Safari/604.1"),
-        NameValue("Mac", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"),
+        NameValue(
+            "iPhone",
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Mobile/15E148 Safari/604.1"
+        ),
+        NameValue(
+            "PC",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"
+        ),
+        NameValue(
+            "iPad",
+            "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1 Mobile/15E148 Safari/604.1"
+        ),
+        NameValue(
+            "Mac",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"
+        ),
     )
 }
 

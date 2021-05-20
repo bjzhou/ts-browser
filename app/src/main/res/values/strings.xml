@@ -76,4 +76,7 @@
     <string name="clear_search_history">Clear search history</string>
     <string name="clear_site_data">Clear site data</string>
     <string name="clear_success">Clear success</string>
+    <string name="set_mnemonic">Set mnemonic</string>
+    <string name="change_mnemonic">Change mnemonic</string>
+    <string name="mnemonic_hint">Mnemonic for secret mode</string>
 </resources>

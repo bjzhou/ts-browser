@@ -37,10 +37,10 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
-import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
-import com.hinnka.tsbrowser.ui.composable.wiget.TSTextField
+import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -90,7 +90,9 @@ fun BottomBar(drawerState: BottomDrawerState) {
             AnimatedVisibility(visible = uiState.value != UIState.Search) {
                 IconButton(onClick = {
                     scope.launch {
-                        drawerState.open()
+                        drawerState.open {
+                            TSDrawer()
+                        }
                     }
                 }) {
                     Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")

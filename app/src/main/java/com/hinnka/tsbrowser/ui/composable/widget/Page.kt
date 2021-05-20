@@ -1,14 +1,13 @@
-package com.hinnka.tsbrowser.ui.composable.wiget
+package com.hinnka.tsbrowser.ui.composable.widget
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.mainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,7 +29,7 @@ object PageController {
         addAnimPending = true
         argumentMap[route] = arguments
         routes.add(route)
-        mainScope.launch {
+        ioScope.launch {
             delay(50)
             currentRoute.value = route
             delay(250)
@@ -58,20 +57,19 @@ object PageGraphBuilder {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PageContainer(start: String, pageGraph: PageGraphBuilder.() -> Unit) {
     if (PageController.routes.isEmpty()) {
         PageController.set(start)
     }
     PageGraphBuilder.pageGraph()
-    Box(modifier = Modifier.fillMaxSize()) {
-        PageController.routes.forEach { route ->
-            Page(route = route) {
-                TSBackHandler(
-                    enabled = PageController.routes.size > 1,
-                    onBack = { PageController.navigateUp() }) {
-                    PageGraphBuilder.pages[route]?.invoke(PageController.argumentMap[route])
-                }
+    PageController.routes.forEach { route ->
+        Page(route = route) {
+            TSBackHandler(
+                enabled = PageController.routes.size > 1,
+                onBack = { PageController.navigateUp() }) {
+                PageGraphBuilder.pages[route]?.invoke(PageController.argumentMap[route])
             }
         }
     }

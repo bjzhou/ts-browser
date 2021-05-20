@@ -17,14 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.hinnka.tsbrowser.ext.removeFromParent
-import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.LocalViewModel
-import com.hinnka.tsbrowser.ui.composable.wiget.BottomDrawerState
-import com.hinnka.tsbrowser.ui.composable.wiget.StatusBar
-import com.hinnka.tsbrowser.ui.composable.wiget.TSBackHandler
-import com.hinnka.tsbrowser.ui.composable.wiget.TSBottomDrawer
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.StatusBar
+import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
+import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -32,7 +31,6 @@ import com.hinnka.tsbrowser.ui.home.UIState
 fun MainPage() {
     val drawerState = remember { BottomDrawerState() }
     TSBottomDrawer(
-        drawerContent = { TSDrawer() },
         drawerState = drawerState,
     ) {
         Column {

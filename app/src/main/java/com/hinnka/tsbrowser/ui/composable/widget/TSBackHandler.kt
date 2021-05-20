@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.composable.wiget
+package com.hinnka.tsbrowser.ui.composable.widget
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box

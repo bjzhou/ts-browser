@@ -25,7 +25,7 @@ import com.hinnka.tsbrowser.ui.composable.download.DownloadPage
 import com.hinnka.tsbrowser.ui.composable.history.HistoryPage
 import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.settings.SettingsPage
-import com.hinnka.tsbrowser.ui.composable.wiget.PageContainer
+import com.hinnka.tsbrowser.ui.composable.widget.PageContainer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import com.hinnka.tsbrowser.ui.AppViewModel
 import com.hinnka.tsbrowser.ui.LocalViewModel
