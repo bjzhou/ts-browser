@@ -56,17 +56,15 @@ fun SettingsPage() {
                 ListItem(
                     modifier = Modifier.clickable {
                         checkedItem.value = Settings.searchEngine
-                        scope.launch {
-                            state.open {
-                                SettingOption(
-                                    options = SettingOptions.searchEngine,
-                                    checked = checkedItem
-                                ) { newValue ->
-                                    checkedItem.value = newValue
-                                    Settings.searchEngine = newValue
-                                    scope.launch {
-                                        state.close()
-                                    }
+                        state.open {
+                            SettingOption(
+                                options = SettingOptions.searchEngine,
+                                checked = checkedItem
+                            ) { newValue ->
+                                checkedItem.value = newValue
+                                Settings.searchEngine = newValue
+                                scope.launch {
+                                    state.close()
                                 }
                             }
                         }
@@ -84,17 +82,15 @@ fun SettingsPage() {
                 ListItem(
                     modifier = Modifier.clickable {
                         checkedItem.value = Settings.userAgent
-                        scope.launch {
-                            state.open {
-                                SettingOption(
-                                    options = SettingOptions.userAgent,
-                                    checked = checkedItem
-                                ) { newValue ->
-                                    checkedItem.value = newValue
-                                    Settings.userAgent = newValue
-                                    scope.launch {
-                                        state.close()
-                                    }
+                        state.open {
+                            SettingOption(
+                                options = SettingOptions.userAgent,
+                                checked = checkedItem
+                            ) { newValue ->
+                                checkedItem.value = newValue
+                                Settings.userAgent = newValue
+                                scope.launch {
+                                    state.close()
                                 }
                             }
                         }
@@ -110,7 +106,9 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
-
+                        state.open {
+                            SetMnemonic()
+                        }
                     },
                     secondaryText = { Text(text = stringResource(id = R.string.mnemonic_hint)) },
                     text = {
@@ -126,17 +124,15 @@ fun SettingsPage() {
                 )
                 ListItem(
                     modifier = Modifier.clickable {
-                        scope.launch {
-                            state.open {
-                                ClearCache {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.clear_success),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    scope.launch {
-                                        state.close()
-                                    }
+                        state.open {
+                            ClearCache {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.clear_success),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                scope.launch {
+                                    state.close()
                                 }
                             }
                         }

@@ -9,19 +9,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.hinnka.tsbrowser.ext.logD
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
-@ExperimentalMaterialApi
 fun TSBottomDrawer(
     modifier: Modifier = Modifier,
     drawerState: BottomDrawerState = remember { BottomDrawerState() },
@@ -30,12 +33,35 @@ fun TSBottomDrawer(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val viewModel = LocalViewModel.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val density = LocalDensity.current
+    val statusBarHeight = statusBarHeight()
+
+    val keyboardIsHiding = remember { mutableStateOf(false) }
 
     var waitForShow by drawerState.waitForShow
-//    logD("TSBottomDrawer $waitForShow")
+    val imeHeight = viewModel.imeHeightState.value
+    if (imeHeight > 0 && !drawerState.isClosing && !keyboardIsHiding.value) {
+        waitForShow = true
+    }
+
+    if (imeHeight == 0f) {
+        keyboardIsHiding.value = false
+    }
+
+    if (drawerState.isClosing) {
+        keyboardIsHiding.value = true
+        keyboardController?.hide()
+    }
+
+    if (drawerState.isClosed) {
+        drawerState.isClosing = false
+    }
 
     BoxWithConstraints(modifier.fillMaxSize()) {
         val fullHeight = constraints.maxHeight.toFloat()
+        val maxHeight = fullHeight - with(density) { statusBarHeight.toPx() }
 
         LaunchedEffect(key1 = fullHeight) {
             drawerState.init(fullHeight)
@@ -46,7 +72,7 @@ fun TSBottomDrawer(
         } else {
             Modifier.pointerInput(Unit) { detectTapGestures {} }
         }
-        val drawerConstraints = with(LocalDensity.current) {
+        val drawerConstraints = with(density) {
             Modifier
                 .sizeIn(
                     maxWidth = constraints.maxWidth.toDp(),
@@ -84,12 +110,16 @@ fun TSBottomDrawer(
                 contentColor = drawerContentColor,
                 elevation = DrawerDefaults.Elevation
             ) {
-                Column(blockClicks, content = drawerState.drawerContent)
+                Column(
+                    blockClicks.heightIn(max = with(density) { maxHeight.toDp() }),
+                    content = drawerState.drawerContent
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 class BottomDrawerState {
 
     private var fullHeight = 0f
@@ -99,6 +129,8 @@ class BottomDrawerState {
 
     val waitForShow = mutableStateOf(false)
 
+    var isClosing = false
+
     val isClosed: Boolean
         get() = offset.value == fullHeight
 
@@ -107,12 +139,15 @@ class BottomDrawerState {
         offset.snapTo(fullHeight)
     }
 
-    suspend fun open(content: @Composable ColumnScope.() -> Unit) {
+    fun open(content: @Composable ColumnScope.() -> Unit) {
         drawerContent = content
         waitForShow.value = true
     }
 
-    suspend fun close() = offset.animateTo(fullHeight)
+    suspend fun close() {
+        isClosing = true
+        offset.animateTo(fullHeight)
+    }
 }
 
 @Composable

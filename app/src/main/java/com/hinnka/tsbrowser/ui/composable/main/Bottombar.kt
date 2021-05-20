@@ -89,10 +89,8 @@ fun BottomBar(drawerState: BottomDrawerState) {
             }
             AnimatedVisibility(visible = uiState.value != UIState.Search) {
                 IconButton(onClick = {
-                    scope.launch {
-                        drawerState.open {
-                            TSDrawer()
-                        }
+                    drawerState.open {
+                        TSDrawer()
                     }
                 }) {
                     Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
