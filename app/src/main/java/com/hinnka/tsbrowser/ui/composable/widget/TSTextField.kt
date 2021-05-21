@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hinnka.tsbrowser.ui.theme.primaryLight
 
 @Composable
 fun TSTextField(
@@ -48,7 +50,7 @@ fun TSTextField(
                 .fillMaxWidth()
                 .border(1.dp, Color.LightGray, RoundedCornerShape(20.dp))
                 .background(
-                    color = Color(0xFFF1FFFB), shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colors.primaryLight, shape = RoundedCornerShape(20.dp),
                 ),
         )
         TextField(

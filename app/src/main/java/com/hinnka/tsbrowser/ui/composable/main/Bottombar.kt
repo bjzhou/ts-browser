@@ -49,16 +49,15 @@ import kotlinx.coroutines.launch
 fun BottomBar(drawerState: BottomDrawerState) {
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
-    val scope = rememberCoroutineScope()
 
-    Box(modifier = Modifier.graphicsLayer {
+    Surface(modifier = Modifier.graphicsLayer {
         translationY = -viewModel.imeHeightState.value
     }) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .height(56.dp)
-                .background(Color.White)
+                .background(MaterialTheme.colors.surface)
                 .padding(start = if (uiState.value == UIState.Search) 8.dp else 0.dp),
         ) {
             AnimatedVisibility(visible = uiState.value == UIState.Main) {

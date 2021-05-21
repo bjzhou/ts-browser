@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -46,7 +47,7 @@ fun SearchList() {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(bottom = with(density) { viewModel.imeHeightState.value.toDp() })
-        .background(Color.White),
+        .background(MaterialTheme.colors.surface),
     ) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             item {

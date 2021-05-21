@@ -2,6 +2,7 @@ package com.hinnka.tsbrowser.ui.composable.widget
 
 import androidx.compose.animation.*
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -110,7 +111,9 @@ fun Page(
             )
         })
     ) {
-        content()
+        Surface {
+            content()
+        }
     }
 
 }

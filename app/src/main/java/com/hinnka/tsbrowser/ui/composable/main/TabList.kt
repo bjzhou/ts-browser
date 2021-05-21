@@ -62,7 +62,7 @@ fun TabList() {
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
         modifier = Modifier
-            .background(Color.White)
+            .background(MaterialTheme.colors.surface)
             .fillMaxSize(),
         state = listState,
         contentPadding = PaddingValues(8.dp)

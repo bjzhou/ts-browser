@@ -18,13 +18,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.persist.*
+import com.hinnka.tsbrowser.persist.Bookmark
+import com.hinnka.tsbrowser.persist.BookmarkType
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.composable.widget.PageController
-import com.hinnka.tsbrowser.ui.theme.PrimaryWhite
 import com.hinnka.tsbrowser.ui.LocalViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.theme.primaryLight
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -34,7 +33,7 @@ fun TSDrawer() {
         modifier = Modifier
             .height(48.dp)
             .fillMaxWidth()
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colors.primaryLight)
     ) {
         BackButton()
         ForwardButton()
@@ -43,7 +42,7 @@ fun TSDrawer() {
     }
     Row(
         modifier = Modifier
-            .background(PrimaryWhite)
+            .background(MaterialTheme.colors.primaryLight)
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween

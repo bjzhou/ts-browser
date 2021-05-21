@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.theme
 
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -22,6 +23,9 @@ private val LightColorPalette = lightColors(
     secondary = Teal200,
     surface = Color.White,
 )
+
+val Colors.primaryLight: Color get() = if (isLight) PrimaryWhite else PrimaryDark
+
 
 @Composable
 fun TSBrowserTheme(content: @Composable() () -> Unit) {
