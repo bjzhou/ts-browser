@@ -23,6 +23,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.home.SecretActivity
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.Settings
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -37,11 +38,12 @@ class AppViewModel : ViewModel() {
         if (urlText.isBlank()) {
             return
         }
-        if (urlText == "900902") {
+        if (urlText.md5() == Settings.mnemonic) {
             if (App.isSecretMode) {
                 (context as? Activity)?.finish()
             } else {
                 context.startActivity(Intent(context, SecretActivity::class.java).apply {
+                    putExtra("mnemonic", urlText.md5())
                     addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                     addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                 })

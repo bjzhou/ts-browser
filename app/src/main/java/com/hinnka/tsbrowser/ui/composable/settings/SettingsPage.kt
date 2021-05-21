@@ -107,13 +107,22 @@ fun SettingsPage() {
                 ListItem(
                     modifier = Modifier.clickable {
                         state.open {
-                            SetMnemonic()
+                            SetMnemonic {
+                                scope.launch {
+                                    state.close()
+                                }
+                            }
                         }
                     },
                     secondaryText = { Text(text = stringResource(id = R.string.mnemonic_hint)) },
                     text = {
-                        Text(text = stringResource(id = Settings.mnemonicState.value?.let { R.string.change_mnemonic }
-                            ?: R.string.set_mnemonic))
+                        Text(
+                            text = stringResource(
+                                id = if (Settings.mnemonicState.value == null) {
+                                    R.string.set_mnemonic
+                                } else R.string.update_mnemonic
+                            )
+                        )
                     },
                     trailing = {
                         Icon(

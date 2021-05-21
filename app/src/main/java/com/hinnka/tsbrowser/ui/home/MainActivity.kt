@@ -150,4 +150,9 @@ open class MainActivity : BaseActivity() {
         super.onPause()
         TabManager.onPause()
     }
+
+    override fun onBackPressed() {
+        logD("onBackPressed")
+        super.onBackPressed()
+    }
 }

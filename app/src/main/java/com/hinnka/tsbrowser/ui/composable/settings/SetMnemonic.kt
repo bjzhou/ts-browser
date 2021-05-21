@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.composable.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -12,19 +13,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.ext.md5
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.ui.LocalViewModel
 
 @Composable
-fun SetMnemonic() {
+fun SetMnemonic(onDismiss: () -> Unit) {
     val viewModel = LocalViewModel.current
     val density = LocalDensity.current
+    val context = LocalContext.current
 
     val currentMnemonic = remember { mutableStateOf(TextFieldValue()) }
     val newMnemonic = remember { mutableStateOf(TextFieldValue()) }
@@ -34,6 +38,29 @@ fun SetMnemonic() {
     val currentTextColor = remember { mutableStateOf(Color.Black) }
     val newTextColor = remember { mutableStateOf(Color.Black) }
     val confirmTextColor = remember { mutableStateOf(Color.Black) }
+
+    val buttonEnable = if (Settings.mnemonic == null) { true } else {
+        currentMnemonic.value.text.isNotBlank()
+    } && newMnemonic.value.text.isNotBlank() && confirmNewMnemonic.value.text.isNotBlank()
+
+    fun updateMnemonic() {
+        Settings.mnemonic?.let {
+            if (currentMnemonic.value.text.md5() != it) {
+                Toast.makeText(context, R.string.current_mnemonic_wrong, Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+        if (newMnemonic.value.text != confirmNewMnemonic.value.text) {
+            Toast.makeText(context, R.string.mnemonic_different, Toast.LENGTH_SHORT).show()
+            return
+        }
+        Settings.mnemonic = newMnemonic.value.text.md5()
+        Toast.makeText(context, R.string.mnemonic_update_success, Toast.LENGTH_SHORT).show()
+        currentMnemonic.value = TextFieldValue()
+        newMnemonic.value = TextFieldValue()
+        confirmNewMnemonic.value = TextFieldValue()
+        onDismiss()
+    }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Box(
@@ -115,7 +142,7 @@ fun SetMnemonic() {
                 .padding(horizontal = 16.dp, vertical = 32.dp)
                 .fillMaxWidth(), contentAlignment = Alignment.CenterEnd
         ) {
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { updateMnemonic() }, enabled = buttonEnable) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         }

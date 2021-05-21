@@ -77,11 +77,13 @@
     <string name="clear_site_data">Clear site data</string>
     <string name="clear_success">Clear success</string>
     <string name="set_mnemonic">Set mnemonic</string>
-    <string name="change_mnemonic">Change mnemonic</string>
     <string name="mnemonic_hint">Mnemonic for secret mode</string>
     <string name="update_mnemonic">Update mnemonic</string>
     <string name="current_mnemonic">Current mnemonic</string>
     <string name="new_mnemonic">New mnemonic</string>
     <string name="confirm_new_mnemonic">Confirm new mnemonic</string>
     <string name="confirm">Confirm</string>
+    <string name="current_mnemonic_wrong">Current mnemonic is not correct</string>
+    <string name="mnemonic_different">New mnemonic and confirm mnemonic is different</string>
+    <string name="mnemonic_update_success">Mnemonic update success</string>
 </resources>

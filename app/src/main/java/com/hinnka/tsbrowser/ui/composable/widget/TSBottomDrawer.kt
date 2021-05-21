@@ -15,8 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.ui.LocalViewModel
@@ -34,9 +33,9 @@ fun TSBottomDrawer(
 ) {
     val scope = rememberCoroutineScope()
     val viewModel = LocalViewModel.current
-    val keyboardController = LocalSoftwareKeyboardController.current
     val density = LocalDensity.current
     val statusBarHeight = statusBarHeight()
+
 
     val keyboardIsHiding = remember { mutableStateOf(false) }
 
@@ -52,7 +51,7 @@ fun TSBottomDrawer(
 
     if (drawerState.isClosing) {
         keyboardIsHiding.value = true
-        keyboardController?.hide()
+        LocalFocusManager.current.clearFocus()
     }
 
     if (drawerState.isClosed) {

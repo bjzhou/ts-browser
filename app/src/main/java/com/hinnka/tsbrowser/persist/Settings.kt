@@ -57,7 +57,8 @@ object Settings {
             return pref.getString("mnemonic", null)
         }
         set(value) {
-            pref.edit { putString("mnemonic", value.md5()) }
+            pref.edit { putString("mnemonic", value) }
+            mnemonicState.asMutable().value = value
         }
 
     var adblock: Boolean

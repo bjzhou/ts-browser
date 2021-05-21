@@ -62,8 +62,9 @@ fun String.aesDecode(key: String): String {
 
 fun String?.md5(): String? {
     this ?: return null
+    val addSalt = "ts${this}browser"
     val md5 = MessageDigest.getInstance("MD5")
-    val bytes = md5.digest(this.toByteArray())
+    val bytes = md5.digest(addSalt.toByteArray())
     return bytes.joinToString("") { "%02x".format(it) }
 }
 
