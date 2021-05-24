@@ -19,9 +19,9 @@ object Settings {
     object Default {
         val searchEngine = NameValue("Google", "https://www.google.com/search?q=%s")
         val userAgent = NameValue("Android", WebSettings.getDefaultUserAgent(App.instance))
-        val adblock = true
-        val acceptThirdPartyCookies = true
-        val dnt = false
+        val dnt = App.isSecretMode
+        const val adblock = true
+        const val acceptThirdPartyCookies = true
     }
 
     var searchEngine: NameValue
@@ -70,7 +70,10 @@ object Settings {
         }
 
     var acceptThirdPartyCookies: Boolean
-        get() = pref.getBoolean("acceptThirdpartyCookies", Default.acceptThirdPartyCookies)
+        get() = if (App.isSecretMode) Settings.Default.acceptThirdPartyCookies else pref.getBoolean(
+            "acceptThirdpartyCookies",
+            Default.acceptThirdPartyCookies
+        )
         set(value) {
             pref.edit { putBoolean("acceptThirdpartyCookies", value) }
             acceptThirdPartyCookiesState.asMutable().value = value
@@ -80,7 +83,7 @@ object Settings {
         }
 
     var dnt: Boolean
-        get() = pref.getBoolean("dnt", Default.dnt)
+        get() = if (App.isSecretMode) Settings.Default.dnt else pref.getBoolean("dnt", Default.dnt)
         set(value) {
             pref.edit { putBoolean("dnt", value) }
             dntState.asMutable().value = value

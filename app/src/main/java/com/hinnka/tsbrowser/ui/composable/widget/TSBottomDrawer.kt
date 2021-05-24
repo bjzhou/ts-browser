@@ -41,7 +41,7 @@ fun TSBottomDrawer(
 
     var waitForShow by drawerState.waitForShow
     val imeHeight = viewModel.imeHeightState.value
-    if (imeHeight > 0 && !drawerState.isClosing && !keyboardIsHiding.value) {
+    if (imeHeight > 0 && !drawerState.isClosed && !drawerState.isClosing && !keyboardIsHiding.value) {
         waitForShow = true
     }
 

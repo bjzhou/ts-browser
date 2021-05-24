@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
@@ -8,8 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.hinnka.tsbrowser.App
 
+@SuppressLint("ConflictingOnColor")
 private val SecretColorPalette = darkColors(
-    primary = Color.Black,
+    primary = Teal200,
     primaryVariant = Color.Black,
     secondary = Teal200,
     onPrimary = Color.White,

@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
@@ -40,6 +41,7 @@ fun MainPage() {
         CheckTabs()
         LongPressPopup()
     }
+    logD("start MainPage")
 }
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)

@@ -42,6 +42,7 @@ class AppViewModel : ViewModel() {
             if (App.isSecretMode) {
                 (context as? Activity)?.finish()
             } else {
+                logD("start secret mode")
                 context.startActivity(Intent(context, SecretActivity::class.java).apply {
                     putExtra("mnemonic", urlText.md5())
                     addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)

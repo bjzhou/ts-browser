@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.NameValue
 import com.hinnka.tsbrowser.persist.SettingOptions
@@ -194,7 +195,9 @@ fun SettingsPage() {
                             checked = Settings.acceptThirdPartyCookiesState.value,
                             onCheckedChange = {
                                 Settings.acceptThirdPartyCookies = it
-                            })
+                            },
+                            enabled = !App.isSecretMode
+                        )
                     }
                 )
                 ListItem(
@@ -209,9 +212,13 @@ fun SettingsPage() {
                     },
                     text = { Text(text = stringResource(id = R.string.dnt)) },
                     trailing = {
-                        Switch(checked = Settings.dntState.value, onCheckedChange = {
-                            Settings.dnt = it
-                        })
+                        Switch(
+                            checked = Settings.dntState.value,
+                            onCheckedChange = {
+                                Settings.dnt = it
+                            },
+                            enabled = !App.isSecretMode
+                        )
                     }
                 )
                 Text(

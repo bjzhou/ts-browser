@@ -2,9 +2,11 @@ package com.hinnka.tsbrowser
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.webkit.WebView
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.logE
 import io.reactivex.plugins.RxJavaPlugins
 import java.lang.reflect.InvocationTargetException
@@ -20,6 +22,10 @@ class App : Application() {
         RxJavaPlugins.setErrorHandler {
             logE("RxJava run error", throwable = it)
         }
+        sendBroadcast(Intent("${packageName}.action.secret").apply {
+            `package` = packageName
+        })
+        logD("${getProcessName()} onCreate complete")
     }
 
     private fun configWebViewCacheDirWithAndroidP() {

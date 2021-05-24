@@ -130,6 +130,12 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <receiver android:name=".util.SecretReceiver" android:process=":secret">
+            <intent-filter>
+                <action android:name="${applicationId}.action.secret" />
+            </intent-filter>
+        </receiver>
+
         <meta-data android:name="android.webkit.WebView.MetricsOptOut"
             android:value="false" />
         <meta-data
