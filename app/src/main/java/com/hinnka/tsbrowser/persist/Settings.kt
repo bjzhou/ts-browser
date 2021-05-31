@@ -11,13 +11,18 @@ import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.asMutable
 import com.hinnka.tsbrowser.ext.md5
 import com.hinnka.tsbrowser.tab.TabManager
+import java.util.*
 
 object Settings {
     private val pref = App.instance.getSharedPreferences("settings", Context.MODE_PRIVATE)
     private val gson = Gson()
 
     object Default {
-        val searchEngine = NameValue("Google", "https://www.google.com/search?q=%s")
+        val searchEngine = if (App.isCN) {
+            NameValue("Baidu", "https://www.baidu.com/s?wd=%s")
+        } else {
+            NameValue("Google", "https://www.google.com/search?q=%s")
+        }
         val userAgent = NameValue("Android", WebSettings.getDefaultUserAgent(App.instance))
         val dnt = App.isSecretMode
         const val adblock = true
@@ -101,9 +106,11 @@ object Settings {
 
 object SettingOptions {
     val searchEngine = listOf(
-        Settings.Default.searchEngine,
+        NameValue("Google", "https://www.google.com/search?q=%s"),
         NameValue("Bing", "https://wwww.bing.com/search?q=%s"),
-        NameValue("DuckDuckGo", "https://duckduckgo.com/?q=%s")
+        NameValue("DuckDuckGo", "https://duckduckgo.com/?q=%s"),
+        NameValue("Baidu", "https://www.baidu.com/s?wd=%s"),
+        NameValue("Sogou", "https://www.sogou.com/web?query=%s"),
     )
     val userAgent = listOf(
         Settings.Default.userAgent,

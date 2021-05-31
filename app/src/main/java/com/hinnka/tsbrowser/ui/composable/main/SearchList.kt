@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
+import android.webkit.URLUtil
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -157,6 +158,7 @@ fun SearchList() {
 fun CurrentUrl(viewModel: AppViewModel, tab: Tab) {
     val title = tab.titleState.value
     val url = tab.urlState.value
+    if (!URLUtil.isNetworkUrl(url)) return
     Row(modifier = Modifier.clickable {
         viewModel.uiState.value = UIState.Main
     }) {

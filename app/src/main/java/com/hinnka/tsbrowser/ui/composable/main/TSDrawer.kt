@@ -37,7 +37,7 @@ fun TSDrawer() {
     ) {
         BackButton()
         ForwardButton()
-        BookmarkButton()
+        AddBookmarkButton()
         ShareButton()
     }
     Row(
@@ -146,7 +146,7 @@ fun RowScope.ShareButton() {
 }
 
 @Composable
-fun RowScope.BookmarkButton() {
+fun RowScope.AddBookmarkButton() {
     val tab by TabManager.currentTab
     val url = tab?.urlState?.value ?: return
     val title = tab?.titleState?.value ?: stringResource(id = R.string.untiled)

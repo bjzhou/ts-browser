@@ -2,6 +2,7 @@ package com.hinnka.tsbrowser.tab
 
 import android.graphics.Bitmap
 import android.os.Message
+import android.webkit.URLUtil
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -9,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.ext.encodeToPath
 import com.hinnka.tsbrowser.ext.host
+import com.hinnka.tsbrowser.ext.isUrl
 import com.hinnka.tsbrowser.ext.mainScope
 import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
@@ -100,7 +102,7 @@ data class Tab(
         canGoForwardState.value = view.canGoForward()
         mainScope.launch {
             val title = titleState.value
-            if (title.isNotBlank()) {
+            if (URLUtil.isNetworkUrl(url) && title.isNotBlank()) {
                 val last = AppDatabase.instance.historyDao().last()
                 if (url != last?.url && title != last?.title) {
                     AppDatabase.instance.historyDao().insert(
@@ -128,11 +130,11 @@ data class Tab(
     }
 
     val isHome
-        get() = urlState.value == "https://www.baidu.com"
+        get() = urlState.value == "about:blank"
 
     fun goHome() {
         view.post {
-            view.loadUrl("https://www.baidu.com")
+            view.loadUrl("about:blank")
         }
     }
 

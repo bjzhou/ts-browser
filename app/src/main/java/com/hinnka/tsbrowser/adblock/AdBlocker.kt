@@ -14,7 +14,7 @@ import java.util.regex.Pattern
 object AdBlocker {
 
     private val urlList = mutableListOf<String>()
-    private val WHITESPACES = Pattern.compile("[ \t]+");
+    private val WHITESPACES = Pattern.compile("[ \t]+")
 
     val emptyResponse: WebResourceResponse by lazy {
         val empty = ByteArrayInputStream(byteArrayOf())
@@ -30,7 +30,7 @@ object AdBlocker {
             file.forEachLine { line ->
                 if (line.startsWith("#")) return@forEachLine
                 val host = WHITESPACES.split(line)
-                if (host.size > 1 && host[0] == "0.0.0.0") {
+                if (host.size > 1 && (host[0] == "0.0.0.0" || host[0] == "127.0.0.1")) {
                     parseList.add(host[1])
                 }
             }

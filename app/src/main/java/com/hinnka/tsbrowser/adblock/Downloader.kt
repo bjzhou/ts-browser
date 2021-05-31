@@ -14,7 +14,7 @@ import kotlin.coroutines.resume
 
 object Downloader {
 
-    val hostUrl = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+    val hostUrl = "https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
 
     suspend fun getHost(): File {
         val task = Task(hostUrl, saveName = "hosts", savePath = App.instance.filesDir.path)

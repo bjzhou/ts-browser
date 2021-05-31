@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
+import android.webkit.URLUtil
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
@@ -12,15 +13,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -35,12 +34,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.Center
+import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -48,51 +50,82 @@ import kotlinx.coroutines.launch
 @Composable
 fun BottomBar(drawerState: BottomDrawerState) {
     val viewModel = LocalViewModel.current
+    val tab = TabManager.currentTab.value
     val uiState = viewModel.uiState
 
-    Surface(modifier = Modifier.graphicsLayer {
+    Column(modifier = Modifier.graphicsLayer {
         translationY = -viewModel.imeHeightState.value
     }) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(56.dp)
-                .background(MaterialTheme.colors.surface)
-                .padding(start = if (uiState.value == UIState.Search) 8.dp else 0.dp),
-        ) {
-            AnimatedVisibility(visible = uiState.value == UIState.Main) {
-                HomeButton()
-            }
-            AnimatedVisibility(visible = uiState.value == UIState.Main) {
-                TabButton(uiState)
-            }
-            AnimatedVisibility(visible = uiState.value == UIState.TabList) {
-                CloseAll()
-            }
-            AnimatedVisibility(visible = uiState.value == UIState.TabList) {
-                NewTab(uiState)
-            }
-            AnimatedVisibility(visible = true, modifier = Modifier.weight(1f)) {
-                if (uiState.value != UIState.TabList) {
-                    AddressTextField(
-                        modifier = Modifier.fillMaxSize(),
-                        uiState = uiState
-                    )
+        val showNewPage = uiState.value == UIState.Main && tab?.isHome != false
+        AnimatedVisibility(visible = showNewPage) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .height(56.dp)
+                    .background(MaterialTheme.colors.surface),
+            ) {
+                Center(modifier = Modifier.weight(1f)) {
+                    TabButton(uiState)
+                }
+                Center(modifier = Modifier.weight(1f)) {
+                    BookmarkButton()
+                }
+                Center(modifier = Modifier.weight(1f)) {
+                    HistoryButton()
+                }
+                Center(modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = {
+                        drawerState.open {
+                            TSDrawer()
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                    }
                 }
             }
-            AnimatedVisibility(visible = uiState.value == UIState.Search) {
-                CancelButton(uiState)
-            }
-            AnimatedVisibility(visible = uiState.value == UIState.Main) {
-                RefreshButton()
-            }
-            AnimatedVisibility(visible = uiState.value != UIState.Search) {
-                IconButton(onClick = {
-                    drawerState.open {
-                        TSDrawer()
+        }
+        AnimatedVisibility(visible = !showNewPage) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .height(56.dp)
+                    .background(MaterialTheme.colors.surface)
+                    .padding(start = if (uiState.value == UIState.Search) 8.dp else 0.dp),
+            ) {
+                AnimatedVisibility(visible = uiState.value == UIState.Main) {
+                    HomeButton()
+                }
+                AnimatedVisibility(visible = uiState.value == UIState.Main) {
+                    TabButton(uiState)
+                }
+                AnimatedVisibility(visible = uiState.value == UIState.TabList) {
+                    CloseAll()
+                }
+                AnimatedVisibility(visible = uiState.value == UIState.TabList) {
+                    NewTab(uiState)
+                }
+                AnimatedVisibility(visible = true, modifier = Modifier.weight(1f)) {
+                    if (uiState.value != UIState.TabList) {
+                        AddressTextField(
+                            modifier = Modifier.fillMaxSize(),
+                            uiState = uiState
+                        )
                     }
-                }) {
-                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                }
+                AnimatedVisibility(visible = uiState.value == UIState.Search) {
+                    CancelButton(uiState)
+                }
+                AnimatedVisibility(visible = uiState.value == UIState.Main) {
+                    RefreshButton()
+                }
+                AnimatedVisibility(visible = uiState.value != UIState.Search) {
+                    IconButton(onClick = {
+                        drawerState.open {
+                            TSDrawer()
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                    }
                 }
             }
         }
@@ -108,11 +141,18 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     val title = tab?.titleState?.value
     val icon = tab?.iconState?.value
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
+    val focusRequester = FocusRequester()
     if (uiState.value != UIState.Search) {
         focusManager.clearFocus()
     }
     val context = LocalContext.current
 
+    val placeholder = if (title?.isNotBlank() == true && title != url) {
+        title
+    } else if (URLUtil.isNetworkUrl(url)) {
+        url
+    } else null
 
     fun onGo() {
         focusManager.clearFocus()
@@ -122,14 +162,18 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     }
 
     TSTextField(
-        modifier = modifier,
+        modifier = modifier.focusRequester(focusRequester),
         text = text,
-        placeholder = if (title.isNullOrBlank()) url
-            ?: stringResource(id = R.string.address_bar) else title,
+        placeholder = placeholder ?: stringResource(id = R.string.address_bar),
         onEnter = { onGo() },
         onFocusChanged = { state ->
             if (state.isFocused) {
                 uiState.value = UIState.Search
+            } else if (uiState.value == UIState.Search) {
+                logD("search mode enabled")
+                scope.launch {
+                    focusRequester.requestFocus()
+                }
             }
         },
         leadingIcon = when (uiState.value) {
@@ -250,7 +294,6 @@ fun CancelButton(uiState: MutableState<UIState>) {
 }
 
 
-
 @Composable
 fun HomeButton() {
     IconButton(onClick = {
@@ -278,5 +321,23 @@ fun RefreshButton() {
             imageVector = if (progress == 1f) Icons.Outlined.Refresh else Icons.Outlined.Close,
             contentDescription = "Refresh"
         )
+    }
+}
+
+@Composable
+fun BookmarkButton() {
+    IconButton(onClick = {
+        PageController.navigate("bookmarks")
+    }) {
+        Icon(imageVector = Icons.Outlined.Bookmarks, contentDescription = "Bookmarks")
+    }
+}
+
+@Composable
+fun HistoryButton() {
+    IconButton(onClick = {
+        PageController.navigate("history")
+    }) {
+        Icon(imageVector = Icons.Outlined.History, contentDescription = "history")
     }
 }

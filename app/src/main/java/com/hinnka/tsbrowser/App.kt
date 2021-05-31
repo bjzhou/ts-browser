@@ -6,11 +6,17 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.webkit.WebView
+import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.logE
+import com.hinnka.tsbrowser.ext.mainScope
+import com.hinnka.tsbrowser.persist.Bookmark
+import com.hinnka.tsbrowser.persist.Favorites
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.launch
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.util.*
 
 
 class App : Application() {
@@ -25,7 +31,15 @@ class App : Application() {
         sendBroadcast(Intent("${packageName}.action.secret").apply {
             `package` = packageName
         })
+        initBrowser()
         logD("${getProcessName()} onCreate complete")
+    }
+
+    private fun initBrowser() {
+        mainScope.launch {
+            Bookmark.init()
+            Favorites.init()
+        }
     }
 
     private fun configWebViewCacheDirWithAndroidP() {
@@ -61,5 +75,8 @@ class App : Application() {
         }
 
         val isSecretMode: Boolean by lazy { getProcessName().endsWith("secret") }
+
+        @SuppressLint("ConstantLocale")
+        val isCN: Boolean = Locale.getDefault().country.toUpperCase(Locale.ROOT) == "CN"
     }
 }

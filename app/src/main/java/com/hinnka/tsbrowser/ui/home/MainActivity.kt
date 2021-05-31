@@ -15,6 +15,7 @@ import com.hinnka.tsbrowser.BuildConfig
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toUrl
+import com.hinnka.tsbrowser.persist.Favorites
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.base.BaseActivity
@@ -39,7 +40,7 @@ open class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Initialize {
+            Providers {
                 TSBrowserTheme {
                     PageContainer("main") {
                         page("main") { MainPage() }
@@ -64,12 +65,6 @@ open class MainActivity : BaseActivity() {
         if (BuildConfig.DEBUG) {
             window.decorView.keepScreenOn = true
         }
-    }
-
-    @Composable
-    fun Initialize(content: @Composable () -> Unit) {
-        Bookmark.init()
-        Providers(content)
     }
 
     @Composable
