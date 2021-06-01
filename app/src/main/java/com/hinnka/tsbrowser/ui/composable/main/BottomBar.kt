@@ -155,10 +155,10 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     } else null
 
     fun onGo() {
-        focusManager.clearFocus()
         uiState.value = UIState.Main
         viewModel.onGo(text.value.text, context)
         text.value = TextFieldValue()
+        focusManager.clearFocus()
     }
 
     TSTextField(

@@ -69,7 +69,7 @@ fun MainView(drawerState: BottomDrawerState) {
                 )
             }
             ProgressIndicator()
-            NewTabView()
+            NewTabView(drawerState)
             CoverView()
         }
         BottomBar(drawerState)
@@ -77,12 +77,12 @@ fun MainView(drawerState: BottomDrawerState) {
 }
 
 @Composable
-fun NewTabView() {
+fun NewTabView(drawerState: BottomDrawerState) {
     val tab = TabManager.currentTab.value
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
     if (uiState.value == UIState.Main && tab?.isHome == true) {
-        NewTabPage()
+        NewTabPage(drawerState)
     }
 }
 

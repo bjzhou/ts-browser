@@ -23,8 +23,11 @@ data class Tab(
     var view: TSWebView,
 ) : WebDataListener {
 
+    companion object {
+        private val faviconMap = mutableMapOf<String, Bitmap?>()
+    }
+
     var parentTab: Tab? = null
-    private val faviconMap = mutableMapOf<String, Bitmap?>()
 
     override val progressState = mutableStateOf(0f)
     override val titleState = mutableStateOf("")

@@ -86,4 +86,7 @@
     <string name="current_mnemonic_wrong">Current mnemonic is not correct</string>
     <string name="mnemonic_different">New mnemonic and confirm mnemonic is different</string>
     <string name="mnemonic_update_success">Mnemonic update success</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="new_tab">New tab</string>
 </resources>

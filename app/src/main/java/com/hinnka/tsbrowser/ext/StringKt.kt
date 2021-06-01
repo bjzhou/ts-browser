@@ -69,4 +69,11 @@ fun String?.md5(): String? {
 }
 
 val String.host: String?
-    get() = Uri.parse(this).host
+    get() {
+        val uri = if (URLUtil.isValidUrl(this)) {
+            Uri.parse(this)
+        } else {
+            Uri.parse("http://$this")
+        }
+        return uri.host
+    }

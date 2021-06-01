@@ -53,18 +53,19 @@ object Favorites {
 
     suspend fun init() {
         if (LocalStorage.isFavoriteInitialized) return
-        AppDatabase.instance.favoriteDao().add(*default.toTypedArray())
+        AppDatabase.instance.favoriteDao().addAll(*default.toTypedArray())
         LocalStorage.isFavoriteInitialized = true
     }
 }
 
 @Entity
 data class Favorite(
-    @PrimaryKey val url: String,
-    @ColumnInfo val title: String,
+    @ColumnInfo var url: String,
+    @ColumnInfo var title: String,
     @ColumnInfo @DrawableRes val iconRes: Int = 0,
     @ColumnInfo val color: Long = 0,
     @ColumnInfo val order: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
 )
 
 @Dao
@@ -73,8 +74,11 @@ interface FavoriteDao {
     suspend fun getAll(): List<Favorite>
 
     @Insert(onConflict = REPLACE)
-    suspend fun add(vararg favorite: Favorite)
+    suspend fun addAll(vararg favorite: Favorite)
+
+    @Insert(onConflict = REPLACE)
+    suspend fun insertOrUpdate(favorite: Favorite): Long
 
     @Delete
-    suspend fun delete(vararg favorite: Favorite)
+    suspend fun delete(favorite: Favorite)
 }

@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.VideoView
 import androidx.core.view.children
 import androidx.lifecycle.*
+import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
@@ -191,7 +192,7 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onReceivedTitle(title: String?) {
-        dataListener?.titleState?.value = title ?: url ?: ""
+        dataListener?.titleState?.value = if (title == "about:blank") context.getString(R.string.new_tab) else title ?: ""
     }
 
     override fun onReceivedIcon(icon: Bitmap?) {

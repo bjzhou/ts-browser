@@ -146,6 +146,7 @@ class BottomDrawerState {
     suspend fun close() {
         isClosing = true
         offset.animateTo(fullHeight)
+        drawerContent = {}
     }
 }
 

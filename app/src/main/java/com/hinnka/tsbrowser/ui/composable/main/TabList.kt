@@ -90,7 +90,7 @@ fun TabList() {
                 TabItem(tab = tabs[it]) {
                     val lastActive = tab.info.isActive
                     tab.active()
-                    if (tab.previewState.value != null) {
+                    if (tab.urlState.value != "about:blank" && tab.previewState.value != null) {
                         if (lastActive) {
                             hideAnim.value = true
                             targetOffset.value = IntOffset.Zero
@@ -136,7 +136,7 @@ fun TabList() {
         animationSpec = if (resetAnim.value) tween(0) else spring()
     )
 
-    if (showAnim.value || hideAnim.value) {
+    if (tab.urlState.value != "about:blank" && (showAnim.value || hideAnim.value)) {
         Image(
             bitmap = preview.asImageBitmap(),
             modifier = Modifier
@@ -154,6 +154,7 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
     val icon = tab.iconState
     val title = tab.titleState
     val preview = tab.previewState
+    val url = tab.urlState
     Column(modifier = Modifier
         .tap {
             onTap()
@@ -170,7 +171,7 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
                     contentDescription = "",
                     modifier = Modifier
                         .size(22.dp)
-                        .padding(3.dp)
+                        .padding(start = 3.dp)
                 )
             }
             Text(
@@ -178,7 +179,9 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
                 fontSize = 12.sp,
                 fontWeight = FontWeight.W500,
                 maxLines = 1,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 3.dp)
             )
             Box(
                 modifier = Modifier
@@ -213,16 +216,20 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
                 .fillMaxWidth()
                 .background(Color.LightGray)
         )
-        preview.value?.asImageBitmap()?.let {
-            Image(
-                bitmap = it,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentDescription = tab.urlState.value,
-                alignment = Alignment.TopCenter,
-                contentScale = ContentScale.FillWidth
-            )
+        if (url.value == "about:blank") {
+            NewTabPagePreview()
+        } else {
+            preview.value?.asImageBitmap()?.let {
+                Image(
+                    bitmap = it,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentDescription = tab.urlState.value,
+                    alignment = Alignment.TopCenter,
+                    contentScale = ContentScale.FillWidth
+                )
+            }
         }
     }
 }
