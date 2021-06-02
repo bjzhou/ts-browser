@@ -1,9 +1,9 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
 import android.widget.FrameLayout
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,16 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.removeFromParent
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.welcome.SecretWelcome
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.StatusBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
@@ -41,8 +42,28 @@ fun MainPage() {
         }
         CheckTabs()
         LongPressPopup()
+        Welcome(drawerState)
     }
     logD("MainPage end")
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun Welcome(drawerState: BottomDrawerState) {
+    var showSecret by remember { mutableStateOf(false) }
+    val hasMnemonic = Settings.mnemonicState.value == null
+    LaunchedEffect(key1 = hasMnemonic) {
+        showSecret = hasMnemonic
+    }
+    AnimatedVisibility(
+        visible = showSecret,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 200f)),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 200f))
+    ) {
+        TSBackHandler(onBack = {}) {
+            SecretWelcome(drawerState)
+        }
+    }
 }
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)

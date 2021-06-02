@@ -11,14 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.BuildConfig
-import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toUrl
-import com.hinnka.tsbrowser.persist.Favorites
+import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
+import com.hinnka.tsbrowser.ui.AppViewModel
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.composable.bookmark.AddFolder
 import com.hinnka.tsbrowser.ui.composable.bookmark.BookmarkPage
@@ -29,8 +29,6 @@ import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.settings.SettingsPage
 import com.hinnka.tsbrowser.ui.composable.widget.PageContainer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
-import com.hinnka.tsbrowser.ui.AppViewModel
-import com.hinnka.tsbrowser.ui.LocalViewModel
 import kotlinx.coroutines.launch
 
 open class MainActivity : BaseActivity() {
