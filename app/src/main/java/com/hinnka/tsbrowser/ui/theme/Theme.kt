@@ -8,6 +8,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.hinnka.tsbrowser.App
+import com.hinnka.tsbrowser.ext.logD
 
 @SuppressLint("ConflictingOnColor")
 private val SecretColorPalette = darkColors(
@@ -31,6 +32,7 @@ val Colors.primaryLight: Color get() = if (isLight) PrimaryWhite else PrimaryDar
 
 @Composable
 fun TSBrowserTheme(content: @Composable() () -> Unit) {
+    logD("TSBrowserTheme start")
     val colors = if (App.isSecretMode) {
         SecretColorPalette
     } else {

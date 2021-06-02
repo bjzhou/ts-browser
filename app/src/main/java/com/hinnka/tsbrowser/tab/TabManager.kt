@@ -10,6 +10,7 @@ import com.hinnka.tsbrowser.persist.update
 import com.hinnka.tsbrowser.ext.decodeBitmap
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.ioScope
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.persist.IconCache
 import com.hinnka.tsbrowser.web.TSWebView
@@ -82,29 +83,37 @@ object TabManager {
 
     suspend fun loadTabs(context: Context) {
         if (isInitialized) return
+        logD("loadTabs start")
         val savedTabs = AppDatabase.instance.tabDao().getAll().map {
+            logD("loadTabs 1")
             Tab(it, TSWebView(context)).apply {
+                logD("loadTabs 2")
                 urlState.value = it.url
                 titleState.value = it.title
-                iconState.value = IconCache.asyncGet(it.url.host ?: "")
-                previewState.value = it.thumbnailPath?.decodeBitmap()
+                ioScope.launch {
+                    iconState.value = IconCache.asyncGet(it.url.host ?: "")
+                    previewState.value = it.thumbnailPath?.decodeBitmap()
+                }
                 if (it.isActive) {
                     currentTab.value = this
                 }
                 view.post {
                     view.loadUrl(it.url)
                 }
+                logD("loadTabs 3")
             }
         }
         tabs.clear()
         tabs.addAll(savedTabs)
         isInitialized = true
         if (tabs.isEmpty()) {
+            logD("loadTabs 4")
             newTab(context).apply {
                 goHome()
                 active()
             }
         }
+        logD("loadTabs end")
     }
 
 }

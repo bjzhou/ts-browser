@@ -15,6 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         val instance: AppDatabase by lazy {
             Room.databaseBuilder(App.instance, AppDatabase::class.java, "app-db-${App.getProcessName()}")
+                .allowMainThreadQueries()
                 .build()
         }
     }

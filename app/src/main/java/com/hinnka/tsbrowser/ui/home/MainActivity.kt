@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.BuildConfig
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.ext.logD
@@ -38,7 +39,7 @@ open class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        logD("MainActivity onCreate")
         setContent {
             Providers {
                 TSBrowserTheme {
@@ -65,10 +66,12 @@ open class MainActivity : BaseActivity() {
         if (BuildConfig.DEBUG) {
             window.decorView.keepScreenOn = true
         }
+        logD("MainActivity onCreate complete")
     }
 
     @Composable
     fun Providers(content: @Composable () -> Unit) {
+        logD("Providers start")
         CompositionLocalProvider(
             LocalViewModel provides viewModel,
             content = content)

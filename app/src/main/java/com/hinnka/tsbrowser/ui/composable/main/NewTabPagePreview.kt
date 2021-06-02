@@ -33,17 +33,7 @@ import com.hinnka.tsbrowser.ui.theme.primaryLight
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NewTabPagePreview() {
-    val favorites = remember { mutableStateListOf<Favorite>() }
-
-    suspend fun refresh() {
-        val list = AppDatabase.instance.favoriteDao().getAll()
-        favorites.clear()
-        favorites.addAll(list)
-    }
-
-    LaunchedEffect(key1 = favorites) {
-        refresh()
-    }
+    val favorites = remember { mutableStateListOf(*AppDatabase.instance.favoriteDao().getAll().toTypedArray()) }
     Column(
         modifier = Modifier.background(MaterialTheme.colors.surface),
         horizontalAlignment = Alignment.CenterHorizontally

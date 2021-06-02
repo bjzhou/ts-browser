@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.host
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.longPress
 import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.persist.AppDatabase
@@ -45,19 +46,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NewTabPage(drawerState: BottomDrawerState) {
+    logD("NewTabPage start")
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val favorites = remember { mutableStateListOf<Favorite>() }
+    val favorites = remember { mutableStateListOf(*AppDatabase.instance.favoriteDao().getAll().toTypedArray()) }
 
-    suspend fun refresh() {
+    fun refresh() {
         val list = AppDatabase.instance.favoriteDao().getAll()
         favorites.clear()
         favorites.addAll(list)
     }
 
-    LaunchedEffect(key1 = favorites) {
-        refresh()
-    }
     Column(
         modifier = Modifier.background(MaterialTheme.colors.surface),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -80,10 +79,8 @@ fun NewTabPage(drawerState: BottomDrawerState) {
                         }
                     }
                 }, onDelete = {
-                    scope.launch {
-                        AppDatabase.instance.favoriteDao().delete(favorite)
-                        refresh()
-                    }
+                    AppDatabase.instance.favoriteDao().delete(favorite)
+                    refresh()
                 })
             }
             if (favorites.size < 10) {
@@ -127,6 +124,7 @@ fun NewTabPage(drawerState: BottomDrawerState) {
         Spacer(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.height(64.dp))
     }
+    logD("NewTabPage end")
 }
 
 @Composable

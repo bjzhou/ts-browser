@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.IntOffset
 import com.hinnka.tsbrowser.ext.ioScope
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.mainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ object PageGraphBuilder {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PageContainer(start: String, pageGraph: PageGraphBuilder.() -> Unit) {
+    logD("PageContainer start")
     if (PageController.routes.isEmpty()) {
         PageController.set(start)
     }
@@ -74,6 +76,7 @@ fun PageContainer(start: String, pageGraph: PageGraphBuilder.() -> Unit) {
             }
         }
     }
+    logD("PageContainer end")
 }
 
 @OptIn(ExperimentalAnimationApi::class)

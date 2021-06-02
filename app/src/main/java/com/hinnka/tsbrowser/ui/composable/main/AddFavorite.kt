@@ -55,9 +55,7 @@ fun AddFavorite(orig: Favorite? = null, onDismiss: (Favorite) -> Unit) {
                 title = titleField.value.text
             }
         } ?: Favorite(urlField.value.text, titleField.value.text)
-        scope.launch {
-            AppDatabase.instance.favoriteDao().insertOrUpdate(favorite)
-        }
+        AppDatabase.instance.favoriteDao().insertOrUpdate(favorite)
         titleField.value = TextFieldValue()
         urlField.value = TextFieldValue()
         onDismiss(favorite)

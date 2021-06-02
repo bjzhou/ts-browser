@@ -51,7 +51,7 @@ object Favorites {
         ),
     )
 
-    suspend fun init() {
+    fun init() {
         if (LocalStorage.isFavoriteInitialized) return
         AppDatabase.instance.favoriteDao().addAll(*default.toTypedArray())
         LocalStorage.isFavoriteInitialized = true
@@ -71,14 +71,14 @@ data class Favorite(
 @Dao
 interface FavoriteDao {
     @Query("SELECT * FROM favorite ORDER BY `order`")
-    suspend fun getAll(): List<Favorite>
+    fun getAll(): List<Favorite>
 
     @Insert(onConflict = REPLACE)
-    suspend fun addAll(vararg favorite: Favorite)
+    fun addAll(vararg favorite: Favorite)
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertOrUpdate(favorite: Favorite): Long
+    fun insertOrUpdate(favorite: Favorite): Long
 
     @Delete
-    suspend fun delete(favorite: Favorite)
+    fun delete(favorite: Favorite)
 }

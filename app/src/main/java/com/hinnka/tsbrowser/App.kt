@@ -23,6 +23,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        logD("${getProcessName()} onCreate")
         instance = this
         configWebViewCacheDirWithAndroidP()
         RxJavaPlugins.setErrorHandler {
@@ -36,10 +37,8 @@ class App : Application() {
     }
 
     private fun initBrowser() {
-        mainScope.launch {
-            Bookmark.init()
-            Favorites.init()
-        }
+        Bookmark.init()
+        Favorites.init()
     }
 
     private fun configWebViewCacheDirWithAndroidP() {

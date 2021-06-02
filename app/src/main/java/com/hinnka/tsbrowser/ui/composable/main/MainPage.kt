@@ -30,6 +30,7 @@ import com.hinnka.tsbrowser.ui.home.UIState
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainPage() {
+    logD("MainPage start")
     val drawerState = remember { BottomDrawerState() }
     TSBottomDrawer(
         drawerState = drawerState,
@@ -41,12 +42,13 @@ fun MainPage() {
         CheckTabs()
         LongPressPopup()
     }
-    logD("start MainPage")
+    logD("MainPage end")
 }
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainView(drawerState: BottomDrawerState) {
+    logD("MainView start")
     val tab = TabManager.currentTab.value
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -74,6 +76,7 @@ fun MainView(drawerState: BottomDrawerState) {
         }
         BottomBar(drawerState)
     }
+    logD("MainView end")
 }
 
 @Composable
@@ -81,7 +84,7 @@ fun NewTabView(drawerState: BottomDrawerState) {
     val tab = TabManager.currentTab.value
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
-    if (uiState.value == UIState.Main && tab?.isHome == true) {
+    if (tab == null || (uiState.value == UIState.Main && tab.isHome)) {
         NewTabPage(drawerState)
     }
 }
