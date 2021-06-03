@@ -3,6 +3,7 @@ package com.hinnka.tsbrowser
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.webkit.WebView
@@ -37,6 +38,8 @@ class App : Application() {
     }
 
     private fun initBrowser() {
+        //FIXME hack for RxDownload init in sub process
+        contentResolver.insert(Uri.parse("content://$packageName.claritypotion/start"), null)
         Bookmark.init()
         Favorites.init()
     }
@@ -55,9 +58,9 @@ class App : Application() {
         @JvmStatic
         lateinit var instance: App
 
-        @SuppressLint("DiscouragedPrivateApi", "PrivateApi")
-        fun getProcessName(): String {
-            return if (Build.VERSION.SDK_INT >= 28) Application.getProcessName() else try {
+        val processName: String by lazy {
+            if (Build.VERSION.SDK_INT >= 28) getProcessName() else try {
+                @SuppressLint("PrivateApi")
                 val activityThread = Class.forName("android.app.ActivityThread")
                 val methodName = "currentProcessName"
                 val getProcessName: Method = activityThread.getDeclaredMethod(methodName)
@@ -73,7 +76,7 @@ class App : Application() {
             }
         }
 
-        val isSecretMode: Boolean by lazy { getProcessName().endsWith("secret") }
+        val isSecretMode: Boolean by lazy { processName.endsWith("secret") }
 
         @SuppressLint("ConstantLocale")
         val isCN: Boolean = Locale.getDefault().country.toUpperCase(Locale.ROOT) == "CN"

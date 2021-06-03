@@ -74,7 +74,7 @@ data class Bookmark(
     }
 
     companion object {
-        val rootPath = File(App.instance.filesDir, "bookmark_${App.getProcessName()}")
+        val rootPath = File(App.instance.filesDir, "bookmark_${App.processName}")
 
         var root = Bookmark(
             guid = UUID(0, 0).toString(),

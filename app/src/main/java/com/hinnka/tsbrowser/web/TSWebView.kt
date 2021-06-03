@@ -20,20 +20,20 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.VideoView
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.persist.AppDatabase
-import com.hinnka.tsbrowser.persist.SearchHistory
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
-import com.hinnka.tsbrowser.persist.History
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
-import com.hinnka.tsbrowser.persist.IconCache
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import kotlin.coroutines.resume
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -94,6 +94,7 @@ class TSWebView @JvmOverloads constructor(
             setGeolocationEnabled(true)
             setGeolocationDatabasePath(File(context.filesDir, "geodb").path)
             setSupportMultipleWindows(true)
+            addJavascriptInterface(TSBridge(this@TSWebView), "TSBridge")
 
             userAgentString = Settings.userAgent.value
         }
@@ -204,52 +205,31 @@ class TSWebView @JvmOverloads constructor(
         requestedOrientation: Int,
         callback: WebChromeClient.CustomViewCallback
     ) {
-//        printView(view)
-        origOrientation =
-            activity?.requestedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        origOrientation = requestedOrientation
+        post {
+            val resolver = context.contentResolver
+            val autoRotationOff = android.provider.Settings.System.getInt(
+                resolver,
+                android.provider.Settings.System.ACCELEROMETER_ROTATION
+            ) == 0
+            if (autoRotationOff && activity?.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+                activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+        }
+        view.removeFromParent()
         if (fullScreenView != null) {
             callback.onCustomViewHidden()
-        }
-        if (requestedOrientation != activity?.requestedOrientation) {
-            activity?.requestedOrientation = requestedOrientation
-        }
-        val resolver = context.contentResolver
-        val autoRotationOff = android.provider.Settings.System.getInt(
-            resolver,
-            android.provider.Settings.System.ACCELEROMETER_ROTATION
-        ) == 0
-        if (autoRotationOff && requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
 
         fullScreenView = view
         val decorView = activity?.window?.decorView as? ViewGroup
         decorView?.addView(view, FrameLayout.LayoutParams(-1, -1))
+        view.isVisible = true
         try {
             view.keepScreenOn = true
         } catch (e: Exception) {
         }
         view.setFullScreen(true)
-        val videoView = view.findVideo
-        videoView?.setOnErrorListener { _, _, _ -> false }
-        videoView?.setOnCompletionListener {
-            callback.onCustomViewHidden()
-        }
-    }
-
-    private fun printView(view: View, root: Boolean = true) {
-        if (root) {
-            logD("=====printView=====")
-        }
-        logD(view.javaClass.name)
-        if (view is ViewGroup) {
-            for (child in view.children) {
-                printView(child, false)
-            }
-        }
-        if (root) {
-            logD("=====printView=====")
-        }
     }
 
     override fun onHideCustomView() {
@@ -258,14 +238,11 @@ class TSWebView @JvmOverloads constructor(
         } catch (e: Exception) {
         }
         fullScreenView?.setFullScreen(false)
-        fullScreenView?.removeFromParent()
+        fullScreenView?.isVisible = false
+//        fullScreenView?.removeFromParent()
         if (activity?.requestedOrientation != origOrientation) {
             activity?.requestedOrientation = origOrientation
         }
-        val videoView = fullScreenView?.findVideo
-        videoView?.stopPlayback()
-        videoView?.setOnErrorListener(null)
-        videoView?.setOnCompletionListener(null)
         fullScreenView = null
     }
 
@@ -298,6 +275,7 @@ class TSWebView @JvmOverloads constructor(
     }
 
     override fun onPageFinished(url: String) {
+        evaluateJavascript(bridgeJs, null)
     }
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
@@ -308,13 +286,11 @@ class TSWebView @JvmOverloads constructor(
         return lifecycleRegistry
     }
 
-    private val View.findVideo: VideoView?
-        get() {
-            if (this is VideoView) {
-                return this
-            } else if (this is ViewGroup) {
-                return this.children.firstOrNull { it is VideoView } as? VideoView
+    companion object {
+        val bridgeJs: String by lazy {
+            App.instance.assets.open("tsbridge.js").use {
+                BufferedReader(InputStreamReader(it)).readText()
             }
-            return null
         }
+    }
 }

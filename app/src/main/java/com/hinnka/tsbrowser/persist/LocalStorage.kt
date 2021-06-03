@@ -5,7 +5,7 @@ import androidx.core.content.edit
 import com.hinnka.tsbrowser.App
 
 object LocalStorage {
-    private val pref = App.instance.getSharedPreferences("localStorage", Context.MODE_PRIVATE)
+    private val pref = App.instance.getSharedPreferences("localStorage.${App.processName}", Context.MODE_PRIVATE)
 
     var isFavoriteInitialized
         get() = pref.getBoolean("isFavoriteInitialized", false)
