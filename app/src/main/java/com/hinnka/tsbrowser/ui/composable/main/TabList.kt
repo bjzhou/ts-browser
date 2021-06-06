@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
@@ -151,6 +152,8 @@ fun TabList() {
 
 @Composable
 fun TabItem(tab: Tab, onTap: () -> Unit) {
+    val context = LocalContext.current
+    val viewModel = LocalViewModel.current
     val icon = tab.iconState
     val title = tab.titleState
     val preview = tab.previewState
@@ -190,12 +193,22 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
                         val index = TabManager.tabs.indexOf(tab)
                         TabManager.remove(tab)
                         if (tab.info.isActive) {
-                            if (TabManager.tabs.size > index) {
-                                TabManager.tabs[index].active()
-                            } else if (TabManager.tabs.isNotEmpty()) {
-                                TabManager.tabs
-                                    .last()
-                                    .active()
+                            when {
+                                TabManager.tabs.size > index -> {
+                                    TabManager.tabs[index].active()
+                                }
+                                TabManager.tabs.isNotEmpty() -> {
+                                    TabManager.tabs
+                                        .last()
+                                        .active()
+                                }
+                                else -> {
+                                    TabManager.newTab(context).apply {
+                                        goHome()
+                                        active()
+                                    }
+                                    viewModel.uiState.value = UIState.Main
+                                }
                             }
                         }
                     },

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -33,8 +34,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.logD
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
@@ -208,23 +211,76 @@ fun TabButton(uiState: MutableState<UIState>) {
         TabManager.currentTab.value?.view?.generatePreview()
         uiState.value = UIState.TabList
     }) {
-        Box(
-            modifier = Modifier
-                .border(
-                    1.5.dp,
-                    LocalContentColor.current,
-                    RoundedCornerShape(4.dp)
+        if (App.isSecretMode) {
+            Box(modifier = Modifier.size(26.dp)) {
+                Box(
+                    modifier = Modifier
+                        .border(
+                            1.5.dp,
+                            LocalContentColor.current,
+                            RoundedCornerShape(4.dp)
+                        )
+                        .size(20.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = tabs.size.toString(),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.W600,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_secret),
+                    contentDescription = "Secret Mode",
+                    modifier = Modifier.size(14.dp).align(Alignment.BottomEnd).background(MaterialTheme.colors.surface),
+                    tint = MaterialTheme.colors.primary
                 )
-                .size(20.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = tabs.size.toString(),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.W600,
-                textAlign = TextAlign.Center,
-            )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .border(
+                        1.5.dp,
+                        LocalContentColor.current,
+                        RoundedCornerShape(4.dp)
+                    )
+                    .size(20.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = tabs.size.toString(),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.W600,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
+//        Box(modifier = Modifier.size(26.dp)) {
+//            Box(
+//                modifier = Modifier
+//                    .border(
+//                        1.5.dp,
+//                        LocalContentColor.current,
+//                        RoundedCornerShape(4.dp)
+//                    )
+//                    .size(20.dp),
+//                contentAlignment = Alignment.Center,
+//            ) {
+//                Text(
+//                    text = tabs.size.toString(),
+//                    fontSize = 12.sp,
+//                    fontWeight = FontWeight.W600,
+//                    textAlign = TextAlign.Center,
+//                )
+//            }
+//            Icon(
+//                painter = painterResource(id = R.drawable.ic_incognito),
+//                contentDescription = "incognito",
+//                modifier = Modifier.size(14.dp).align(Alignment.BottomEnd).background(MaterialTheme.colors.surface),
+//                tint = MaterialTheme.colors.primary
+//            )
+//        }
 
     }
 }

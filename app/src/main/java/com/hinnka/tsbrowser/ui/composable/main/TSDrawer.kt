@@ -1,9 +1,14 @@
 package com.hinnka.tsbrowser.ui.composable.main
 
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyGridScope
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -11,29 +16,35 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.BookmarkAdded
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.BookmarkType
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.theme.primaryLight
 
-@OptIn(ExperimentalMaterialApi::class)
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun TSDrawer() {
-    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .height(48.dp)
             .fillMaxWidth()
-            .background(MaterialTheme.colors.primaryLight)
+//            .background(MaterialTheme.colors.primaryLight)
     ) {
         BackButton()
         ForwardButton()
@@ -42,9 +53,9 @@ fun TSDrawer() {
     }
     Row(
         modifier = Modifier
-            .background(MaterialTheme.colors.primaryLight)
+//            .background(MaterialTheme.colors.primaryLight)
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 32.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -58,42 +69,122 @@ fun TSDrawer() {
                 fontWeight = FontWeight.Medium,
             )
         }
-        Image(
-            painter = painterResource(id = R.drawable.ic_security),
-            contentDescription = "Security"
+        Icon(
+            imageVector = Icons.Outlined.Security,
+            contentDescription = "Security",
+            modifier = Modifier.size(68.dp),
+            tint = MaterialTheme.colors.primary
         )
     }
-    ListItem(
-        modifier = Modifier.clickable {
+    LazyVerticalGrid(cells = GridCells.Fixed(4), modifier = Modifier.padding(8.dp)) {
+        drawerItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.DarkMode,
+                    contentDescription = "Dark Mode",
+                    tint = if (Settings.darkModeState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.dark),
+                    color = if (Settings.darkModeState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
+                )
+            }
+        ) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                Settings.darkMode = !Settings.darkMode
+            } else {
+                Toast.makeText(context, R.string.dark_unsupport, Toast.LENGTH_SHORT).show()
+            }
+        }
+        drawerItem(
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_incognito),
+                    contentDescription = "Incognito",
+                    tint = if (Settings.darkModeState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.incognito),
+                    color = if (Settings.darkModeState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
+                )
+            }
+        ) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                Settings.darkMode = !Settings.darkMode
+            } else {
+                Toast.makeText(context, R.string.dark_unsupport, Toast.LENGTH_SHORT).show()
+            }
+        }
+        drawerItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.Bookmarks,
+                    contentDescription = "Bookmarks"
+                )
+            },
+            text = { Text(text = stringResource(id = R.string.bookmark)) }
+        ) {
             PageController.navigate("bookmarks")
-        },
-        icon = { Icon(imageVector = Icons.Outlined.Bookmarks, contentDescription = "Bookmarks") },
-    ) {
-        Text(text = stringResource(id = R.string.bookmark))
-    }
-    ListItem(
-        modifier = Modifier.clickable {
+        }
+        drawerItem(
+            icon = { Icon(imageVector = Icons.Outlined.History, contentDescription = "History") },
+            text = { Text(text = stringResource(id = R.string.history)) }
+        ) {
             PageController.navigate("history")
-        },
-        icon = { Icon(imageVector = Icons.Outlined.History, contentDescription = "History") },
-    ) {
-        Text(text = stringResource(id = R.string.history))
-    }
-    ListItem(
-        modifier = Modifier.clickable {
+        }
+        drawerItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.Download,
+                    contentDescription = "Downloads"
+                )
+            },
+            text = { Text(text = stringResource(id = R.string.downloads)) }
+        ) {
             PageController.navigate("downloads")
-        },
-        icon = { Icon(imageVector = Icons.Outlined.Download, contentDescription = "Downloads") },
-    ) {
-        Text(text = stringResource(id = R.string.downloads))
-    }
-    ListItem(
-        modifier = Modifier.clickable {
+        }
+        drawerItem(
+            icon = { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") },
+            text = { Text(text = stringResource(id = R.string.settings)) }
+        ) {
             PageController.navigate("settings")
-        },
-        icon = { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") },
-    ) {
-        Text(text = stringResource(id = R.string.settings))
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+fun LazyGridScope.drawerItem(
+    icon: @Composable () -> Unit,
+    text: @Composable () -> Unit,
+    onClick: () -> Unit
+) {
+    item {
+        CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 10.sp)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable {
+                        onClick()
+                    }
+                    .padding(16.dp)
+            ) {
+                icon()
+                Spacer(modifier = Modifier.height(4.dp))
+                text()
+            }
+        }
     }
 }
 

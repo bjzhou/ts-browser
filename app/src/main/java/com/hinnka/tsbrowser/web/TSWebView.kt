@@ -22,6 +22,8 @@ import android.widget.VideoView
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadHandler
@@ -88,6 +90,7 @@ class TSWebView @JvmOverloads constructor(
             mediaPlaybackRequiresUserGesture = false
             useWideViewPort = true
             setSupportZoom(true)
+            setDarkMode(Settings.darkMode)
 
             setAppCacheEnabled(true)
             setAppCachePath(context.cacheDir.path)
@@ -108,6 +111,18 @@ class TSWebView @JvmOverloads constructor(
     init {
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptThirdPartyCookies(this, Settings.acceptThirdPartyCookies)
+    }
+
+    fun setDarkMode(dark: Boolean) {
+        if (dark) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(settings, WebSettingsCompat.FORCE_DARK_ON)
+            }
+        } else {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(settings, WebSettingsCompat.FORCE_DARK_OFF)
+            }
+        }
     }
 
     override fun loadUrl(url: String) {

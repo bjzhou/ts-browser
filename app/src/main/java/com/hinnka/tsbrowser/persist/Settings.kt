@@ -6,11 +6,13 @@ import android.webkit.WebSettings
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
+import androidx.webkit.WebSettingsCompat
 import com.google.gson.Gson
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.asMutable
 import com.hinnka.tsbrowser.ext.md5
 import com.hinnka.tsbrowser.tab.TabManager
+import com.hinnka.tsbrowser.web.TSWebView
 import java.util.*
 
 object Settings {
@@ -28,6 +30,14 @@ object Settings {
         const val adblock = true
         const val acceptThirdPartyCookies = true
     }
+
+    var darkMode: Boolean
+        get() = pref.getBoolean("darkMode", false)
+        set(value) {
+            pref.edit { putBoolean("darkMode", value) }
+            darkModeState.asMutable().value = value
+            TabManager.currentTab.value?.view?.setDarkMode(value)
+        }
 
     var searchEngine: NameValue
         get() {
@@ -101,6 +111,7 @@ object Settings {
     val adblockState: State<Boolean> = mutableStateOf(adblock)
     val acceptThirdPartyCookiesState: State<Boolean> = mutableStateOf(acceptThirdPartyCookies)
     val dntState: State<Boolean> = mutableStateOf(dnt)
+    val darkModeState: State<Boolean> = mutableStateOf(darkMode)
 }
 
 

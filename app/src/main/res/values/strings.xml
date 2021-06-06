@@ -94,4 +94,7 @@
     <string name="what_is_secret_mode">What is secret mode?</string>
     <string name="how_to_use">How to use?</string>
     <string name="how_to_use_desc">Enter the \"secret word\" in the address bar to access the secret mode</string>
+    <string name="dark">Dark</string>
+    <string name="dark_unsupport">Sorry, dark mode is unsupported on your device!</string>
+    <string name="incognito">Incognito</string>
 </resources>

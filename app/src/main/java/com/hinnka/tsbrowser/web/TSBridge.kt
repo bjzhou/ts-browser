@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.webkit.JavascriptInterface
 import com.hinnka.tsbrowser.ext.activity
+import com.hinnka.tsbrowser.persist.Settings
 
 class TSBridge(val webView: TSWebView) {
 
@@ -42,5 +43,10 @@ class TSBridge(val webView: TSWebView) {
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
             }
         }
+    }
+
+    @JavascriptInterface
+    fun isDarkMode(): Boolean {
+        return Settings.darkMode
     }
 }

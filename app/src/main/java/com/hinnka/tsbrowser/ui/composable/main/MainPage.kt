@@ -13,13 +13,11 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.welcome.SecretWelcome
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
@@ -40,7 +38,6 @@ fun MainPage() {
             StatusBar()
             MainView(drawerState)
         }
-        CheckTabs()
         LongPressPopup()
         Welcome(drawerState)
     }
@@ -57,8 +54,8 @@ fun Welcome(drawerState: BottomDrawerState) {
     }
     AnimatedVisibility(
         visible = showSecret,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 200f)),
-        exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 200f))
+        enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 250f)),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 250f))
     ) {
         TSBackHandler(onBack = {}) {
             SecretWelcome(drawerState)
@@ -122,24 +119,6 @@ fun CoverView() {
             UIState.TabList -> TabList()
             else -> {
             }
-        }
-    }
-}
-
-@Composable
-//FIXME sometimes not work
-fun CheckTabs() {
-    if (!TabManager.isInitialized) return
-    val context = LocalContext.current
-    val viewModel = LocalViewModel.current
-    val tabs = TabManager.tabs
-    if (tabs.isEmpty()) {
-        TabManager.newTab(context).apply {
-            goHome()
-            active()
-        }
-        if (viewModel.uiState.value != UIState.Main) {
-            viewModel.uiState.value = UIState.Main
         }
     }
 }
