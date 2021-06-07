@@ -108,6 +108,8 @@ class TSWebView @JvmOverloads constructor(
         webChromeClient = TSChromeClient(this)
         webViewClient = TSWebClient(this)
 
+
+
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 

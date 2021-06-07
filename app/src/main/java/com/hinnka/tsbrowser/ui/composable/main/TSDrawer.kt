@@ -28,6 +28,7 @@ import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.BookmarkType
+import com.hinnka.tsbrowser.persist.SettingOptions
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
@@ -148,6 +149,30 @@ fun TSDrawer(drawerState: BottomDrawerState) {
                 drawerState.open(false) {
                     FindInPage(drawerState)
                 }
+            }
+        }
+        drawerItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.DesktopWindows,
+                    contentDescription = "Desktop",
+                    tint = if (SettingOptions.userAgentDesktop.contains(Settings.userAgentState.value)) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.desktop),
+                    color = if (SettingOptions.userAgentDesktop.contains(Settings.userAgentState.value)) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
+                )
+            }
+        ) {
+            Settings.userAgent = if (Settings.userAgentState.value == SettingOptions.userAgentDesktop[0])  Settings.Default.userAgent else SettingOptions.userAgentDesktop[0]
+            scope.launch {
+                drawerState.close()
             }
         }
         drawerItem(

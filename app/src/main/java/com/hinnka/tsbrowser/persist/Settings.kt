@@ -1,22 +1,21 @@
 package com.hinnka.tsbrowser.persist
 
 import android.content.Context
+import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
-import androidx.webkit.WebSettingsCompat
 import com.google.gson.Gson
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.asMutable
 import com.hinnka.tsbrowser.ext.ioScope
-import com.hinnka.tsbrowser.ext.logD
-import com.hinnka.tsbrowser.ext.md5
+import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.tab.TabManager
+import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.web.TSWebView
 import kotlinx.coroutines.launch
-import java.util.*
 
 object Settings {
     private val pref = App.instance.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -79,12 +78,16 @@ object Settings {
         set(value) {
             pref.edit { putString("userAgent", gson.toJson(value)) }
             userAgentState.asMutable().value = value
-            TabManager.currentTab.value?.view?.let {
-                it.settings.userAgentString = value.value
-                it.reload()
-                it.post {
-                    it.settings.loadWithOverviewMode = false
-                    it.settings.loadWithOverviewMode = true
+            TabManager.currentTab.value?.view?.let { view ->
+                view.settings.userAgentString = value.value
+                view.reload()
+                if (SettingOptions.userAgentDesktop.contains(value)) {
+                    view.settings.loadWithOverviewMode = false
+                    view.settings.useWideViewPort = false
+                    view.postDelayed({
+                        view.settings.loadWithOverviewMode = true
+                        view.settings.useWideViewPort = true
+                    }, 500)
                 }
             }
         }
@@ -146,12 +149,14 @@ object SettingOptions {
         NameValue("Baidu", "https://www.baidu.com/s?wd=%s"),
         NameValue("Sogou", "https://www.sogou.com/web?query=%s"),
     )
-    val userAgent = listOf(
+    val userAgentMobile = listOf(
         Settings.Default.userAgent,
         NameValue(
             "iPhone",
             "Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Mobile/15E148 Safari/604.1"
         ),
+    )
+    val userAgentDesktop = listOf(
         NameValue(
             "PC",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"
@@ -165,6 +170,7 @@ object SettingOptions {
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"
         ),
     )
+    val userAgent = userAgentDesktop + userAgentMobile
 }
 
 data class NameValue(val name: String, val value: String)

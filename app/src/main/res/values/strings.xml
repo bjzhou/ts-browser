@@ -99,4 +99,5 @@
     <string name="incognito">Incognito</string>
     <string name="find">Find</string>
     <string name="find_in_page">Find in page</string>
+    <string name="desktop">Desktop</string>
 </resources>
