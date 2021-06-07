@@ -10,9 +10,12 @@ import androidx.webkit.WebSettingsCompat
 import com.google.gson.Gson
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.asMutable
+import com.hinnka.tsbrowser.ext.ioScope
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.md5
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.web.TSWebView
+import kotlinx.coroutines.launch
 import java.util.*
 
 object Settings {
@@ -37,6 +40,25 @@ object Settings {
             pref.edit { putBoolean("darkMode", value) }
             darkModeState.asMutable().value = value
             TabManager.currentTab.value?.view?.setDarkMode(value)
+        }
+
+    var incognito: Boolean
+        get() = pref.getBoolean("incognito", false)
+        set(value) {
+            pref.edit { putBoolean("incognito", value) }
+            incognitoState.asMutable().value = value
+            TabManager.tabs.forEach { tab ->
+                if (value) {
+                    ioScope.launch {
+                        if (tab.tempHistoryList.isNotEmpty()) {
+                            AppDatabase.instance.historyDao().delete(*tab.tempHistoryList.toTypedArray())
+                            tab.tempHistoryList.clear()
+                        }
+                        AppDatabase.instance.tabDao().update(TabInfo(id = tab.info.id, isActive = true))
+                    }
+                }
+                tab.view.setIncognito(true)
+            }
         }
 
     var searchEngine: NameValue
@@ -112,6 +134,7 @@ object Settings {
     val acceptThirdPartyCookiesState: State<Boolean> = mutableStateOf(acceptThirdPartyCookies)
     val dntState: State<Boolean> = mutableStateOf(dnt)
     val darkModeState: State<Boolean> = mutableStateOf(darkMode)
+    val incognitoState: State<Boolean> = mutableStateOf(incognito)
 }
 
 

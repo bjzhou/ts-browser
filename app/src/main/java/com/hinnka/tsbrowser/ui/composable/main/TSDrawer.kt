@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.webkit.WebViewFeature
+import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.BookmarkType
@@ -102,29 +103,27 @@ fun TSDrawer() {
                 Toast.makeText(context, R.string.dark_unsupport, Toast.LENGTH_SHORT).show()
             }
         }
-        drawerItem(
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_incognito),
-                    contentDescription = "Incognito",
-                    tint = if (Settings.darkModeState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                        alpha = LocalContentAlpha.current
+        if (!App.isSecretMode) {
+            drawerItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_incognito),
+                        contentDescription = "Incognito",
+                        tint = if (Settings.incognitoState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                            alpha = LocalContentAlpha.current
+                        )
                     )
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(id = R.string.incognito),
-                    color = if (Settings.darkModeState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                        alpha = LocalContentAlpha.current
+                },
+                text = {
+                    Text(
+                        text = stringResource(id = R.string.incognito),
+                        color = if (Settings.incognitoState.value) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                            alpha = LocalContentAlpha.current
+                        )
                     )
-                )
-            }
-        ) {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-                Settings.darkMode = !Settings.darkMode
-            } else {
-                Toast.makeText(context, R.string.dark_unsupport, Toast.LENGTH_SHORT).show()
+                }
+            ) {
+                Settings.incognito = !Settings.incognito
             }
         }
         drawerItem(

@@ -28,7 +28,9 @@ import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
+import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.Settings
+import com.hinnka.tsbrowser.persist.TabInfo
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import kotlinx.coroutines.launch
@@ -90,9 +92,7 @@ class TSWebView @JvmOverloads constructor(
             mediaPlaybackRequiresUserGesture = false
             useWideViewPort = true
             setSupportZoom(true)
-            setDarkMode(Settings.darkMode)
 
-            setAppCacheEnabled(true)
             setAppCachePath(context.cacheDir.path)
             setGeolocationEnabled(true)
             setGeolocationDatabasePath(File(context.filesDir, "geodb").path)
@@ -101,6 +101,9 @@ class TSWebView @JvmOverloads constructor(
 
             userAgentString = Settings.userAgent.value
         }
+
+        setDarkMode(Settings.darkMode)
+        setIncognito(Settings.incognito)
 
         webChromeClient = TSChromeClient(this)
         webViewClient = TSWebClient(this)
@@ -122,6 +125,25 @@ class TSWebView @JvmOverloads constructor(
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                 WebSettingsCompat.setForceDark(settings, WebSettingsCompat.FORCE_DARK_OFF)
             }
+        }
+    }
+
+    fun setIncognito(value: Boolean) {
+        if (value) {
+            CookieManager.getInstance().setAcceptCookie(false)
+            settings.cacheMode = WebSettings.LOAD_NO_CACHE
+            settings.setAppCacheEnabled(false)
+            clearHistory()
+            clearCache(true)
+            clearFormData()
+            settings.savePassword = false
+            settings.saveFormData = false
+        } else {
+            CookieManager.getInstance().setAcceptCookie(true)
+            settings.cacheMode = WebSettings.LOAD_DEFAULT
+            settings.setAppCacheEnabled(true)
+            settings.savePassword = true
+            settings.saveFormData = true
         }
     }
 
@@ -171,6 +193,9 @@ class TSWebView @JvmOverloads constructor(
         stopLoading()
         onPause()
         removeAllViews()
+        if (Settings.incognito) {
+            clearHistory()
+        }
         destroy()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }

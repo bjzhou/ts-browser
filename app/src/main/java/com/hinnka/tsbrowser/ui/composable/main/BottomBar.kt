@@ -211,8 +211,68 @@ fun TabButton(uiState: MutableState<UIState>) {
         TabManager.currentTab.value?.view?.generatePreview()
         uiState.value = UIState.TabList
     }) {
-        if (App.isSecretMode) {
-            Box(modifier = Modifier.size(26.dp)) {
+        when {
+            App.isSecretMode -> {
+                Box(modifier = Modifier.size(26.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                1.5.dp,
+                                LocalContentColor.current,
+                                RoundedCornerShape(4.dp)
+                            )
+                            .size(20.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = tabs.size.toString(),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W600,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_secret),
+                        contentDescription = "Secret Mode",
+                        modifier = Modifier
+                            .size(14.dp)
+                            .align(Alignment.BottomEnd)
+                            .background(MaterialTheme.colors.surface),
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+            }
+            Settings.incognitoState.value -> {
+                Box(modifier = Modifier.size(26.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                1.5.dp,
+                                LocalContentColor.current,
+                                RoundedCornerShape(4.dp)
+                            )
+                            .size(20.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = tabs.size.toString(),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W600,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_incognito),
+                        contentDescription = "incognito",
+                        modifier = Modifier
+                            .size(14.dp)
+                            .align(Alignment.BottomEnd)
+                            .background(MaterialTheme.colors.surface),
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+            }
+            else -> {
                 Box(
                     modifier = Modifier
                         .border(
@@ -230,58 +290,8 @@ fun TabButton(uiState: MutableState<UIState>) {
                         textAlign = TextAlign.Center,
                     )
                 }
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_secret),
-                    contentDescription = "Secret Mode",
-                    modifier = Modifier.size(14.dp).align(Alignment.BottomEnd).background(MaterialTheme.colors.surface),
-                    tint = MaterialTheme.colors.primary
-                )
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .border(
-                        1.5.dp,
-                        LocalContentColor.current,
-                        RoundedCornerShape(4.dp)
-                    )
-                    .size(20.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = tabs.size.toString(),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.W600,
-                    textAlign = TextAlign.Center,
-                )
             }
         }
-//        Box(modifier = Modifier.size(26.dp)) {
-//            Box(
-//                modifier = Modifier
-//                    .border(
-//                        1.5.dp,
-//                        LocalContentColor.current,
-//                        RoundedCornerShape(4.dp)
-//                    )
-//                    .size(20.dp),
-//                contentAlignment = Alignment.Center,
-//            ) {
-//                Text(
-//                    text = tabs.size.toString(),
-//                    fontSize = 12.sp,
-//                    fontWeight = FontWeight.W600,
-//                    textAlign = TextAlign.Center,
-//                )
-//            }
-//            Icon(
-//                painter = painterResource(id = R.drawable.ic_incognito),
-//                contentDescription = "incognito",
-//                modifier = Modifier.size(14.dp).align(Alignment.BottomEnd).background(MaterialTheme.colors.surface),
-//                tint = MaterialTheme.colors.primary
-//            )
-//        }
-
     }
 }
 

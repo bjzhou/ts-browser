@@ -52,16 +52,18 @@ class AppViewModel : ViewModel() {
             return
         }
         TabManager.currentTab.value?.loadUrl(urlText.toUrl())
-        ioScope.launch {
-            val searchHistory = SearchHistory(
-                if (urlText.isUrl()) urlText.toUrl() else urlText,
-                System.currentTimeMillis(),
-            )
-            val searchDao = AppDatabase.instance.searchHistoryDao()
-            searchDao.insert(searchHistory)
-            val allList = searchDao.getAll()
-            if (allList.size > 10) {
-                searchDao.delete(*allList.subList(0, allList.size - 10).toTypedArray())
+        if (!Settings.incognito) {
+            ioScope.launch {
+                val searchHistory = SearchHistory(
+                    if (urlText.isUrl()) urlText.toUrl() else urlText,
+                    System.currentTimeMillis(),
+                )
+                val searchDao = AppDatabase.instance.searchHistoryDao()
+                searchDao.insert(searchHistory)
+                val allList = searchDao.getAll()
+                if (allList.size > 10) {
+                    searchDao.delete(*allList.subList(0, allList.size - 10).toTypedArray())
+                }
             }
         }
     }

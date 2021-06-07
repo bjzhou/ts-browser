@@ -39,6 +39,8 @@ data class Tab(
     val canGoBackState = mutableStateOf(false)
     val canGoForwardState = mutableStateOf(false)
 
+    val tempHistoryList = mutableListOf<History>()
+
     override fun onCreateWindow(message: Message) {
         message.apply {
             val newWebView = WebView(view.context)
@@ -108,13 +110,17 @@ data class Tab(
             if (URLUtil.isNetworkUrl(url) && title.isNotBlank()) {
                 val last = AppDatabase.instance.historyDao().last()
                 if (url != last?.url && title != last?.title) {
-                    AppDatabase.instance.historyDao().insert(
-                        History(
-                            url = url,
-                            title = title,
-                            date = System.currentTimeMillis()
-                        )
+                    val history = History(
+                        url = url,
+                        title = title,
+                        date = System.currentTimeMillis()
                     )
+                    if (!Settings.incognito) {
+                        AppDatabase.instance.historyDao().insert(history).apply {
+                            history.id = this
+                            tempHistoryList.add(history)
+                        }
+                    }
                 }
             }
         }
@@ -176,6 +182,8 @@ data class Tab(
         }
         info.thumbnailPath = previewState.value?.encodeToPath("preview-${info.url}")
         info.title = titleState.value
-        info.update()
+        if (!Settings.incognito) {
+            info.update()
+        }
     }
 }

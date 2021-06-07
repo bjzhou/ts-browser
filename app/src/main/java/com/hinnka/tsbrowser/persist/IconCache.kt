@@ -59,7 +59,6 @@ object IconCache : LruCache<String, Bitmap?>(99) {
             override fun onReceivedIcon(view: WebView?, icon: Bitmap?) {
                 mainScope.launch {
                     icon?.let { save(key, it) }
-                    get(key)
                 }
             }
         }
