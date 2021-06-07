@@ -2,8 +2,6 @@ package com.hinnka.tsbrowser.ui.composable.main
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -33,14 +31,17 @@ import com.hinnka.tsbrowser.persist.BookmarkType
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
-import com.hinnka.tsbrowser.ui.theme.primaryLight
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TSDrawer() {
+fun TSDrawer(drawerState: BottomDrawerState) {
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val showNewPage = TabManager.currentTab.value?.isHome != false
     Row(
         modifier = Modifier
             .height(48.dp)
@@ -102,6 +103,9 @@ fun TSDrawer() {
             } else {
                 Toast.makeText(context, R.string.dark_unsupport, Toast.LENGTH_SHORT).show()
             }
+            scope.launch {
+                drawerState.close()
+            }
         }
         if (!App.isSecretMode) {
             drawerItem(
@@ -124,6 +128,26 @@ fun TSDrawer() {
                 }
             ) {
                 Settings.incognito = !Settings.incognito
+                scope.launch {
+                    drawerState.close()
+                }
+            }
+        }
+        drawerItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.FindInPage,
+                    contentDescription = "Find in page",
+                )
+            },
+            text = { Text(text = stringResource(id = R.string.find)) },
+            enabled = !showNewPage
+        ) {
+            scope.launch {
+                drawerState.close()
+                drawerState.open(false) {
+                    FindInPage(drawerState)
+                }
             }
         }
         drawerItem(
@@ -167,14 +191,19 @@ fun TSDrawer() {
 fun LazyGridScope.drawerItem(
     icon: @Composable () -> Unit,
     text: @Composable () -> Unit,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     item {
-        CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 10.sp)) {
+        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
+        CompositionLocalProvider(
+            LocalTextStyle provides TextStyle(fontSize = 10.sp),
+            LocalContentAlpha provides contentAlpha
+        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .clickable {
+                    .clickable(enabled = enabled) {
                         onClick()
                     }
                     .padding(16.dp)

@@ -87,11 +87,13 @@ fun TSBottomDrawer(
             }) {
                 content()
             }
-            BottomDrawerScrim(
-                color = DrawerDefaults.scrimColor,
-                onDismiss = { scope.launch { drawerState.close() } },
-                visible = !drawerState.isClosed || waitForShow
-            )
+            if (drawerState.showScrimState.value) {
+                BottomDrawerScrim(
+                    color = DrawerDefaults.scrimColor,
+                    onDismiss = { scope.launch { drawerState.close() } },
+                    visible = !drawerState.isClosed || waitForShow
+                )
+            }
             Surface(
                 drawerConstraints
                     .onGloballyPositioned { position ->
@@ -127,6 +129,7 @@ class BottomDrawerState {
     internal var drawerContent: @Composable ColumnScope.() -> Unit = {}
 
     val waitForShow = mutableStateOf(false)
+    var showScrimState = mutableStateOf(true)
 
     var isClosing = false
 
@@ -138,7 +141,8 @@ class BottomDrawerState {
         offset.snapTo(fullHeight)
     }
 
-    fun open(content: @Composable ColumnScope.() -> Unit) {
+    fun open(showScrim: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
+        showScrimState.value = showScrim
         drawerContent = content
         waitForShow.value = true
     }

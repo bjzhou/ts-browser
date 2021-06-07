@@ -97,4 +97,6 @@
     <string name="dark">Dark</string>
     <string name="dark_unsupport">Sorry, dark mode is unsupported on your device!</string>
     <string name="incognito">Incognito</string>
+    <string name="find">Find</string>
+    <string name="find_in_page">Find in page</string>
 </resources>

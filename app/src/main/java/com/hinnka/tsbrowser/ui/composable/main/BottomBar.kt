@@ -79,7 +79,7 @@ fun BottomBar(drawerState: BottomDrawerState) {
                 Center(modifier = Modifier.weight(1f)) {
                     IconButton(onClick = {
                         drawerState.open {
-                            TSDrawer()
+                            TSDrawer(drawerState)
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
@@ -124,7 +124,7 @@ fun BottomBar(drawerState: BottomDrawerState) {
                 AnimatedVisibility(visible = uiState.value != UIState.Search) {
                     IconButton(onClick = {
                         drawerState.open {
-                            TSDrawer()
+                            TSDrawer(drawerState)
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
