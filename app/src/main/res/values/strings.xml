@@ -42,7 +42,7 @@
     <string name="copy">Copy</string>
     <string name="bookmark">Bookmarks</string>
     <string name="privacy_protect">Privacy protect</string>
-    <string name="days">%d days</string>
+    <string name="days">days</string>
     <string name="history">History</string>
     <string name="empty">Empty</string>
     <string name="bookmark_count">%d bookmarks</string>
@@ -100,4 +100,7 @@
     <string name="find">Find</string>
     <string name="find_in_page">Find in page</string>
     <string name="desktop">Desktop</string>
+    <string name="secret">Secret</string>
+    <string name="ads_blocked">Ads blocked</string>
+    <string name="times">times</string>
 </resources>

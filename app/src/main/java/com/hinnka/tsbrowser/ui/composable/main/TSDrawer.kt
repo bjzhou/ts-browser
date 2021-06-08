@@ -2,20 +2,22 @@ package com.hinnka.tsbrowser.ui.composable.main
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.BookmarkAdded
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,14 +28,12 @@ import androidx.compose.ui.unit.sp
 import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.persist.Bookmark
-import com.hinnka.tsbrowser.persist.BookmarkType
-import com.hinnka.tsbrowser.persist.SettingOptions
-import com.hinnka.tsbrowser.persist.Settings
+import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.theme.primaryLight
 import kotlinx.coroutines.launch
 
 
@@ -47,38 +47,84 @@ fun TSDrawer(drawerState: BottomDrawerState) {
         modifier = Modifier
             .height(48.dp)
             .fillMaxWidth()
-//            .background(MaterialTheme.colors.primaryLight)
     ) {
         BackButton()
         ForwardButton()
         AddBookmarkButton()
         ShareButton()
     }
-    Row(
-        modifier = Modifier
-//            .background(MaterialTheme.colors.primaryLight)
+    Box(
+        Modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
-            Text(
-                text = stringResource(id = R.string.privacy_protect),
-                fontSize = 12.sp,
-            )
-            Text(
-                text = stringResource(id = R.string.days, 101),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-            )
+            .padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .border(1.dp, Color(0x66000000), RoundedCornerShape(8.dp))
+                .padding(16.dp), horizontalArrangement = Arrangement.SpaceAround) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Security,
+                    contentDescription = "days",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = 8.dp),
+                    tint = MaterialTheme.colors.primary
+                )
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.privacy_protect),
+                        fontSize = 13.sp,
+                    )
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = LocalStorage.protectDays.toString(),
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colors.primary,
+                            modifier = Modifier.alignByBaseline(),
+                            fontWeight = FontWeight.Medium,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.days),
+                            modifier = Modifier.padding(start = 4.dp).alignByBaseline(),
+                            fontSize = 12.sp,
+                        )
+                    }
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Block,
+                    contentDescription = "adblock",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = 8.dp),
+                    tint = Color.Red
+                )
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.ads_blocked),
+                        fontSize = 13.sp,
+                    )
+                    Row {
+                        Text(
+                            text = LocalStorage.blockTimesState.value.toString(),
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colors.primary,
+                            modifier = Modifier.alignByBaseline(),
+                            fontWeight = FontWeight.Medium,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.times),
+                            modifier = Modifier.padding(start = 4.dp).alignByBaseline(),
+                            fontSize = 12.sp,
+                        )
+                    }
+                }
+            }
         }
-        Icon(
-            imageVector = Icons.Outlined.Security,
-            contentDescription = "Security",
-            modifier = Modifier.size(68.dp),
-            tint = MaterialTheme.colors.primary
-        )
     }
+
     LazyVerticalGrid(cells = GridCells.Fixed(4), modifier = Modifier.padding(8.dp)) {
         drawerItem(
             icon = {
@@ -108,7 +154,25 @@ fun TSDrawer(drawerState: BottomDrawerState) {
                 drawerState.close()
             }
         }
-        if (!App.isSecretMode) {
+        if (App.isSecretMode) {
+            drawerItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_secret),
+                        contentDescription = "Secret Mode",
+                        tint = MaterialTheme.colors.primary
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(id = R.string.secret),
+                        color = MaterialTheme.colors.primary
+                    )
+                }
+            ) {
+                //TODO exit confirm
+            }
+        } else {
             drawerItem(
                 icon = {
                     Icon(

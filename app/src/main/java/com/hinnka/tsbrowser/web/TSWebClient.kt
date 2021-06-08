@@ -27,6 +27,7 @@ import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.adblock.AdBlocker
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.logE
+import com.hinnka.tsbrowser.persist.LocalStorage
 import java.util.concurrent.TimeUnit
 
 class TSWebClient(private val controller: UIController) : WebViewClientCompat() {
@@ -87,6 +88,7 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         request: WebResourceRequest
     ): WebResourceResponse? {
         if (AdBlocker.shouldBlock(request.url)) {
+            LocalStorage.blockTimes++
             return AdBlocker.emptyResponse
         }
         return null
