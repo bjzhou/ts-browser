@@ -27,7 +27,7 @@ import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.Favorite
-import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.ui.theme.primaryLight
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -73,7 +73,7 @@ fun FavoriteItemPreview(favorite: Favorite) {
                     contentScale = ContentScale.Inside
                 )
             }
-        } else IconCache[favorite.url.host ?: ""]?.asImageBitmap()?.let {
+        } else IconMap[favorite.url]?.asImageBitmap()?.let {
             Image(
                 bitmap = it,
                 contentDescription = "",

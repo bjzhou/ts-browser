@@ -22,7 +22,7 @@ import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.home.SecretActivity
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.persist.Settings
 import kotlinx.coroutines.launch
 import java.io.File
@@ -72,7 +72,7 @@ class AppViewModel : ViewModel() {
         ioScope.launch {
             val list = AppDatabase.instance.searchHistoryDao().getAll().asReversed()
             list.forEach {
-                it.iconBitmap = IconCache[it.url?.host ?: ""]
+                it.iconBitmap = IconMap[it.url ?: ""]
             }
             searchList.clear()
             searchList.addAll(list)

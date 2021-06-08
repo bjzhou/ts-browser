@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
@@ -31,11 +30,10 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.logD
-import com.hinnka.tsbrowser.ext.longPress
 import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.Favorite
-import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
@@ -87,9 +85,8 @@ fun NewTabPage(drawerState: BottomDrawerState) {
                 item {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
                         drawerState.open {
-                            AddFavorite { fav ->
+                            AddFavorite {
                                 scope.launch {
-                                    fav.url.host?.let { IconCache.fetch(context, it) }
                                     drawerState.close()
                                     refresh()
                                 }
@@ -158,7 +155,7 @@ fun FavoriteItem(favorite: Favorite, onUpdate: () -> Unit, onDelete: () -> Unit)
                     contentScale = ContentScale.Inside
                 )
             }
-        } else IconCache[favorite.url.host ?: ""]?.asImageBitmap()?.let {
+        } else IconMap[favorite.url]?.asImageBitmap()?.let {
             Image(
                 bitmap = it,
                 contentDescription = "",

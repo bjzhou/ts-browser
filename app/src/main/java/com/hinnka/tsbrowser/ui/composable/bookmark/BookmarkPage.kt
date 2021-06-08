@@ -29,7 +29,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
-import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.IconMap
 
 @Composable
 fun BookmarkPage() {
@@ -124,7 +124,7 @@ fun BookmarkItem(bookmark: Bookmark, onClick: () -> Unit) {
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
-            val icon = IconCache[bookmark.url.host ?: ""]?.asImageBitmap()
+            val icon = IconMap[bookmark.url]?.asImageBitmap()
             if (icon == null) {
                 Icon(
                     imageVector = Icons.Default.NetworkCell,

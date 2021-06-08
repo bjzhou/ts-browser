@@ -35,7 +35,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.tap
+import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.tab.Tab
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
@@ -154,10 +156,10 @@ fun TabList() {
 fun TabItem(tab: Tab, onTap: () -> Unit) {
     val context = LocalContext.current
     val viewModel = LocalViewModel.current
-    val icon = tab.iconState
     val title = tab.titleState
     val preview = tab.previewState
     val url = tab.urlState
+    val icon = IconMap[url.value]
     Column(modifier = Modifier
         .tap {
             onTap()
@@ -168,7 +170,7 @@ fun TabItem(tab: Tab, onTap: () -> Unit) {
             shape = RoundedCornerShape(4.dp)
         )) {
         Row(modifier = Modifier.height(28.dp), verticalAlignment = Alignment.CenterVertically) {
-            icon.value?.let {
+            icon?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
                     contentDescription = "",

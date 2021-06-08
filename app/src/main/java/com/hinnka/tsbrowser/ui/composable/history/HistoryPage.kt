@@ -47,7 +47,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
-import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.IconMap
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -199,7 +199,7 @@ fun HistoryItem(history: History, onClick: () -> Unit, onDeleteItem: () -> Unit)
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
-            val icon = IconCache[history.url.host ?: ""]?.asImageBitmap()
+            val icon = IconMap[history.url]?.asImageBitmap()
             if (icon == null) {
                 Icon(
                     imageVector = Icons.Default.NetworkCell,

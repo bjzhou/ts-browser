@@ -73,7 +73,7 @@ val String.host: String?
         val uri = if (URLUtil.isValidUrl(this)) {
             Uri.parse(this)
         } else {
-            Uri.parse("http://$this")
+            Uri.parse("https://$this")
         }
         return uri.host
     }

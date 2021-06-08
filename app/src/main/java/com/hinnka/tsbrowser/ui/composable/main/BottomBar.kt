@@ -36,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.logD
+import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
@@ -142,7 +144,7 @@ fun AddressTextField(modifier: Modifier, uiState: MutableState<UIState>) {
     val tab = TabManager.currentTab.value
     val url = tab?.urlState?.value
     val title = tab?.titleState?.value
-    val icon = tab?.iconState?.value
+    val icon = IconMap[url ?: ""]
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val focusRequester = FocusRequester()

@@ -12,7 +12,7 @@ import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ui.home.UIState
-import com.hinnka.tsbrowser.persist.IconCache
+import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.web.TSWebView
 import kotlinx.coroutines.launch
 
@@ -91,7 +91,6 @@ object TabManager {
                 urlState.value = it.url
                 titleState.value = it.title
                 ioScope.launch {
-                    iconState.value = IconCache.asyncGet(it.url.host ?: "")
                     previewState.value = it.thumbnailPath?.decodeBitmap()
                 }
                 if (it.isActive) {

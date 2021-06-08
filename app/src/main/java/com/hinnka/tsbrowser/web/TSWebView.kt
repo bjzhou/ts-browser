@@ -18,8 +18,6 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
-import android.widget.VideoView
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.webkit.WebSettingsCompat
@@ -28,9 +26,7 @@ import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.*
-import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.Settings
-import com.hinnka.tsbrowser.persist.TabInfo
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
 import kotlinx.coroutines.launch
