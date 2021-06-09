@@ -19,9 +19,9 @@ import zlc.season.rxdownload4.task.Task
 import zlc.season.rxdownload4.utils.log
 
 class DownloadNotificationCreator : NotificationCreator {
-    private val channelId = "RxDownload"
-    private val channelName = "RxDownload"
-    private val channelDesc = "RxDownload"
+    private val channelId = "Download"
+    private val channelName = "TS Downloads"
+    private val channelDesc = ""
 
     private lateinit var task: Task
     private val builderHelper by lazy { BuilderHelper(channelId, task) }
@@ -67,6 +67,7 @@ class DownloadNotificationCreator : NotificationCreator {
                 //Do not need notification
                 is Normal -> return null
                 is Deleted -> return null
+                else -> return null
             }
             return builder
         }

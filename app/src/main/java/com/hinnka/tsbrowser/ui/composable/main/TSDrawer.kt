@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
@@ -86,7 +88,9 @@ fun TSDrawer(drawerState: BottomDrawerState) {
                         )
                         Text(
                             text = stringResource(id = R.string.days),
-                            modifier = Modifier.padding(start = 4.dp).alignByBaseline(),
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .alignByBaseline(),
                             fontSize = 12.sp,
                         )
                     }
@@ -116,7 +120,9 @@ fun TSDrawer(drawerState: BottomDrawerState) {
                         )
                         Text(
                             text = stringResource(id = R.string.times),
-                            modifier = Modifier.padding(start = 4.dp).alignByBaseline(),
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .alignByBaseline(),
                             fontSize = 12.sp,
                         )
                     }
@@ -258,14 +264,25 @@ fun TSDrawer(drawerState: BottomDrawerState) {
         }
         drawerItem(
             icon = {
-                Icon(
-                    imageVector = Icons.Outlined.Download,
-                    contentDescription = "Downloads"
-                )
+                Box(Modifier) {
+                    Icon(
+                        imageVector = Icons.Outlined.Download,
+                        contentDescription = "Downloads"
+                    )
+                    if (DownloadHandler.showDownloadingBadge.value) {
+                        Spacer(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(Color.Red, CircleShape)
+                                .align(Alignment.TopEnd)
+                        )
+                    }
+                }
             },
             text = { Text(text = stringResource(id = R.string.downloads)) }
         ) {
             PageController.navigate("downloads")
+            DownloadHandler.showDownloadingBadge.value = false
         }
         drawerItem(
             icon = { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") },

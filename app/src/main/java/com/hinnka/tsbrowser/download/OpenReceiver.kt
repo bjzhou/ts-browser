@@ -53,5 +53,8 @@ fun File.open(context: Context) {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(openIntent)
+    try {
+        context.startActivity(openIntent)
+    } catch (e: Exception) {
+    }
 }

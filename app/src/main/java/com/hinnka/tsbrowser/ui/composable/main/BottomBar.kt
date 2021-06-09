@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.persist.IconMap
@@ -85,6 +87,16 @@ fun BottomBar(drawerState: BottomDrawerState) {
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                        if (DownloadHandler.showDownloadingBadge.value) {
+                            Box(Modifier.fillMaxSize().padding(8.dp)) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(Color.Red, CircleShape)
+                                        .align(Alignment.TopEnd)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -130,6 +142,16 @@ fun BottomBar(drawerState: BottomDrawerState) {
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                        if (DownloadHandler.showDownloadingBadge.value) {
+                            Box(Modifier.fillMaxSize().padding(8.dp)) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(Color.Red, CircleShape)
+                                        .align(Alignment.TopEnd)
+                                )
+                            }
+                        }
                     }
                 }
             }

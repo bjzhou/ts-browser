@@ -17,6 +17,7 @@ import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.logD
@@ -31,6 +32,10 @@ import java.io.File
 import java.io.FileInputStream
 
 class DownloadHandler(val context: Context) : DownloadListener {
+
+    companion object {
+        val showDownloadingBadge = mutableStateOf(true)
+    }
 
     init {
         OpenReceiver.register(context)
@@ -145,6 +150,7 @@ class DownloadHandler(val context: Context) : DownloadListener {
                 }
             }
         manager.start()
+        showDownloadingBadge.value = true
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
