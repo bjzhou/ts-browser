@@ -34,7 +34,7 @@ import java.io.FileInputStream
 class DownloadHandler(val context: Context) : DownloadListener {
 
     companion object {
-        val showDownloadingBadge = mutableStateOf(true)
+        val showDownloadingBadge = mutableStateOf(false)
     }
 
     init {

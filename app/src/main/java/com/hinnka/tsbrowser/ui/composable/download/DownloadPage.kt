@@ -21,6 +21,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.download.DownloadNotificationCreator
 import com.hinnka.tsbrowser.ext.longPress
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
@@ -35,31 +36,42 @@ import zlc.season.rxdownload4.recorder.TaskEntity
 fun DownloadPage() {
     val tasks = remember { mutableStateListOf<TaskEntity>() }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        DownloadHandler.showDownloadingBadge.value = false
+    }
+
     Scaffold(topBar = {
         TSAppBar(title = stringResource(id = R.string.downloads), actions = {
-            Box(modifier = Modifier.fillMaxHeight().clickable {
-                RxDownloadRecorder.getAllTaskWithStatus(Completed())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        if (it.isNullOrEmpty()) return@subscribe
-                        AlertDialog.Builder(context).apply {
-                            setTitle(R.string.clear)
-                            setMessage(context.getString(R.string.clear_confirm, it.size))
-                            setPositiveButton(R.string.delete) { _, _ ->
-                                it.forEach { entity ->
-                                    val manager = entity.task.manager(
-                                        recorder = RoomRecorder(),
-                                        notificationCreator = DownloadNotificationCreator()
-                                    )
-                                    manager.delete()
-                                    tasks.removeAll { item -> item.id == entity.id }
+            Box(modifier = Modifier
+                .fillMaxHeight()
+                .clickable {
+                    RxDownloadRecorder
+                        .getAllTaskWithStatus(Completed())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            if (it.isNullOrEmpty()) return@subscribe
+                            AlertDialog
+                                .Builder(context)
+                                .apply {
+                                    setTitle(R.string.clear)
+                                    setMessage(context.getString(R.string.clear_confirm, it.size))
+                                    setPositiveButton(R.string.delete) { _, _ ->
+                                        it.forEach { entity ->
+                                            val manager = entity.task.manager(
+                                                recorder = RoomRecorder(),
+                                                notificationCreator = DownloadNotificationCreator()
+                                            )
+                                            manager.delete()
+                                            tasks.removeAll { item -> item.id == entity.id }
+                                        }
+                                    }
+                                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                                    }
                                 }
-                            }
-                            setNegativeButton(android.R.string.cancel) { _, _ ->
-                            }
-                        }.show()
-                    }
-            }, contentAlignment = Alignment.Center) {
+                                .show()
+                        }
+                }, contentAlignment = Alignment.Center) {
                 Text(
                     text = stringResource(id = R.string.clear),
                     modifier = Modifier.padding(horizontal = 8.dp),

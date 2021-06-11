@@ -282,7 +282,6 @@ fun TSDrawer(drawerState: BottomDrawerState) {
             text = { Text(text = stringResource(id = R.string.downloads)) }
         ) {
             PageController.navigate("downloads")
-            DownloadHandler.showDownloadingBadge.value = false
         }
         drawerItem(
             icon = { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") },

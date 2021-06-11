@@ -20,6 +20,7 @@ class OpenReceiver : BroadcastReceiver() {
         val url = intent.getStringExtra("url") ?: return
         val file = url.file()
         file.open(context)
+        DownloadHandler.showDownloadingBadge.value = false
     }
 
     companion object {

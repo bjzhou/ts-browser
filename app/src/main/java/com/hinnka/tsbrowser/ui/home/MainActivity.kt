@@ -31,6 +31,7 @@ import com.hinnka.tsbrowser.ui.composable.history.HistoryPage
 import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.settings.SettingsPage
 import com.hinnka.tsbrowser.ui.composable.widget.PageContainer
+import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import kotlinx.coroutines.launch
 
@@ -112,6 +113,11 @@ open class MainActivity : BaseActivity() {
         when (intent.action) {
             Intent.ACTION_WEB_SEARCH -> handleSearch(intent)
             Intent.ACTION_VIEW -> handleOpen(intent)
+            "navigate" -> intent.getStringExtra("route")?.let {
+                if (PageController.currentRoute.value != it) {
+                    PageController.navigate(it)
+                }
+            }
         }
     }
 

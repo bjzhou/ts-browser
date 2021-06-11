@@ -72,7 +72,7 @@ fun MainView(drawerState: BottomDrawerState) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
             TSBackHandler(
-                enabled = tab?.canGoBackState?.value == true,
+                enabled = tab?.canGoBackState?.value == true && drawerState.isClosed,
                 onBack = { tab?.onBackPressed() }) {
                 AndroidView(
                     factory = {

@@ -5,6 +5,7 @@ import zlc.season.rxdownload4.notification.createNotificationChannel
 import zlc.season.rxdownload4.notification.isEnableNotification
 
 import android.app.Notification
+import android.content.Intent
 import androidx.core.app.NotificationCompat.Builder
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
@@ -94,7 +95,10 @@ class DownloadNotificationCreator : NotificationCreator {
                     icon = icon,
                     intent = if (status is Completed) OpenReceiver.getPendingIntent(
                         App.instance, task.url
-                    ) else getPendingIntent(MainActivity::class.java),
+                    ) else getPendingIntent(Intent(App.instance, MainActivity::class.java).apply {
+                        action = "navigate"
+                        putExtra("route", "downloads")
+                    }),
                     actions = actions
                 )
                 builderMap[status] = newBuilder

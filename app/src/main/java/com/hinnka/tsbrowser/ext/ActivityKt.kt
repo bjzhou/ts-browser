@@ -15,3 +15,8 @@ fun Activity.pendingIntent(requestCode: Int = 0): PendingIntent {
 fun getPendingIntent(activityClass: Class<out Activity>, requestCode: Int = 0): PendingIntent {
     return PendingIntent.getActivity(App.instance, requestCode, Intent(App.instance, activityClass), PendingIntent.FLAG_UPDATE_CURRENT)
 }
+
+@SuppressLint("UnspecifiedImmutableFlag")
+fun getPendingIntent(intent: Intent, requestCode: Int = 0): PendingIntent {
+    return PendingIntent.getActivity(App.instance, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+}
