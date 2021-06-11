@@ -12,20 +12,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.NameValue
 import com.hinnka.tsbrowser.persist.SettingOptions
 import com.hinnka.tsbrowser.persist.Settings
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
@@ -34,11 +37,23 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingsPage() {
+    val viewModel = LocalViewModel.current
     val scope = rememberCoroutineScope()
     val checkedItem = remember { mutableStateOf(NameValue("", "")) }
     val context = LocalContext.current
-
+    val isDefaultBrowser = remember { mutableStateOf(viewModel.isDefaultBrowser) }
     val state = remember { BottomDrawerState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { source, event ->
+            isDefaultBrowser.value = viewModel.isDefaultBrowser
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     TSBottomDrawer(drawerState = state) {
         Column(Modifier.background(MaterialTheme.colors.surface)) {
@@ -53,6 +68,19 @@ fun SettingsPage() {
                     modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colors.primary,
                     fontSize = 13.sp
+                )
+                ListItem(
+                    modifier = Modifier.clickable {
+                        viewModel.openDefaultBrowserSetting(context)
+                    },
+                    secondaryText = { Text(text = stringResource(id = if (isDefaultBrowser.value) R.string.on else R.string.off)) },
+                    text = { Text(text = stringResource(id = R.string.set_default_browser)) },
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = ""
+                        )
+                    }
                 )
                 ListItem(
                     modifier = Modifier.clickable {
@@ -250,7 +278,10 @@ fun SettingsPage() {
                             )
                             setPackage("com.android.vending")
                         }
-                        context.startActivity(intent)
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                        }
                     },
                     text = { Text(text = stringResource(id = R.string.update)) },
                     trailing = {

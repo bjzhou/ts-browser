@@ -2,8 +2,11 @@ package com.hinnka.tsbrowser.ui
 
 import android.app.Activity
 import android.content.ClipData
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import androidx.compose.animation.core.Animatable
@@ -24,6 +27,7 @@ import com.hinnka.tsbrowser.ui.home.SecretActivity
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.persist.Settings
+import com.hinnka.tsbrowser.util.DeviceUtil
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -32,6 +36,34 @@ class AppViewModel : ViewModel() {
     val searchList = mutableStateListOf<SearchHistory>()
     val addressText = mutableStateOf(TextFieldValue())
     val imeHeightState = Animatable(0f)
+
+    val isDefaultBrowser: Boolean
+        get() {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
+            val info = App.instance.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            return info?.activityInfo?.packageName == App.instance.packageName
+        }
+
+    fun openDefaultBrowserSetting(context: Context) {
+        val intent = Intent().apply {
+            if (DeviceUtil.isMIUI()) {
+                component =
+                    ComponentName.unflattenFromString("com.android.settings/.SubSettings")
+                putExtra(
+                    ":android:show_fragment",
+                    "com.android.settings.applications.defaultapps.DefaultBrowserPicker"
+                )
+            } else {
+                action = android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS
+            }
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun onGo(text: String, context: Context) {
         val urlText = text.trim()
