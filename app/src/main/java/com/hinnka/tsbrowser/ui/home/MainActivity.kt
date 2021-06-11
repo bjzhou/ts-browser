@@ -4,12 +4,15 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Browser
+import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.BuildConfig
 import com.hinnka.tsbrowser.ext.logD
@@ -35,6 +38,8 @@ open class MainActivity : BaseActivity() {
 
     private val viewModel by viewModels<AppViewModel>()
 
+    lateinit var videoLayout: FrameLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logD("MainActivity onCreate")
@@ -50,6 +55,10 @@ open class MainActivity : BaseActivity() {
                         page("addFolder") { AddFolder(it?.get(0) as Bookmark) }
                         page("editBookmark") { EditBookmark(it?.get(0) as Bookmark) }
                     }
+                    AndroidView(factory = { context -> FrameLayout(context).apply {
+                        isVisible = false
+                        videoLayout = this
+                    } })
                     ImeListener()
                 }
             }

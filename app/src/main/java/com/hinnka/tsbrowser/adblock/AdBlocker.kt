@@ -1,14 +1,11 @@
 package com.hinnka.tsbrowser.adblock
 
-import android.net.Uri
 import android.webkit.WebResourceResponse
-import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.persist.Settings
 import kotlinx.coroutines.launch
 import java.io.ByteArrayInputStream
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.regex.Pattern
 
 object AdBlocker {
@@ -40,7 +37,7 @@ object AdBlocker {
         }
     }
 
-    fun shouldBlock(url: Uri): Boolean {
-        return Settings.adblock && urlList.any { url.host?.contains(it) == true }
+    fun shouldBlock(host: String): Boolean {
+        return Settings.adblock && urlList.any { host.contains(it) }
     }
 }

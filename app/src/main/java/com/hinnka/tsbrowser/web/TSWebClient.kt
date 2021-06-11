@@ -3,6 +3,7 @@ package com.hinnka.tsbrowser.web
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.net.http.SslError
 import android.os.Message
 import android.text.TextUtils
@@ -39,6 +40,8 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
 
     private var sslLastAllow = false
     private var sslLastTime = 0L
+
+    private val interceptUrls = mutableListOf<String>()
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val uri = request.url
@@ -87,8 +90,12 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         view: WebView,
         request: WebResourceRequest
     ): WebResourceResponse? {
-        if (AdBlocker.shouldBlock(request.url)) {
-            LocalStorage.blockTimes++
+        val host = request.url?.host ?: return null
+        if (AdBlocker.shouldBlock(host)) {
+            if (!interceptUrls.contains(host)) {
+                LocalStorage.blockTimes++
+                interceptUrls.add(host)
+            }
             return AdBlocker.emptyResponse
         }
         return null

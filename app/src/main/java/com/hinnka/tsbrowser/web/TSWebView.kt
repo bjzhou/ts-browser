@@ -29,6 +29,7 @@ import com.hinnka.tsbrowser.ext.*
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.home.LongPressInfo
+import com.hinnka.tsbrowser.ui.home.MainActivity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.BufferedReader
@@ -42,7 +43,7 @@ class TSWebView @JvmOverloads constructor(
 ) : WebView(context, attrs), UIController, LifecycleOwner {
 
     private val lifecycleRegistry = LifecycleRegistry(context as LifecycleOwner)
-    private var fullScreenView: View? = null
+    private var fullScreenView: ViewGroup? = null
     private var origOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private val downloadHandler = DownloadHandler(context)
     var dataListener: WebDataListener? = null
@@ -259,15 +260,16 @@ class TSWebView @JvmOverloads constructor(
             callback.onCustomViewHidden()
         }
 
-        fullScreenView = view
-        val decorView = activity?.window?.decorView as? ViewGroup
-        decorView?.addView(view, FrameLayout.LayoutParams(-1, -1))
-        view.isVisible = true
+        val parentView = (context as? MainActivity)?.videoLayout
+        parentView?.removeAllViews()
+        parentView?.addView(view, FrameLayout.LayoutParams(-1, -1))
+        parentView?.isVisible = true
         try {
-            view.keepScreenOn = true
+            parentView?.keepScreenOn = true
         } catch (e: Exception) {
         }
-        view.setFullScreen(true)
+        parentView?.setFullScreen(true)
+        fullScreenView = parentView
     }
 
     override fun onHideCustomView() {
@@ -277,7 +279,7 @@ class TSWebView @JvmOverloads constructor(
         }
         fullScreenView?.setFullScreen(false)
         fullScreenView?.isVisible = false
-//        fullScreenView?.removeFromParent()
+        fullScreenView?.removeAllViews()
         if (activity?.requestedOrientation != origOrientation) {
             activity?.requestedOrientation = origOrientation
         }
