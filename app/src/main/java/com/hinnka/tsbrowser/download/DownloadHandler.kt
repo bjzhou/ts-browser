@@ -16,12 +16,12 @@ import android.webkit.DownloadListener
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.lifecycleScope
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.mimeType
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import zlc.season.rxdownload4.RANGE_CHECK_HEADER
 import zlc.season.rxdownload4.file
@@ -60,15 +60,15 @@ class DownloadHandler(val context: Context) : DownloadListener {
         }
 
         requestPermissionIfNeeded {
-            AlertDialog.Builder(context).apply {
+            AlertBottomSheet.Builder(context).apply {
                 setMessage(context.getString(R.string.download_message, guessName, downloadSize))
-                setPositiveButton(android.R.string.ok) { _, _ ->
+                setPositiveButton(android.R.string.ok) {
                     try {
                         download(url, guessName, mimetype)
                     } catch (e: Exception) {
                     }
                 }
-                setNegativeButton(android.R.string.cancel) { _, _ ->
+                setNegativeButton(android.R.string.cancel) {
                 }
             }.show()
         }

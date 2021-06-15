@@ -72,8 +72,7 @@ fun FindInPage(drawerState: BottomDrawerState) {
 
     Row(
         Modifier
-            .fillMaxWidth()
-            .padding(bottom = with(density) { viewModel.imeHeightState.value.toDp() }),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TSTextField(

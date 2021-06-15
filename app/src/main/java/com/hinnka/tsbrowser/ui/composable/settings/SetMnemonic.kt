@@ -17,24 +17,19 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.md5
 import com.hinnka.tsbrowser.persist.Settings
-import com.hinnka.tsbrowser.ui.LocalViewModel
 
 @Composable
 fun SetMnemonic(onDismiss: () -> Unit) {
-    val viewModel = LocalViewModel.current
-    val density = LocalDensity.current
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val contentColor = LocalContentColor.current
@@ -179,6 +174,5 @@ fun SetMnemonic(onDismiss: () -> Unit) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         }
-        Spacer(modifier = Modifier.height(with(density) { viewModel.imeHeightState.value.toDp() }))
     }
 }

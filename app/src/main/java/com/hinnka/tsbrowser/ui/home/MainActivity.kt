@@ -22,6 +22,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.AppViewModel
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.base.BaseActivity
 import com.hinnka.tsbrowser.ui.composable.bookmark.AddFolder
 import com.hinnka.tsbrowser.ui.composable.bookmark.BookmarkPage
@@ -32,6 +33,7 @@ import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.settings.SettingsPage
 import com.hinnka.tsbrowser.ui.composable.widget.PageContainer
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import kotlinx.coroutines.launch
 
@@ -56,6 +58,7 @@ open class MainActivity : BaseActivity() {
                         page("addFolder") { AddFolder(it?.get(0) as Bookmark) }
                         page("editBookmark") { EditBookmark(it?.get(0) as Bookmark) }
                     }
+                    TSBottomDrawer(drawerState = AlertBottomSheet.drawerState)
                     AndroidView(factory = { context -> FrameLayout(context).apply {
                         isVisible = false
                         videoLayout = this

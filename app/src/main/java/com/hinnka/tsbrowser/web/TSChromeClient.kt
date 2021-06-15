@@ -3,21 +3,21 @@ package com.hinnka.tsbrowser.web
 import android.Manifest
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Message
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.webkit.*
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.activity
+import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.mainScope
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -138,21 +138,22 @@ class TSChromeClient(private val controller: UIController) : WebChromeClient() {
         origin: String,
         callback: GeolocationPermissions.Callback
     ) {
+        logD("TSWebView onGeolocationPermissionsShowPrompt")
         val context = (controller as? View)?.context ?: run {
             callback.invoke(origin, false, true)
             return
         }
-        AlertDialog.Builder(context).apply {
+        AlertBottomSheet.Builder(context).apply {
             setTitle(R.string.location)
             setMessage(context.getString(R.string.location_message, "\"${origin.subSequence(0, min(origin.length, 50))}\""))
             setCancelable(false)
-            setPositiveButton(android.R.string.ok) { _, _ ->
+            setPositiveButton(android.R.string.ok) {
                 mainScope.launch {
                     val allow = controller.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                     callback.invoke(origin, allow, true)
                 }
             }
-            setNegativeButton(android.R.string.cancel) { _, _ ->
+            setNegativeButton(android.R.string.cancel) {
                 callback.invoke(origin, false, true)
             }
         }.show()

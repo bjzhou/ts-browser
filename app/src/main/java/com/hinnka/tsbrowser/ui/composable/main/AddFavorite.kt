@@ -9,14 +9,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,16 +25,11 @@ import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.Favorite
-import com.hinnka.tsbrowser.ui.LocalViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun AddFavorite(orig: Favorite? = null, onDismiss: (Favorite) -> Unit) {
-    val viewModel = LocalViewModel.current
-    val density = LocalDensity.current
     val focusManager = LocalFocusManager.current
     val contentColor = LocalContentColor.current
-    val scope = rememberCoroutineScope()
 
     val titleField = remember { mutableStateOf(TextFieldValue(orig?.title ?: "")) }
     val urlField = remember { mutableStateOf(TextFieldValue(orig?.url ?: "")) }
@@ -136,6 +129,5 @@ fun AddFavorite(orig: Favorite? = null, onDismiss: (Favorite) -> Unit) {
                 Text(text = stringResource(id = R.string.confirm))
             }
         }
-        Spacer(modifier = Modifier.height(with(density) { viewModel.imeHeightState.value.toDp() }))
     }
 }

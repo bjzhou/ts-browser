@@ -1,6 +1,5 @@
 package com.hinnka.tsbrowser.ui.composable.download
 
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +23,7 @@ import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.download.DownloadNotificationCreator
 import com.hinnka.tsbrowser.ext.longPress
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import zlc.season.rxdownload4.file
@@ -47,16 +47,21 @@ fun DownloadPage() {
                 .fillMaxHeight()
                 .clickable {
                     RxDownloadRecorder
-                        .getAllTaskWithStatus(Completed())
+                        .getAllTaskWithStatus(Completed(), Failed())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             if (it.isNullOrEmpty()) return@subscribe
-                            AlertDialog
+                            AlertBottomSheet
                                 .Builder(context)
                                 .apply {
                                     setTitle(R.string.clear)
-                                    setMessage(context.getString(R.string.clear_confirm, it.size))
-                                    setPositiveButton(R.string.delete) { _, _ ->
+                                    setMessage(
+                                        context.getString(
+                                            R.string.clear_confirm,
+                                            it.size
+                                        )
+                                    )
+                                    setPositiveButton(R.string.delete) {
                                         it.forEach { entity ->
                                             val manager = entity.task.manager(
                                                 recorder = RoomRecorder(),
@@ -66,12 +71,13 @@ fun DownloadPage() {
                                             tasks.removeAll { item -> item.id == entity.id }
                                         }
                                     }
-                                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                                    setNegativeButton(android.R.string.cancel) {
                                     }
                                 }
                                 .show()
                         }
-                }, contentAlignment = Alignment.Center) {
+                }, contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(id = R.string.clear),
                     modifier = Modifier.padding(horizontal = 8.dp),

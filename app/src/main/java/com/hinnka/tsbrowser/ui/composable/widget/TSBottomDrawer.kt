@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -29,7 +30,7 @@ fun TSBottomDrawer(
     drawerState: BottomDrawerState = remember { BottomDrawerState() },
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val viewModel = LocalViewModel.current
@@ -90,7 +91,11 @@ fun TSBottomDrawer(
             if (drawerState.showScrimState.value) {
                 BottomDrawerScrim(
                     color = DrawerDefaults.scrimColor,
-                    onDismiss = { scope.launch { drawerState.close() } },
+                    onDismiss = {
+                        if (drawerState.cancelable) {
+                            scope.launch { drawerState.close() }
+                        }
+                    },
                     visible = !drawerState.isClosed || waitForShow
                 )
             }
@@ -104,6 +109,9 @@ fun TSBottomDrawer(
                             }
                             waitForShow = false
                         }
+                    }
+                    .graphicsLayer {
+                        translationY = -viewModel.imeHeightState.value
                     }
                     .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) },
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
@@ -130,6 +138,8 @@ class BottomDrawerState {
 
     val waitForShow = mutableStateOf(false)
     var showScrimState = mutableStateOf(true)
+
+    var cancelable = true
 
     var isClosing = false
 

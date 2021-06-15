@@ -38,7 +38,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.isSameDay
 import com.hinnka.tsbrowser.ext.toDateString
 import com.hinnka.tsbrowser.persist.AppDatabase
@@ -48,6 +47,7 @@ import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import com.hinnka.tsbrowser.persist.IconMap
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -73,16 +73,16 @@ fun HistoryPage() {
     Scaffold(topBar = {
         TSAppBar(title = stringResource(id = R.string.history), actions = {
             IconButton(onClick = {
-                androidx.appcompat.app.AlertDialog.Builder(context).apply {
+                AlertBottomSheet.Builder(context).apply {
                     setMessage(context.getString(R.string.clear_all_history))
-                    setPositiveButton(R.string.clear) { _, _ ->
+                    setPositiveButton(R.string.clear) {
                         scope.launch {
                             WebStorage.getInstance().deleteAllData()
                             AppDatabase.instance.historyDao().clear()
                             lazyPagingItems.refresh()
                         }
                     }
-                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                    setNegativeButton(android.R.string.cancel) {
                     }
                 }.show()
             }) {

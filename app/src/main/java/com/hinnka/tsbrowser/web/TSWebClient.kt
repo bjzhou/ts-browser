@@ -3,35 +3,31 @@ package com.hinnka.tsbrowser.web
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.net.http.SslError
 import android.os.Message
 import android.text.TextUtils
-import android.util.Log
 import android.view.KeyEvent
 import android.webkit.*
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.webkit.SafeBrowsingResponseCompat
-import androidx.webkit.WebResourceErrorCompat
-import androidx.webkit.WebViewClientCompat
-import androidx.webkit.WebViewFeature
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.adblock.AdBlocker
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.logE
 import com.hinnka.tsbrowser.persist.LocalStorage
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import java.util.concurrent.TimeUnit
 
-class TSWebClient(private val controller: UIController) : WebViewClientCompat() {
+class TSWebClient(private val controller: UIController) : WebViewClient() {
 
     companion object {
         val localSchemes = arrayOf("http", "https", "ftp", "file", "about", "data", "javascript")
@@ -110,14 +106,14 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
     }
 
     override fun onFormResubmission(view: WebView, dontResend: Message, resend: Message) {
-        AlertDialog.Builder(view.context).apply {
+        AlertBottomSheet.Builder(view.context).apply {
             setTitle(R.string.form_resubmission)
             setMessage(R.string.resend_data)
             setCancelable(false)
-            setPositiveButton(android.R.string.yes) { _, _ ->
+            setPositiveButton(android.R.string.yes) {
                 resend.sendToTarget()
             }
-            setNegativeButton(android.R.string.no) { _, _ ->
+            setNegativeButton(android.R.string.no) {
                 dontResend.sendToTarget()
             }
         }.show()
@@ -136,15 +132,15 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
             }
             return
         }
-        AlertDialog.Builder(view.context).apply {
+        AlertBottomSheet.Builder(view.context).apply {
             setTitle(R.string.warning)
             setMessage(R.string.insecue_message)
-            setPositiveButton(android.R.string.yes) { _, _ ->
+            setPositiveButton(android.R.string.yes) {
                 sslLastAllow = true
                 sslLastTime = System.currentTimeMillis()
                 handler.proceed()
             }
-            setNegativeButton(android.R.string.no) { _, _ ->
+            setNegativeButton(android.R.string.no) {
                 sslLastAllow = false
                 sslLastTime = System.currentTimeMillis()
                 handler.cancel()
@@ -162,30 +158,29 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         host: String,
         realm: String
     ) {
-        var user = ""
-        var password = ""
-        AlertDialog.Builder(view.context).apply {
-            setView(ComposeView(view.context).apply { 
-                setContent { 
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp)) {
-                        Text(text = realm, maxLines = 3)
-                        OutlinedTextField(value = "", onValueChange = {
-                            user = it
-                        }, placeholder = { Text(text = stringResource(id = R.string.username)) })
-                        OutlinedTextField(value = "", onValueChange = {
-                            password = it
-                        }, placeholder = { Text(text = stringResource(id = R.string.password)) })
-                    }
+        var user by mutableStateOf("")
+        var password by mutableStateOf("")
+        AlertBottomSheet.Builder(view.context).apply {
+            setView {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(text = host, maxLines = 1)
+                    OutlinedTextField(value = user, onValueChange = {
+                        user = it
+                    }, placeholder = { Text(text = stringResource(id = R.string.username)) })
+                    OutlinedTextField(value = password, onValueChange = {
+                        password = it
+                    }, placeholder = { Text(text = stringResource(id = R.string.password)) })
                 }
-            })
+            }
             setTitle(R.string.signin)
-            setPositiveButton(android.R.string.ok) { _, _ ->
+            setPositiveButton(android.R.string.ok) {
                 handler.proceed(user, password)
             }
-            setNegativeButton(android.R.string.cancel) { _, _ ->
+            setNegativeButton(android.R.string.cancel) {
                 handler.cancel()
             }
         }.show()
@@ -222,27 +217,27 @@ class TSWebClient(private val controller: UIController) : WebViewClientCompat() 
         super.onPageCommitVisible(view, url)
     }
 
-    override fun onReceivedError(
-        view: WebView,
-        request: WebResourceRequest,
-        error: WebResourceErrorCompat
-    ) {
-        super.onReceivedError(view, request, error)
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_DESCRIPTION)) {
-                logE(
-                    "onReceivedError: ${request.url} ${error.errorCode} ${error.description}"
-                )
-            }
-        }
-    }
-
-    override fun onSafeBrowsingHit(
-        view: WebView,
-        request: WebResourceRequest,
-        threatType: Int,
-        callback: SafeBrowsingResponseCompat
-    ) {
-        super.onSafeBrowsingHit(view, request, threatType, callback)
-    }
+//    override fun onReceivedError(
+//        view: WebView,
+//        request: WebResourceRequest,
+//        error: WebResourceErrorCompat
+//    ) {
+//        super.onReceivedError(view, request, error)
+//        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
+//            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_DESCRIPTION)) {
+//                logE(
+//                    "onReceivedError: ${request.url} ${error.errorCode} ${error.description}"
+//                )
+//            }
+//        }
+//    }
+//
+//    override fun onSafeBrowsingHit(
+//        view: WebView,
+//        request: WebResourceRequest,
+//        threatType: Int,
+//        callback: SafeBrowsingResponseCompat
+//    ) {
+//        super.onSafeBrowsingHit(view, request, threatType, callback)
+//    }
 }
