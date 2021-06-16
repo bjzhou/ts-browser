@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -25,16 +24,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.LocalViewModel
-import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import kotlinx.coroutines.launch
 
 @Composable
-fun FindInPage(drawerState: BottomDrawerState) {
+fun FindInPage() {
     val scope = rememberCoroutineScope()
-    val viewModel = LocalViewModel.current
-    val density = LocalDensity.current
     val focusManager = LocalFocusManager.current
     val search = remember {
         mutableStateOf(TextFieldValue())
@@ -66,7 +62,7 @@ fun FindInPage(drawerState: BottomDrawerState) {
         }
     }
 
-    if (drawerState.isClosed) {
+    if (AlertBottomSheet.drawerState.isClosed) {
         clear()
     }
 
@@ -105,7 +101,7 @@ fun FindInPage(drawerState: BottomDrawerState) {
         IconButton(onClick = {
             clear()
             scope.launch {
-                drawerState.close()
+                AlertBottomSheet.close()
             }
         }) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Close")

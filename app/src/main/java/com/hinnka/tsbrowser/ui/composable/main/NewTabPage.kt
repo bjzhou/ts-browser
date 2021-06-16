@@ -21,14 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.R
-import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.persist.AppDatabase
@@ -36,17 +34,16 @@ import com.hinnka.tsbrowser.persist.Favorite
 import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
-import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.theme.primaryLight
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NewTabPage(drawerState: BottomDrawerState) {
+fun NewTabPage() {
     logD("NewTabPage start")
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val favorites = remember { mutableStateListOf(*AppDatabase.instance.favoriteDao().getAll().toTypedArray()) }
 
     fun refresh() {
@@ -68,10 +65,10 @@ fun NewTabPage(drawerState: BottomDrawerState) {
         ) {
             items(favorites) { favorite ->
                 FavoriteItem(favorite, onUpdate = {
-                    drawerState.open {
+                    AlertBottomSheet.open {
                         AddFavorite(favorite) {
                             scope.launch {
-                                drawerState.close()
+                                AlertBottomSheet.close()
                                 refresh()
                             }
                         }
@@ -84,10 +81,10 @@ fun NewTabPage(drawerState: BottomDrawerState) {
             if (favorites.size < 10) {
                 item {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
-                        drawerState.open {
+                        AlertBottomSheet.open {
                             AddFavorite {
                                 scope.launch {
-                                    drawerState.close()
+                                    AlertBottomSheet.close()
                                     refresh()
                                 }
                             }

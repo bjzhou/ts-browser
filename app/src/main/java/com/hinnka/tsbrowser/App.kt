@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.webkit.WebView
+import androidx.compose.ui.text.toUpperCase
 import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.logE
@@ -24,7 +25,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        logD("${getProcessName()} onCreate")
+        logD("$processName onCreate")
         instance = this
         configWebViewCacheDirWithAndroidP()
         RxJavaPlugins.setErrorHandler {
@@ -34,7 +35,7 @@ class App : Application() {
             `package` = packageName
         })
         initBrowser()
-        logD("${getProcessName()} onCreate complete")
+        logD("$processName onCreate complete")
     }
 
     private fun initBrowser() {

@@ -15,13 +15,14 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -38,24 +39,23 @@ import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadHandler
-import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
-import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
-import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.LocalViewModel
-import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.Center
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
+import com.hinnka.tsbrowser.ui.home.UIState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun BottomBar(drawerState: BottomDrawerState) {
+fun BottomBar() {
     val viewModel = LocalViewModel.current
     val tab = TabManager.currentTab.value
     val uiState = viewModel.uiState
@@ -82,8 +82,8 @@ fun BottomBar(drawerState: BottomDrawerState) {
                 }
                 Center(modifier = Modifier.weight(1f)) {
                     IconButton(onClick = {
-                        drawerState.open {
-                            TSDrawer(drawerState)
+                        AlertBottomSheet.open {
+                            TSDrawer()
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
@@ -137,8 +137,8 @@ fun BottomBar(drawerState: BottomDrawerState) {
                 }
                 AnimatedVisibility(visible = uiState.value != UIState.Search) {
                     IconButton(onClick = {
-                        drawerState.open {
-                            TSDrawer(drawerState)
+                        AlertBottomSheet.open {
+                            TSDrawer()
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")

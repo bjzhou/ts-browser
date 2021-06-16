@@ -33,16 +33,14 @@ import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
-import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
-import com.hinnka.tsbrowser.ui.theme.primaryLight
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TSDrawer(drawerState: BottomDrawerState) {
-    val scope = rememberCoroutineScope()
+fun TSDrawer() {
     val context = LocalContext.current
     val showNewPage = TabManager.currentTab.value?.isHome != false
     Row(
@@ -156,9 +154,6 @@ fun TSDrawer(drawerState: BottomDrawerState) {
             } else {
                 Toast.makeText(context, R.string.dark_unsupport, Toast.LENGTH_SHORT).show()
             }
-            scope.launch {
-                drawerState.close()
-            }
         }
         if (App.isSecretMode) {
             drawerItem(
@@ -199,9 +194,6 @@ fun TSDrawer(drawerState: BottomDrawerState) {
                 }
             ) {
                 Settings.incognito = !Settings.incognito
-                scope.launch {
-                    drawerState.close()
-                }
             }
         }
         drawerItem(
@@ -214,11 +206,8 @@ fun TSDrawer(drawerState: BottomDrawerState) {
             text = { Text(text = stringResource(id = R.string.find)) },
             enabled = !showNewPage
         ) {
-            scope.launch {
-                drawerState.close()
-                drawerState.open(false) {
-                    FindInPage(drawerState)
-                }
+            AlertBottomSheet.open(false) {
+                FindInPage()
             }
         }
         drawerItem(
@@ -241,9 +230,6 @@ fun TSDrawer(drawerState: BottomDrawerState) {
             }
         ) {
             Settings.userAgent = if (Settings.userAgentState.value == SettingOptions.userAgentDesktop[0])  Settings.Default.userAgent else SettingOptions.userAgentDesktop[0]
-            scope.launch {
-                drawerState.close()
-            }
         }
         drawerItem(
             icon = {
@@ -300,6 +286,7 @@ fun LazyGridScope.drawerItem(
     onClick: () -> Unit
 ) {
     item {
+        val scope = rememberCoroutineScope()
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
         CompositionLocalProvider(
             LocalTextStyle provides TextStyle(fontSize = 10.sp),
@@ -309,7 +296,10 @@ fun LazyGridScope.drawerItem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .clickable(enabled = enabled) {
-                        onClick()
+                        scope.launch {
+                            AlertBottomSheet.close()
+                            onClick()
+                        }
                     }
                     .padding(16.dp)
             ) {

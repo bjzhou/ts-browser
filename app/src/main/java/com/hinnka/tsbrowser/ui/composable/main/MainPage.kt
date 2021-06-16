@@ -20,33 +20,26 @@ import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.welcome.SecretWelcome
-import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.StatusBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
-import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainPage() {
     logD("MainPage start")
-    val drawerState = remember { BottomDrawerState() }
-    TSBottomDrawer(
-        drawerState = drawerState,
-    ) {
-        Column {
-            StatusBar()
-            MainView(drawerState)
-        }
-        LongPressPopup()
-        Welcome(drawerState)
+    Column {
+        StatusBar()
+        MainView()
     }
+    LongPressPopup()
+    Welcome()
     logD("MainPage end")
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Welcome(drawerState: BottomDrawerState) {
+fun Welcome() {
     var showSecret by remember { mutableStateOf(false) }
     val hasMnemonic = Settings.mnemonicState.value == null
     LaunchedEffect(key1 = hasMnemonic) {
@@ -58,21 +51,21 @@ fun Welcome(drawerState: BottomDrawerState) {
         exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 250f))
     ) {
         TSBackHandler(onBack = {}) {
-            SecretWelcome(drawerState)
+            SecretWelcome()
         }
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun MainView(drawerState: BottomDrawerState) {
+fun MainView() {
     logD("MainView start")
     val tab = TabManager.currentTab.value
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
             TSBackHandler(
-                enabled = tab?.canGoBackState?.value == true && drawerState.isClosed,
+                enabled = tab?.canGoBackState?.value == true,
                 onBack = { tab?.onBackPressed() }) {
                 AndroidView(
                     factory = {
@@ -89,21 +82,21 @@ fun MainView(drawerState: BottomDrawerState) {
                 )
             }
             ProgressIndicator()
-            NewTabView(drawerState)
+            NewTabView()
             CoverView()
         }
-        BottomBar(drawerState)
+        BottomBar()
     }
     logD("MainView end")
 }
 
 @Composable
-fun NewTabView(drawerState: BottomDrawerState) {
+fun NewTabView() {
     val tab = TabManager.currentTab.value
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
     if (tab == null || (uiState.value == UIState.Main && tab.isHome)) {
-        NewTabPage(drawerState)
+        NewTabPage()
     }
 }
 

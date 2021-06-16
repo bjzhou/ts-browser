@@ -128,5 +128,13 @@ class AlertBottomSheet(val params: Params) {
 
     companion object {
         val drawerState = BottomDrawerState()
+
+        fun open(showScrim: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
+            drawerState.open(showScrim, content)
+        }
+
+        suspend fun close() {
+            drawerState.close()
+        }
     }
 }

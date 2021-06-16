@@ -11,20 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.tap
 import com.hinnka.tsbrowser.ui.composable.settings.SetMnemonic
-import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
+import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import kotlinx.coroutines.launch
 
 @Composable
-fun SecretWelcome(drawerState: BottomDrawerState) {
+fun SecretWelcome() {
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
@@ -54,10 +52,10 @@ fun SecretWelcome(drawerState: BottomDrawerState) {
             }
             Button(
                 onClick = {
-                    drawerState.open {
+                    AlertBottomSheet.open {
                         SetMnemonic {
                             scope.launch {
-                                drawerState.close()
+                                AlertBottomSheet.close()
                             }
                         }
                     }

@@ -7,6 +7,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.mutableStateOf
+import com.hinnka.tsbrowser.App
+import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.ext.encodeToPath
 import com.hinnka.tsbrowser.ext.host
 import com.hinnka.tsbrowser.ext.mainScope
@@ -83,7 +85,7 @@ data class Tab(
         canGoForwardState.value = view.canGoForward()
         mainScope.launch {
             val title = titleState.value
-            if (URLUtil.isNetworkUrl(url) && title.isNotBlank()) {
+            if (URLUtil.isNetworkUrl(url) && title.isNotBlank() && title != App.instance.getString(R.string.new_tab)) {
                 val last = AppDatabase.instance.historyDao().last()
                 if (url != last?.url && title != last?.title) {
                     val history = History(
