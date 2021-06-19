@@ -42,7 +42,7 @@ import com.hinnka.tsbrowser.ext.toDateString
 import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.persist.History
 import com.hinnka.tsbrowser.tab.TabManager
-import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.page.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import com.hinnka.tsbrowser.persist.IconMap

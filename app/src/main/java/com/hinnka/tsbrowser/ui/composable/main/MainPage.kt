@@ -19,6 +19,7 @@ import com.hinnka.tsbrowser.ext.removeFromParent
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.main.bottom.BottomBar
 import com.hinnka.tsbrowser.ui.composable.welcome.SecretWelcome
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.StatusBar

@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.composable.main
+package com.hinnka.tsbrowser.ui.composable.main.drawer
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

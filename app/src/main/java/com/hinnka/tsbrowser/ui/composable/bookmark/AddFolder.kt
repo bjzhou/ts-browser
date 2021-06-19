@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.BookmarkType
-import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
+import com.hinnka.tsbrowser.ui.composable.widget.page.PageController
 
 @Composable
 fun AddFolder(parentBookmark: Bookmark) {

@@ -32,8 +32,8 @@ import com.hinnka.tsbrowser.ui.composable.history.HistoryPage
 import com.hinnka.tsbrowser.ui.composable.main.MainPage
 import com.hinnka.tsbrowser.ui.composable.settings.SettingsPage
 import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
-import com.hinnka.tsbrowser.ui.composable.widget.PageContainer
-import com.hinnka.tsbrowser.ui.composable.widget.PageController
+import com.hinnka.tsbrowser.ui.composable.widget.page.PageContainer
+import com.hinnka.tsbrowser.ui.composable.widget.page.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.theme.TSBrowserTheme
 import kotlinx.coroutines.launch
