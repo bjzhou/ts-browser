@@ -45,7 +45,6 @@ import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.LocalViewModel
-import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.Center
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
@@ -59,7 +58,7 @@ fun BottomBar() {
     val viewModel = LocalViewModel.current
     val tab = TabManager.currentTab.value
     val uiState = viewModel.uiState
-    val drawerState = MainDrawerState.current
+    val drawerState = LocalMainDrawerState.current
 
     Column(modifier = Modifier.graphicsLayer {
         translationY = -viewModel.imeHeightState.value

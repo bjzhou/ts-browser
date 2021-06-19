@@ -25,9 +25,10 @@ import com.hinnka.tsbrowser.ui.composable.widget.StatusBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
 import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
+import kotlinx.coroutines.delay
 
 
-val MainDrawerState = staticCompositionLocalOf<BottomDrawerState> {
+val LocalMainDrawerState = staticCompositionLocalOf<BottomDrawerState> {
     error("main drawer state not found")
 }
 
@@ -40,7 +41,7 @@ fun MainPage() {
     Column {
         StatusBar()
         TSBottomDrawer(drawerState = mainDrawerState) {
-            CompositionLocalProvider(MainDrawerState provides mainDrawerState) {
+            CompositionLocalProvider(LocalMainDrawerState provides mainDrawerState) {
                 MainView()
             }
         }
@@ -54,9 +55,10 @@ fun MainPage() {
 @Composable
 fun Welcome() {
     var showSecret by remember { mutableStateOf(false) }
-    val hasMnemonic = Settings.mnemonicState.value == null
-    LaunchedEffect(key1 = hasMnemonic) {
-        showSecret = hasMnemonic
+    val mnemonicNotSet = Settings.mnemonicState.value == null
+    LaunchedEffect(key1 = mnemonicNotSet) {
+        delay(500)
+        showSecret = mnemonicNotSet
     }
     AnimatedVisibility(
         visible = showSecret,
@@ -111,10 +113,10 @@ fun MainView() {
 
 @Composable
 fun NewTabView() {
-    val tab = TabManager.currentTab.value
+    val tab = TabManager.currentTab.value ?: return
     val viewModel = LocalViewModel.current
     val uiState = viewModel.uiState
-    if (tab == null || (uiState.value == UIState.Main && tab.isHome)) {
+    if (uiState.value == UIState.Main && tab.isHome) {
         NewTabPage()
     }
 }
