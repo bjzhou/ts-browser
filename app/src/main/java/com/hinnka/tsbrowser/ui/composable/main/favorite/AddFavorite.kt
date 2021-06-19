@@ -1,4 +1,4 @@
-package com.hinnka.tsbrowser.ui.composable.main
+package com.hinnka.tsbrowser.ui.composable.main.favorite
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

@@ -34,6 +34,8 @@ import com.hinnka.tsbrowser.persist.Favorite
 import com.hinnka.tsbrowser.persist.IconMap
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.main.favorite.AddFavorite
+import com.hinnka.tsbrowser.ui.composable.main.favorite.FavoriteItem
 import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.home.UIState
 import com.hinnka.tsbrowser.ui.theme.primaryLight
@@ -124,79 +126,6 @@ fun NewTabPage() {
     logD("NewTabPage end")
 }
 
-@Composable
-fun FavoriteItem(favorite: Favorite, onUpdate: () -> Unit, onDelete: () -> Unit) {
-    val showPopup = remember { mutableStateOf(false) }
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onLongPress = {
-                    showPopup.value = true
-                },
-                onTap = {
-                    TabManager.currentTab.value?.loadUrl(favorite.url)
-                }
-            )
-        }) {
-        Spacer(modifier = Modifier.height(8.dp))
-        if (favorite.iconRes != 0) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        Color(favorite.color),
-                        shape = CircleShape
-                    ), contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = favorite.iconRes),
-                    contentDescription = "",
-                    modifier = Modifier.size(28.dp),
-                    contentScale = ContentScale.Inside
-                )
-            }
-        } else IconMap[favorite.url]?.asImageBitmap()?.let {
-            Image(
-                bitmap = it,
-                contentDescription = "",
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color.Transparent, shape = CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        } ?: Icon(
-            imageVector = Icons.Default.Info,
-            contentDescription = "",
-            modifier = Modifier.size(40.dp),
-            tint = MaterialTheme.colors.primary
-        )
-        Text(
-            text = favorite.title,
-            modifier = Modifier.padding(vertical = 8.dp),
-            fontSize = 12.sp
-        )
-    }
-    DropdownMenu(
-        expanded = showPopup.value,
-        offset = DpOffset.Zero,
-        onDismissRequest = {
-            showPopup.value = false
-        },
-    ) {
-        DropdownMenuItem(onClick = {
-            showPopup.value = false
-            onUpdate()
-        }) {
-            Text(text = stringResource(id = R.string.edit))
-        }
-        DropdownMenuItem(onClick = {
-            showPopup.value = false
-            onDelete()
-        }) {
-            Text(text = stringResource(id = R.string.delete))
-        }
-    }
-}
 
 @Composable
 fun NewTabTextField(modifier: Modifier) {

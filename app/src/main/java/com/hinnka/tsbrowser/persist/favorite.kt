@@ -1,6 +1,5 @@
 package com.hinnka.tsbrowser.persist
 
-import androidx.annotation.DrawableRes
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.hinnka.tsbrowser.R
@@ -60,17 +59,32 @@ object Favorites {
 
 @Entity
 data class Favorite(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo var url: String,
     @ColumnInfo var title: String,
-    @ColumnInfo @DrawableRes val iconRes: Int = 0,
-    @ColumnInfo val color: Long = 0,
-    @ColumnInfo val order: Int = 0,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-)
+) {
+
+    @Ignore
+    var iconRes: Int = 0
+
+    @Ignore
+    var color: Long = 0
+
+    constructor(
+        url: String,
+        title: String,
+        iconRes: Int = 0,
+        color: Long = 0
+    ) : this(url = url, title = title) {
+        this.iconRes = iconRes
+        this.color = color
+    }
+
+}
 
 @Dao
 interface FavoriteDao {
-    @Query("SELECT * FROM favorite ORDER BY `order`")
+    @Query("SELECT * FROM favorite")
     fun getAll(): List<Favorite>
 
     @Insert(onConflict = REPLACE)
