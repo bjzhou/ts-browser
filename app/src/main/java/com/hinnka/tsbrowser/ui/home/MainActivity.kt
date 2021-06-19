@@ -19,6 +19,7 @@ import com.hinnka.tsbrowser.BuildConfig
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.persist.Bookmark
+import com.hinnka.tsbrowser.persist.LocalStorage
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.AppViewModel
@@ -183,5 +184,14 @@ open class MainActivity : BaseActivity() {
     override fun onBackPressed() {
         logD("onBackPressed")
         super.onBackPressed()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        logD("MainActivity onActivityResult $requestCode $resultCode")
+        if (requestCode == viewModel.secretRequestCode && resultCode == RESULT_OK) {
+            LocalStorage.isSecretVisited = true
+            viewModel.updateDefaultBrowserBadgeState()
+        }
     }
 }

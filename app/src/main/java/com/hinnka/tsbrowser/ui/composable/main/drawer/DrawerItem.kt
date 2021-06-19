@@ -26,6 +26,7 @@ import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.persist.SettingOptions
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
+import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.page.PageController
 import kotlinx.coroutines.launch
@@ -208,8 +209,21 @@ fun DownloadsItem() {
 
 @Composable
 fun SettingsItem() {
+    val viewModel = LocalViewModel.current
     DrawerItem(
-        icon = { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") },
+        icon = {
+            Box {
+                Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings")
+                if (viewModel.canShowDefaultBrowserBadgeState.value) {
+                    Spacer(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(Color.Red, CircleShape)
+                            .align(Alignment.TopEnd)
+                    )
+                }
+            }
+        },
         text = { Text(text = stringResource(id = R.string.settings)) }
     ) {
         PageController.navigate("settings")

@@ -5,24 +5,22 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.persist.NameValue
@@ -48,6 +46,7 @@ fun SettingsPage() {
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { source, event ->
             isDefaultBrowser.value = viewModel.isDefaultBrowser
+            viewModel.updateDefaultBrowserBadgeState()
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
@@ -76,10 +75,21 @@ fun SettingsPage() {
                     secondaryText = { Text(text = stringResource(id = if (isDefaultBrowser.value) R.string.on else R.string.off)) },
                     text = { Text(text = stringResource(id = R.string.set_default_browser)) },
                     trailing = {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
-                            contentDescription = ""
-                        )
+                        Row {
+                            if (viewModel.canShowDefaultBrowserBadgeState.value) {
+                                Box(Modifier.padding(8.dp)) {
+                                    Spacer(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(Color.Red, CircleShape)
+                                    )
+                                }
+                            }
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = ""
+                            )
+                        }
                     }
                 )
                 ListItem(

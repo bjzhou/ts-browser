@@ -4,22 +4,16 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.main.LocalMainDrawerState
-import com.hinnka.tsbrowser.ui.composable.main.drawer.TSDrawer
 import com.hinnka.tsbrowser.ui.composable.widget.Center
 import com.hinnka.tsbrowser.ui.home.UIState
 
@@ -52,26 +46,7 @@ fun BottomBar() {
                     HistoryButton()
                 }
                 Center(modifier = Modifier.weight(1f)) {
-                    IconButton(onClick = {
-                        drawerState.open {
-                            TSDrawer(drawerState)
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
-                        if (DownloadHandler.showDownloadingBadge.value) {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp)) {
-                                Spacer(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(Color.Red, CircleShape)
-                                        .align(Alignment.TopEnd)
-                                )
-                            }
-                        }
-                    }
+                    MoreButton(drawerState)
                 }
             }
         }
@@ -110,26 +85,7 @@ fun BottomBar() {
                     RefreshButton()
                 }
                 AnimatedVisibility(visible = uiState.value != UIState.Search) {
-                    IconButton(onClick = {
-                        drawerState.open {
-                            TSDrawer(drawerState)
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
-                        if (DownloadHandler.showDownloadingBadge.value) {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp)) {
-                                Spacer(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(Color.Red, CircleShape)
-                                        .align(Alignment.TopEnd)
-                                )
-                            }
-                        }
-                    }
+                    MoreButton(drawerState)
                 }
             }
         }

@@ -4,11 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -16,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,10 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hinnka.tsbrowser.App
 import com.hinnka.tsbrowser.R
+import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.LocalViewModel
+import com.hinnka.tsbrowser.ui.composable.main.drawer.TSDrawer
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.page.PageController
 import com.hinnka.tsbrowser.ui.home.UIState
 import kotlinx.coroutines.delay
@@ -237,5 +243,32 @@ fun HistoryButton() {
         PageController.navigate("history")
     }) {
         Icon(imageVector = Icons.Outlined.History, contentDescription = "history")
+    }
+}
+
+@Composable
+fun MoreButton(drawerState: BottomDrawerState) {
+    val viewModel = LocalViewModel.current
+    val showBadge = DownloadHandler.showDownloadingBadge.value
+            || viewModel.canShowDefaultBrowserBadgeState.value
+    IconButton(onClick = {
+        drawerState.open {
+            TSDrawer(drawerState)
+        }
+    }) {
+        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+        if (showBadge) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)) {
+                Spacer(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(Color.Red, CircleShape)
+                        .align(Alignment.TopEnd)
+                )
+            }
+        }
     }
 }
