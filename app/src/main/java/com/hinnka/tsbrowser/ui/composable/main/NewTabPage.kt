@@ -44,7 +44,8 @@ import kotlinx.coroutines.launch
 fun NewTabPage() {
     logD("NewTabPage start")
     val scope = rememberCoroutineScope()
-    val favorites = remember { mutableStateListOf(*AppDatabase.instance.favoriteDao().getAll().toTypedArray()) }
+    val favorites =
+        remember { mutableStateListOf(*AppDatabase.instance.favoriteDao().getAll().toTypedArray()) }
 
     fun refresh() {
         val list = AppDatabase.instance.favoriteDao().getAll()
@@ -80,16 +81,18 @@ fun NewTabPage() {
             }
             if (favorites.size < 10) {
                 item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
-                        AlertBottomSheet.open {
-                            AddFavorite {
-                                scope.launch {
-                                    AlertBottomSheet.close()
-                                    refresh()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable {
+                            AlertBottomSheet.open {
+                                AddFavorite {
+                                    scope.launch {
+                                        AlertBottomSheet.close()
+                                        refresh()
+                                    }
                                 }
                             }
-                        }
-                    }) {
+                        }) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Box(
                             modifier = Modifier

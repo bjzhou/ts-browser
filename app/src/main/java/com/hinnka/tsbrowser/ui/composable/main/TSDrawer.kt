@@ -58,12 +58,14 @@ fun TSDrawer(drawerState: BottomDrawerState) {
     Box(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)) {
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()
                 .border(1.dp, Color(0x66000000), RoundedCornerShape(8.dp))
-                .padding(16.dp), horizontalArrangement = Arrangement.SpaceAround) {
+                .padding(16.dp), horizontalArrangement = Arrangement.SpaceAround
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Security,
@@ -234,7 +236,8 @@ fun TSDrawer(drawerState: BottomDrawerState) {
                 )
             }
         ) {
-            Settings.userAgent = if (Settings.userAgentState.value == SettingOptions.userAgentDesktop[0])  Settings.Default.userAgent else SettingOptions.userAgentDesktop[0]
+            Settings.userAgent =
+                if (Settings.userAgentState.value == SettingOptions.userAgentDesktop[0]) Settings.Default.userAgent else SettingOptions.userAgentDesktop[0]
         }
         drawerItem(
             icon = {

@@ -5,17 +5,12 @@ import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.webkit.WebView
-import androidx.compose.ui.text.toUpperCase
-import com.hinnka.tsbrowser.ext.ioScope
 import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.logE
-import com.hinnka.tsbrowser.ext.mainScope
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.Favorites
 import io.reactivex.plugins.RxJavaPlugins
-import kotlinx.coroutines.launch
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.*
@@ -39,8 +34,10 @@ class App : Application() {
     }
 
     private fun initBrowser() {
-        //FIXME hack for RxDownload init in sub process
-        contentResolver.insert(Uri.parse("content://$packageName.claritypotion/start"), null)
+        if (processName != packageName) {
+            //FIXME hack for RxDownload init in sub process
+            contentResolver.insert(Uri.parse("content://$packageName.claritypotion/start"), null)
+        }
         Bookmark.init()
         Favorites.init()
     }

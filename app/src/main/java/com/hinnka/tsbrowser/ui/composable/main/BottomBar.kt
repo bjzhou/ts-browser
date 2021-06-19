@@ -88,7 +88,10 @@ fun BottomBar() {
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
                         if (DownloadHandler.showDownloadingBadge.value) {
-                            Box(Modifier.fillMaxSize().padding(8.dp)) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp)) {
                                 Spacer(
                                     modifier = Modifier
                                         .size(8.dp)
@@ -143,7 +146,10 @@ fun BottomBar() {
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
                         if (DownloadHandler.showDownloadingBadge.value) {
-                            Box(Modifier.fillMaxSize().padding(8.dp)) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp)) {
                                 Spacer(
                                     modifier = Modifier
                                         .size(8.dp)

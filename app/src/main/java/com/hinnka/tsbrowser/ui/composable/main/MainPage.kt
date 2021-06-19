@@ -27,7 +27,6 @@ import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
 import kotlinx.coroutines.delay
 
-
 val LocalMainDrawerState = staticCompositionLocalOf<BottomDrawerState> {
     error("main drawer state not found")
 }
