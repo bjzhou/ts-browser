@@ -1,5 +1,6 @@
 package com.hinnka.tsbrowser.ui.composable.download
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,19 +23,25 @@ import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.download.DownloadHandler
 import com.hinnka.tsbrowser.download.DownloadNotificationCreator
+import com.hinnka.tsbrowser.download.TSRecorder
 import com.hinnka.tsbrowser.ext.longPress
+import com.hinnka.tsbrowser.ext.mainScope
+import com.hinnka.tsbrowser.persist.AppDatabase
 import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
 import com.hinnka.tsbrowser.ui.composable.widget.TSAppBar
 import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.coroutines.launch
 import zlc.season.rxdownload4.file
 import zlc.season.rxdownload4.manager.*
 import zlc.season.rxdownload4.recorder.RoomRecorder
 import zlc.season.rxdownload4.recorder.RxDownloadRecorder
 import zlc.season.rxdownload4.recorder.TaskEntity
 
+@SuppressLint("CheckResult")
 @Composable
 fun DownloadPage() {
     val tasks = remember { mutableStateListOf<TaskEntity>() }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -46,36 +53,36 @@ fun DownloadPage() {
             Box(modifier = Modifier
                 .fillMaxHeight()
                 .clickable {
-                    RxDownloadRecorder
-                        .getAllTaskWithStatus(Completed(), Failed())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            if (it.isNullOrEmpty()) return@subscribe
-                            AlertBottomSheet
-                                .Builder(context)
-                                .apply {
-                                    setTitle(R.string.clear)
-                                    setMessage(
-                                        context.getString(
-                                            R.string.clear_confirm,
-                                            it.size
-                                        )
+                    scope.launch {
+                        val it = AppDatabase.instance
+                            .downloadDao()
+                            .getAllWithStatus(Completed(), Failed())
+                        if (it.isNullOrEmpty()) return@launch
+                        AlertBottomSheet
+                            .Builder(context)
+                            .apply {
+                                setTitle(R.string.clear)
+                                setMessage(
+                                    context.getString(
+                                        R.string.clear_confirm,
+                                        it.size
                                     )
-                                    setPositiveButton(R.string.delete) {
-                                        it.forEach { entity ->
-                                            val manager = entity.task.manager(
-                                                recorder = RoomRecorder(),
-                                                notificationCreator = DownloadNotificationCreator()
-                                            )
-                                            manager.delete()
-                                            tasks.removeAll { item -> item.id == entity.id }
-                                        }
-                                    }
-                                    setNegativeButton(android.R.string.cancel) {
+                                )
+                                setPositiveButton(R.string.delete) {
+                                    it.forEach { entity ->
+                                        val manager = entity.task.manager(
+                                            recorder = RoomRecorder(),
+                                            notificationCreator = DownloadNotificationCreator()
+                                        )
+                                        manager.delete()
+                                        tasks.removeAll { item -> item.id == entity.id }
                                     }
                                 }
-                                .show()
-                        }
+                                setNegativeButton(android.R.string.cancel) {
+                                }
+                            }
+                            .show()
+                    }
                 }, contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -86,25 +93,21 @@ fun DownloadPage() {
             }
         })
     }) {
-        DisposableEffect(key1 = tasks) {
-            val disposable = RxDownloadRecorder.getAllTask().subscribe { list ->
-                list?.let {
-                    tasks.clear()
-                    tasks.addAll(it.sortedBy { item ->
-                        when (item.status) {
-                            is Completed -> {
-                                System.currentTimeMillis() - item.task.file().lastModified()
-                            }
-                            is Failed -> -1L
-                            is Paused -> -2L
-                            is Pending -> -3L
-                            else -> -4L
+        LaunchedEffect(key1 = tasks) {
+            scope.launch {
+                val list = AppDatabase.instance.downloadDao().getAll()
+                tasks.clear()
+                tasks.addAll(list.sortedBy { item ->
+                    when (item.status) {
+                        is Completed -> {
+                            System.currentTimeMillis() - item.task.file().lastModified()
                         }
-                    })
-                }
-            }
-            onDispose {
-                disposable.dispose()
+                        is Failed -> -1L
+                        is Paused -> -2L
+                        is Pending -> -3L
+                        else -> -4L
+                    }
+                })
             }
         }
 
@@ -128,7 +131,7 @@ fun DownloadPage() {
                 val showPopup = remember { mutableStateOf(false) }
                 val popupOffset = remember { mutableStateOf(DpOffset.Zero) }
                 val manager = entity.task.manager(
-                    recorder = RoomRecorder(),
+                    recorder = TSRecorder(),
                     notificationCreator = DownloadNotificationCreator()
                 )
                 val clipboardManager = LocalClipboardManager.current

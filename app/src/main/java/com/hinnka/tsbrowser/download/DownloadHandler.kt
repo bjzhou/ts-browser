@@ -130,7 +130,7 @@ class DownloadHandler(val context: Context) : DownloadListener {
             headerMap["Cookie"] = cookie
         }
         val manager = getTask(url, guessName, mimetype).manager(
-            recorder = RoomRecorder(),
+            recorder = TSRecorder(),
             notificationCreator = DownloadNotificationCreator()
         )
 

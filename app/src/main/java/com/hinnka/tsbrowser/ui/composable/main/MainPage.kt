@@ -38,10 +38,10 @@ fun MainPage() {
     logD("MainPage start")
     val mainDrawerState = remember { BottomDrawerState() }
 
-    Column {
-        StatusBar()
-        TSBottomDrawer(drawerState = mainDrawerState) {
-            CompositionLocalProvider(LocalMainDrawerState provides mainDrawerState) {
+    TSBottomDrawer(drawerState = mainDrawerState) {
+        CompositionLocalProvider(LocalMainDrawerState provides mainDrawerState) {
+            Column {
+                StatusBar()
                 MainView()
             }
         }
