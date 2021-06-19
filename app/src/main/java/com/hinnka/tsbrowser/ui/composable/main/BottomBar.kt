@@ -59,6 +59,7 @@ fun BottomBar() {
     val viewModel = LocalViewModel.current
     val tab = TabManager.currentTab.value
     val uiState = viewModel.uiState
+    val drawerState = MainDrawerState.current
 
     Column(modifier = Modifier.graphicsLayer {
         translationY = -viewModel.imeHeightState.value
@@ -82,8 +83,8 @@ fun BottomBar() {
                 }
                 Center(modifier = Modifier.weight(1f)) {
                     IconButton(onClick = {
-                        AlertBottomSheet.open {
-                            TSDrawer()
+                        drawerState.open {
+                            TSDrawer(drawerState)
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
@@ -137,8 +138,8 @@ fun BottomBar() {
                 }
                 AnimatedVisibility(visible = uiState.value != UIState.Search) {
                     IconButton(onClick = {
-                        AlertBottomSheet.open {
-                            TSDrawer()
+                        drawerState.open {
+                            TSDrawer(drawerState)
                         }
                     }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")

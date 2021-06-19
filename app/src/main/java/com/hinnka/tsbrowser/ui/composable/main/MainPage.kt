@@ -20,17 +20,30 @@ import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.welcome.SecretWelcome
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.StatusBar
 import com.hinnka.tsbrowser.ui.composable.widget.TSBackHandler
+import com.hinnka.tsbrowser.ui.composable.widget.TSBottomDrawer
 import com.hinnka.tsbrowser.ui.home.UIState
+
+
+val MainDrawerState = staticCompositionLocalOf<BottomDrawerState> {
+    error("main drawer state not found")
+}
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainPage() {
     logD("MainPage start")
+    val mainDrawerState = remember { BottomDrawerState() }
+
     Column {
         StatusBar()
-        MainView()
+        TSBottomDrawer(drawerState = mainDrawerState) {
+            CompositionLocalProvider(MainDrawerState provides mainDrawerState) {
+                MainView()
+            }
+        }
     }
     LongPressPopup()
     Welcome()
@@ -47,8 +60,14 @@ fun Welcome() {
     }
     AnimatedVisibility(
         visible = showSecret,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 250f)),
-        exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, spring(stiffness = 250f))
+        enter = fadeIn() + slideInVertically(
+            initialOffsetY = { fullHeight -> fullHeight },
+            spring(stiffness = 250f)
+        ),
+        exit = fadeOut() + slideOutVertically(
+            targetOffsetY = { fullHeight -> fullHeight },
+            spring(stiffness = 250f)
+        )
     ) {
         TSBackHandler(onBack = {}) {
             SecretWelcome()

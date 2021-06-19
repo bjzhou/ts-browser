@@ -34,15 +34,17 @@ import com.hinnka.tsbrowser.persist.*
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.LocalViewModel
 import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.PageController
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TSDrawer() {
+fun TSDrawer(drawerState: BottomDrawerState) {
     val context = LocalContext.current
     val showNewPage = TabManager.currentTab.value?.isHome != false
+    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
             .height(48.dp)
@@ -206,8 +208,11 @@ fun TSDrawer() {
             text = { Text(text = stringResource(id = R.string.find)) },
             enabled = !showNewPage
         ) {
-            AlertBottomSheet.open(false) {
-                FindInPage()
+            scope.launch {
+                drawerState.close()
+                drawerState.open(false) {
+                    FindInPage(drawerState)
+                }
             }
         }
         drawerItem(
@@ -296,10 +301,7 @@ fun LazyGridScope.drawerItem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .clickable(enabled = enabled) {
-                        scope.launch {
-                            AlertBottomSheet.close()
-                            onClick()
-                        }
+                        onClick()
                     }
                     .padding(16.dp)
             ) {

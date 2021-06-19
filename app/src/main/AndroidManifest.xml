@@ -115,10 +115,8 @@
             android:excludeFromRecents="true"
             android:process=":secret"
             android:taskAffinity="browser.secret"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:theme="@style/Theme.TSBrowser.Secret">
-        </activity>
+            android:theme="@style/Theme.TSBrowser.Secret"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

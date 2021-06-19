@@ -25,11 +25,12 @@ import androidx.compose.ui.unit.dp
 import com.hinnka.tsbrowser.R
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.ui.composable.widget.AlertBottomSheet
+import com.hinnka.tsbrowser.ui.composable.widget.BottomDrawerState
 import com.hinnka.tsbrowser.ui.composable.widget.TSTextField
 import kotlinx.coroutines.launch
 
 @Composable
-fun FindInPage() {
+fun FindInPage(drawerState: BottomDrawerState) {
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val search = remember {
@@ -101,7 +102,7 @@ fun FindInPage() {
         IconButton(onClick = {
             clear()
             scope.launch {
-                AlertBottomSheet.close()
+                drawerState.close()
             }
         }) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
