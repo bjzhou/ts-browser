@@ -1,0 +1,26 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_tab"
+        android:enabled="true"
+        android:icon="@drawable/ic_add"
+        android:shortcutShortLabel="@string/new_tab">
+        <intent
+            android:action="shortcut"
+            android:targetPackage="com.hinnka.tsbrowser"
+            android:targetClass="com.hinnka.tsbrowser.ui.home.MainActivity">
+            <extra android:name="shortcutId" android:value="new_tab" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="incognito"
+        android:enabled="true"
+        android:icon="@drawable/ic_incognito_shortcut"
+        android:shortcutShortLabel="@string/incognito">
+        <intent
+            android:action="shortcut"
+            android:targetPackage="com.hinnka.tsbrowser"
+            android:targetClass="com.hinnka.tsbrowser.ui.home.MainActivity">
+            <extra android:name="shortcutId" android:value="incognito" />
+        </intent>
+    </shortcut>
+</shortcuts>

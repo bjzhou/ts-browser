@@ -20,6 +20,7 @@ import com.hinnka.tsbrowser.ext.logD
 import com.hinnka.tsbrowser.ext.toUrl
 import com.hinnka.tsbrowser.persist.Bookmark
 import com.hinnka.tsbrowser.persist.LocalStorage
+import com.hinnka.tsbrowser.persist.Settings
 import com.hinnka.tsbrowser.tab.TabManager
 import com.hinnka.tsbrowser.tab.active
 import com.hinnka.tsbrowser.ui.AppViewModel
@@ -135,6 +136,19 @@ open class MainActivity : BaseActivity() {
             "navigate" -> intent.getStringExtra("route")?.let {
                 if (PageController.currentRoute.value != it) {
                     PageController.navigate(it)
+                }
+            }
+            "shortcut" -> when (intent.getStringExtra("shortcutId")) {
+                "new_tab" -> TabManager.newTab(this).apply {
+                    goHome()
+                    active()
+                }
+                "incognito" -> {
+                    Settings.incognito = true
+                    TabManager.newTab(this).apply {
+                        goHome()
+                        active()
+                    }
                 }
             }
         }
