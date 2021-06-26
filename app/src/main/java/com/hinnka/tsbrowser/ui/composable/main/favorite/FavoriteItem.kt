@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
@@ -31,6 +32,7 @@ import com.hinnka.tsbrowser.tab.TabManager
 
 @Composable
 fun FavoriteItem(favorite: Favorite, onUpdate: () -> Unit, onDelete: () -> Unit) {
+    val context = LocalContext.current
     val showPopup = remember { mutableStateOf(false) }
     val defaultFav = Favorites.default.firstOrNull { it.url == favorite.url }
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
@@ -45,7 +47,12 @@ fun FavoriteItem(favorite: Favorite, onUpdate: () -> Unit, onDelete: () -> Unit)
             )
         }) {
         Spacer(modifier = Modifier.height(8.dp))
-        if (defaultFav != null && defaultFav.iconRes != 0) {
+        val resourceValid = try {
+            defaultFav?.iconRes?.let { context.resources.getResourceName(it) != null } ?: false
+        } catch (e: Exception) {
+            false
+        }
+        if (defaultFav != null && resourceValid) {
             Box(
                 modifier = Modifier
                     .size(40.dp)

@@ -1,6 +1,7 @@
 package com.hinnka.tsbrowser.web
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
@@ -9,15 +10,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.webkit.WebSettingsCompat
@@ -217,11 +217,27 @@ class TSWebView @JvmOverloads constructor(
         if (width == 0 || height == 0) {
             return
         }
+        val currentUrl = url
         ioScope.launch {
             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
             val canvas = Canvas(bitmap)
-            canvas.translate(-scrollX.toFloat(), -scrollY.toFloat())
-            draw(canvas)
+            if (currentUrl == "about:blank") {
+                val window = (context as? Activity)?.window ?: return@launch
+                val insets = ViewCompat.getRootWindowInsets(window.decorView)
+                val height = insets?.getInsets(WindowInsetsCompat.Type.statusBars())?.top ?: 0
+                canvas.translate(0f, -1f * height)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val windowBitmap = Bitmap.createBitmap(window.decorView.width, window.decorView.height, Bitmap.Config.RGB_565)
+                    PixelCopy.request(window, windowBitmap, {}, handler)
+                    canvas.drawBitmap(windowBitmap, 0f, 0f, null)
+                } else {
+                    canvas.drawBitmap(window.decorView.drawingCache, 0f, 0f, null)
+//                    window.decorView.draw(canvas)
+                }
+            } else {
+                canvas.translate(-scrollX.toFloat(), -scrollY.toFloat())
+                draw(canvas)
+            }
             dataListener?.previewState?.value = bitmap
             dataListener?.updateInfo()
         }

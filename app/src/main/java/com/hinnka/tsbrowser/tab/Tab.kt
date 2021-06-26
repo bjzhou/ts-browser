@@ -130,7 +130,7 @@ data class Tab(
     }
 
     fun onPause() {
-        view.generatePreview()
+//        view.generatePreview()
         view.onPause()
     }
 
